@@ -1,4 +1,2 @@
-numpy>=1.13
-numba
+npbrain
 matplotlib
-sympy
