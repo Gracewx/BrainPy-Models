@@ -1,7 +1,6 @@
 import numpy as np
 import npbrain as nb
 import matplotlib.pyplot as plt
-import pdb
 
 ## set global params
 # set rand seed
@@ -52,12 +51,8 @@ neu = nb.NeuGroup(LIF_model, geometry = (10, ), monitors = ['Vm'],
                  })  #create a neuron group with 10 neurons.
 net = nb.Network(neu)
 
-pdb.set_trace()
-
 net.run(duration = duration, inputs = [neu, "ST.input", 26.], report = True)  
 #simulate for 100 ms. Give external input = [receiver, field name, strength]
-
-pdb.set_trace()
 
 #paint
 ts = net.ts
