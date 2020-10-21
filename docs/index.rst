@@ -24,6 +24,7 @@ NumpyBrain for neurons, synapses and topological networks.
    :caption: Neuron models
    
    neurons/LIF_model
+   neurons/HH_model
 
 .. toctree::
    :maxdepth: 1
