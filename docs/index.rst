@@ -23,6 +23,7 @@ NumpyBrain for neurons, synapses and topological networks.
    :maxdepth: 1
    :caption: Neuron models
 
+   neurons\HH_model
 
 .. toctree::
    :maxdepth: 1
