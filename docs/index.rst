@@ -25,6 +25,7 @@ NumpyBrain for neurons, synapses and topological networks.
    
    neurons/LIF_model
    neurons/HH_model
+   neurons/Izhikevich_model
 
 
 
