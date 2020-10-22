@@ -57,3 +57,6 @@ autosummary_generate = True
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
+
+master_doc = 'index'
+
