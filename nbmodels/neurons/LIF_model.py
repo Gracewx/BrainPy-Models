@@ -17,9 +17,9 @@ def LIF_model(Vr = 0, Vth = 20, Rm = 1, Cm = 10, tau_m = 10, refTime = 5, noise 
         help = '''
             LIF neuron model.
             Vm: voltage of membrane.
-            refState: refractory state
-            input: external input, from stimulus and other synapses
-            spikeCnt: total spike cnt (record to compute firing rate)
+            refState: refractory state.
+            input: external input, from stimulus and other synapses.
+            spikeCnt: total spike cnt (record to compute firing rate).
         '''
     )
     
