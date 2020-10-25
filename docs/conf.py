@@ -18,7 +18,7 @@ import nbmodels
 
 # -- Project information -----------------------------------------------------
 
-project = 'NumpyBrain-Models'
+project = 'BrainPy-Models'
 copyright = '2020, Chaoming Wang'
 author = 'Chaoming Wang'
 
