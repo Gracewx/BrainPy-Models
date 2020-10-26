@@ -92,7 +92,8 @@ def define_HH (noise=NOISE, V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_K =
     return bp.NeuType(name='HH_neuron', requires={"ST": ST}, steps=update, vector_based=True)
 
 
-def get_neuron(geometry, monitors=['spike', 'V', 'm', 'h', 'n'], V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_k = E_K,
+def get_neuron(geometry, noise = NOISE, monitors=['spike', 'V', 'm', 'h', 'n'], 
+             V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_k = E_K,
              E_leak = E_LEAK, g_Na = G_NA, g_K = G_K, g_leak = G_LEAK):
     '''
     Create HH neuron.
@@ -108,9 +109,9 @@ def get_neuron(geometry, monitors=['spike', 'V', 'm', 'h', 'n'], V_threshold = V
     mode = bp.profile._backend
 
     if mode == 'numba':
-        HH = define_HH(noise=NOISE)
+        HH = define_HH(noise=noise)
     else:
-        HH = define_HH(noise=NOISE, V_threshold = V_threshold, C = C, E_Na = E_Na, E_K = E_k,
+        HH = define_HH(noise=noise, V_threshold = V_threshold, C = C, E_Na = E_Na, E_K = E_k,
              E_leak = E_leak, g_Na = g_Na, g_K = g_K, g_leak = g_leak)
 
     neuron = bp.NeuGroup(HH, geometry=geometry, monitors=monitors)
@@ -127,8 +128,10 @@ def get_neuron(geometry, monitors=['spike', 'V', 'm', 'h', 'n'], V_threshold = V
                         
     return neuron
 
-def simulate(input_current, duration, geometry = (1,), init_V = None, monitors=['spike', 'V', 'm', 'h', 'n'], V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_k = E_K,
-             E_leak = E_LEAK, g_Na = G_NA, g_K = G_K, g_leak = G_LEAK):
+def simulate(input_current, duration, geometry = (1,), init_V = None, noise = NOISE,
+             monitors=['spike', 'V', 'm', 'h', 'n'], V_threshold = V_THRESHOLD, 
+             C = C, E_Na = E_NA, E_k = E_K, E_leak = E_LEAK, 
+             g_Na = G_NA, g_K = G_K, g_leak = G_LEAK):
     '''
     Apply input current to HH neurons.
 
@@ -149,8 +152,9 @@ def simulate(input_current, duration, geometry = (1,), init_V = None, monitors=[
 
     '''
 
-    HH_neuron = get_neuron(geometry=geometry, monitors=monitors, V_threshold = V_threshold, C = C, E_Na = E_Na, E_k = E_k,
-             E_leak = E_leak, g_Na = g_Na, g_K = g_K, g_leak = g_leak)
+    HH_neuron = get_neuron(geometry=geometry, noise = noise, monitors=monitors, 
+                V_threshold = V_threshold, C = C, E_Na = E_Na, E_k = E_k,
+                E_leak = E_leak, g_Na = g_Na, g_K = g_K, g_leak = g_leak)
 
     # set initial values
     if init_V == None:
@@ -168,3 +172,57 @@ def simulate(input_current, duration, geometry = (1,), init_V = None, monitors=[
     n = HH_neuron.mon.n[:, 0]
 
     return (ts, V, m, h, n)
+
+
+if __name__ == "__main__":
+    bp.profile.set(backend='numpy', dt=0.02, numerical_method='milstein', merge_steps=True)
+    
+    duration = 80.
+
+    # Way 1
+    (ts, V, m, h, n) = simulate(input_current = 5., duration = duration, geometry=1)
+
+    '''
+    # Way 2
+    # HH_neuron = get_neuron(geometry=1, noise=0.)
+
+    # Way 3
+    HH = define_HH(noise = 0.)
+    HH_neuron = bp.NeuGroup(HH, geometry=1, 
+                    monitors=['spike', 'V', 'm', 'h', 'n'])
+
+
+    HH_neuron.run(duration=duration, inputs=['ST.input', 5.], report=True)
+
+    ts = HH_neuron.mon.ts
+    V = HH_neuron.mon.V[:, 0]
+    m = HH_neuron.mon.m[:, 0]
+    h = HH_neuron.mon.h[:, 0]
+    n = HH_neuron.mon.n[:, 0]
+    '''
+
+    # Visualization
+
+    import matplotlib.pyplot as plt
+
+    fig, gs = bp.visualize.get_figure(2, 1, 3, 8)
+
+    # plot membrane potential
+    fig.add_subplot(gs[0, 0])
+    plt.plot(ts, V)
+    plt.ylabel('Membrane potential (mV)')
+    plt.xlim(-0.1, duration + 0.1)
+    plt.title('Membrane potential')
+
+    # plot gate variables
+    fig.add_subplot(gs[1, 0])
+    plt.plot(ts, m, label='m')
+    plt.plot(ts, h, label='h')
+    plt.plot(ts, n, label='n')
+    plt.legend()
+    plt.xlim(-0.1, duration + 0.1)
+    plt.xlabel('Time (ms)')
+    plt.ylabel('gate variables')
+    plt.title('gate variables')
+
+    plt.show()
