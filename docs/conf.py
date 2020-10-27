@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))
-import nbmodels
+import bpmodels
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +23,7 @@ copyright = '2020, Chaoming Wang'
 author = 'Chaoming Wang'
 
 # The full version, including alpha/beta/rc tags
-release = nbmodels.__version__
+release = bpmodels.__version__
 
 # -- General configuration ---------------------------------------------------
 
