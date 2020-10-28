@@ -31,7 +31,7 @@ BrainPy for neurons, synapses and topological networks.
    :maxdepth: 1
    :caption: Synapse models
    
-   synapses/AMPA
+   synapses/Excitatory_models
 
 Indices and tables
 ==================
