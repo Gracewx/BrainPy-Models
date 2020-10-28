@@ -35,7 +35,6 @@ def LIF_model(Vr = 0., Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., 
     
     return bp.NeuType(name = 'LIF_neuron', requires = dict(ST=ST), steps = update, vector_based = False)
     
-    
 if __name__ == '__main__':
     print("version：", bp.__version__)
     ## set global params
@@ -68,5 +67,4 @@ if __name__ == '__main__':
     plt.xlim(-0.1, net.t_end - net.t_start + 0.1)
     plt.legend()
     plt.xlabel('Time (ms)')
-
     plt.show()
