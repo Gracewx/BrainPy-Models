@@ -56,12 +56,12 @@ To quickly run simulation of a HH neuron model, you can call ``HH.simulate()``.
 
   (ts, V, m, h, n) = HH.simulate(input_current = 5., duration = 80., geometry=(1,))
 
-If you want to be more flexible, you can use ``HH.get_neuron()`` to get an ``NeuType`` object to run simulation.
+If you want to be more flexible, you can use ``HH.get_neuron()`` to get a ``NeuGroup`` object to run simulation.
 
 ::
 
   HH_neuron = HH.get_neuron(geometry=1, noise=0.)
-  HH_neuron.run(duration=duration, inputs=['ST.input', 5.], report=True)
+  HH_neuron.run(duration=80., inputs=['ST.input', 5.], report=True)
 
   ts = HH_neuron.mon.ts
   V = HH_neuron.mon.V[:, 0]
@@ -69,7 +69,7 @@ If you want to be more flexible, you can use ``HH.get_neuron()`` to get an ``Neu
   h = HH_neuron.mon.h[:, 0]
   n = HH_neuron.mon.n[:, 0]
   
-It is also possible to directly call ``HH.define_HH()`` if necessary.
+It is also possible to directly call ``HH.define_HH()``, if necessary.
 
 ::
 
@@ -77,7 +77,7 @@ It is also possible to directly call ``HH.define_HH()`` if necessary.
   HH_neuron = bp.NeuGroup(HH, geometry=1, 
                       monitors=['spike', 'V', 'm', 'h', 'n'])
 
-  HH_neuron.run(duration=duration, inputs=['ST.input', 5.], report=True)
+  HH_neuron.run(duration=80., inputs=['ST.input', 5.], report=True)
 
   ts = HH_neuron.mon.ts
   V = HH_neuron.mon.V[:, 0]
