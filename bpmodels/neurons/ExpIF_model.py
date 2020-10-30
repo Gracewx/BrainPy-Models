@@ -45,9 +45,9 @@ if __name__ == '__main__':
     dt = 0.125        # update variables per <dt> ms
     duration = 350.  # simulate duration
     bp.profile.set(backend = "numba", dt = dt, merge_steps = True, show_code = False)
-    Exp_LIF_neuron = Exp_LIF_model(noise = 0.)
-
-    neu = bp.NeuGroup(Exp_LIF_neuron, geometry = (10, ), monitors = ['Vm', 'isFire'],
+    
+    Exp_LIF_neuron = Exp_LIF_model()
+    neu = bp.NeuGroup(Exp_LIF_neuron, geometry = (10, ), monitors = ['Vm'],
                       pars_update = {
                      'Vrest': np.random.randint(-65, -63, size = (10,)),
                      'tau_m': np.random.randint(5, 10, size = (10,)) # ,
@@ -55,7 +55,7 @@ if __name__ == '__main__':
                      })  #create a neuron group with 10 neurons.
     net = bp.Network(neu)
     
-    current, pos_dur = bp.inputs.constant_current([(0.30, duration)])  ##threshold=0.16已验证 notebookmark！！！
+    current, pos_dur = bp.inputs.constant_current([(0.30, duration)])
     
     net.run(duration = pos_dur, inputs = [neu, "ST.input", current], report = True)  
     #simulate for 100 ms. Give external input = [receiver, field name, strength]
