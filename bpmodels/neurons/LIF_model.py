@@ -4,9 +4,9 @@ import brainpy as bp
 import matplotlib.pyplot as plt
 
 ## define Leaky Integrate-and-Fire model
-def LIF_model(Vr = 0., Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., noise = 0.):
+def LIF_model(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., noise = 0.):
     ST = bp.types.NeuState(
-        {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0}
+        {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0, 'isFire': 0}
     )  
     '''
     LIF neuron model.
@@ -22,13 +22,16 @@ def LIF_model(Vr = 0., Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., 
 
     def update(ST, _t_):  
         # update variables
+        dt = profile.get_dt()
         refPeriod = refTime // dt  #refractory
+        ST['isFire'] = 0
         if ST['refState'] <= 0:
             V = int_v(ST['Vm'], _t_, ST['input'])
             if V >= Vth:
-                V = Vr
+                V = Vreset
                 ST['refState'] = refPeriod
                 ST['spikeCnt'] += 1
+                ST['isFire'] = 1
             ST['Vm'] = V
         else:
             ST['refState'] -= 1
