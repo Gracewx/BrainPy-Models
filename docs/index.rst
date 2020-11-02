@@ -20,19 +20,28 @@ BrainPy for neurons, synapses and topological networks.
 
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Neuron models
+   :maxdepth: 2
+   :caption: Tutorials
    
-   neurons/LIF_model
-   neurons/HH_model
-   neurons/Izhikevich_model
-   neurons/ExpIF_model
+   tutorials/tutorials
+   tutorials/neurons
+   tutorials/synapses
+   tutorials/learning_rules
 
 .. toctree::
    :maxdepth: 1
-   :caption: Synapse models
+   :caption: Examples
    
-   synapses/Excitatory_models
+   examples/examples
+   examples/neurons
+   examples/synapses
+   examples/learning_rules
+
+.. toctree::
+   :maxdepth: 1
+   :caption: APIs
+   
+   apis/apis
 
 Indices and tables
 ==================
