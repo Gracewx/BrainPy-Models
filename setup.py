@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 
 import io
 import os
@@ -25,15 +24,12 @@ setup(
     version=version,
     description='BrainPy-Models: An example package accompany with BrainPy.',
     long_description=README,
-    author='LLJ',
-    author_email='somemail',
+    author='Pku-Nip-Lab',
+    author_email='adaduo@outlook.com',
     packages=find_packages(),
     python_requires='>=3.5',
     install_requires=[
-        'numpy>=1.15',
-        'matplotlib>=2.0',
-        'sympy>=1.2',
-        'autopep8',
+        'Brain.Py',
     ],
     url='https://github.com/PKU-NIP-Lab/BrainPy-Models',
     keywords='computational neuroscience',
