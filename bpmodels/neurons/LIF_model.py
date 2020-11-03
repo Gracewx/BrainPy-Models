@@ -4,7 +4,7 @@ import brainpy as bp
 import matplotlib.pyplot as plt
 
 ## define Leaky Integrate-and-Fire model
-def LIF_model(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., noise = 0.):
+def LIF_model(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refPeriod = 5.//0.02, noise = 0.):
     ST = bp.types.NeuState(
         {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0, 'isFire': 0}
     )  
@@ -22,8 +22,6 @@ def LIF_model(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10.,
 
     def update(ST, _t_):  
         # update variables
-        dt = profile.get_dt()
-        refPeriod = refTime // dt  #refractory
         ST['isFire'] = 0
         if ST['refState'] <= 0:
             V = int_v(ST['Vm'], _t_, ST['input'])
@@ -35,9 +33,11 @@ def LIF_model(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10.,
             ST['Vm'] = V
         else:
             ST['refState'] -= 1
+    
+    def reset(ST):
         ST['input'] = 0.  #ST['input'] is current input (only valid for current step, need reset each step)
     
-    return bp.NeuType(name = 'LIF_neuron', requires = dict(ST=ST), steps = update, vector_based = False)
+    return bp.NeuType(name = 'LIF_neuron', requires = dict(ST=ST), steps = [update, reset], vector_based = False)
     
 if __name__ == '__main__':
     print("version：", bp.__version__)
@@ -54,6 +54,7 @@ if __name__ == '__main__':
                       'tau_m': np.random.randint(5, 10, size = (10,))  ,
                       'noise': 1.
                      })  #create a neuron group with 10 neurons.
+    neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
     net = bp.Network(neu)
 
     net.run(duration = duration, inputs = [neu, "ST.input", 26.], report = True)  
