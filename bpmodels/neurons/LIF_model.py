@@ -8,12 +8,29 @@ def LIF_model(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10.,
     ST = bp.types.NeuState(
         {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0, 'isFire': 0}
     )  
-    '''
-    LIF neuron model.
-    Vm: voltage of membrane.
-    refState: refractory state.
-    input: external input, from stimulus and other synapses.
-    spikeCnt: total spike cnt (record to compute firing rate).
+    '''Leaky Integrate-and-fire neuron model.
+    
+    ..math::
+        \\tau_m \\frac{d V_m}{d t} &= - ( V_m - V_{rest}) + RI(t)
+        
+    Parameters
+    ----------
+    Vrest : float
+        Resting potential.
+    Vreset : float
+        Reset potential after spike.
+    Vth : float
+        Threshold potential of spike.
+    Rm : float
+        Membrane Resistance.
+    Cm : float
+        Membrane Capacitance.
+    tau_m : float
+        Membrane time constant. Compute by Rm * Cm.
+    refPeriod : int
+        Refractory period length.
+    noise : float
+        noise.   
     '''
     
     @bp.integrate
