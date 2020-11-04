@@ -33,15 +33,13 @@ BrainPy for neurons, synapses and topological networks.
    :caption: Examples
    
    examples/examples
-   examples/neurons
-   examples/synapses
-   examples/learning_rules
 
 .. toctree::
    :maxdepth: 1
    :caption: APIs
    
    apis/apis
+   apis/neurons
 
 Indices and tables
 ==================

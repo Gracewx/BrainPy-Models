@@ -4,22 +4,35 @@ import brainpy as bp
 import matplotlib.pyplot as plt
 
 ## define Exponential Leaky Integrate-and-Fire model
-def Exp_LIF_model(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.48, 
+def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.48, 
                   Rm = 10., Cm = 1., tau_m = 10., refTime = 1.7, noise = 0.):
     ST = bp.types.NeuState(
         {'Vm': -65., 'refState': 0, 'input':0, 'isFire':0, 'spikeCnt':0}
     )  
-    '''
-    LIF neuron model.
-    Vm: voltage of membrane.
-    refState: refractory state.
-    input: external input, from stimulus and other synapses.
-    spikeCnt: total spike cnt (record to compute firing rate).
+    '''Exponential Integrate-and-Fire neuron model.
+    
+    ..math::
+        \\tau_m \\frac{d V_m}{d t} &= - ( V_m - V_{rest}) + \\varDelta_T e^{\\frac{V_m-V_{rest}{\\varDelta_T}}} + RI(t)
+        
+    Args:
+        Vrest (float): Resting potential.
+        Vreset (float): Reset potential after spike.
+        Vth (float): Threshold potential of spike.
+        VT (float): Threshold potential of steady/non-steady.
+        delta_T (float): Spike slope factor.
+        Rm (float): Membrane Resistance.
+        Cm (float): Membrane Capacitance.
+        tau_m (float): Membrane time constant. Compute by Rm * Cm.
+        refPeriod (int): Refractory period length.
+        noise (float): noise.   
+        
+    Returns:
+        bp.Neutype: return description of ExpIF model.
     '''
     
     @bp.integrate
     def int_v(V, _t_, I_syn):  # integrate u(t)
-        return (- ( V - Vrest ) + delta_T * exp((V - VT)/delta_T) + Rm * I_syn) / tau_m, 0.  #, noise / tau_m
+        return (- ( V - Vrest ) + delta_T * exp((V - VT)/delta_T) + Rm * I_syn) / tau_m, noise / tau_m
 
     def update(ST, _t_):  
         # update variables
@@ -47,31 +60,30 @@ if __name__ == '__main__':
     duration = 350.  # simulate duration
     bp.profile.set(backend = "numba", dt = dt, merge_steps = True, show_code = False)
     
-    Exp_LIF_neuron = Exp_LIF_model()
-    neu = bp.NeuGroup(Exp_LIF_neuron, geometry = (10, ), monitors = ['Vm'],
-                      pars_update = {
-                     'Vrest': np.random.randint(-65, -63, size = (10,)),
-                     'tau_m': np.random.randint(5, 10, size = (10,)) # ,
-                     #'noise': 1.
-                     })  #create a neuron group with 10 neurons.
-    net = bp.Network(neu)
+    # define neuron type
+    Exp_LIF_neuron = get_ExpIF()
     
+    # build neuron group
+    neu = bp.NeuGroup(Exp_LIF_neuron, geometry = (10, ), monitors = ['Vm'])
+    neu.pars['Vrest'] = np.random.randint(-65, -63, size = (10,))
+    neu.pars['tau_m'] = np.random.randint(5, 10, size = (10,))
+    neu.pars['noise'] = 1.
+    
+    # create input
     current, pos_dur = bp.inputs.constant_current([(0.30, duration)])
     
-    net.run(duration = pos_dur, inputs = [neu, "ST.input", current], report = True)  
-    #simulate for 100 ms. Give external input = [receiver, field name, strength]
+    # simulate
+    neu.run(duration = pos_dur, inputs = ["ST.input", current], report = True)  
+    #simulate for 100 ms. Give external input = current
 
-    #paint
-    ts = net.ts
+    # paint
+    ts = neu.mon.ts
     fig, gs = bp.visualize.get_figure(1, 1, 4, 8)
-
     fig.add_subplot(gs[0, 0])
     plt.plot(ts, neu.mon.Vm[:, 0], label = f'neuron No.{0}, Vr = {neu.pars.get("Vrest")[0]}mV, tau_m = {neu.pars.get("tau_m")[0]}ms.')
     plt.plot(ts, neu.mon.Vm[:, 6], label = f'neuron No.{6}, Vr = {neu.pars.get("Vrest")[6]}mV, tau_m = {neu.pars.get("tau_m")[6]}ms.')
-    #paint Vm-t plot of 1st and 2nd neuron
-    plt.ylabel('Membrane potential')
-    plt.xlim(-0.1, net.t_end - net.t_start + 0.1)
-    plt.legend()
     plt.xlabel('Time (ms)')
-
+    plt.ylabel('Membrane potential')
+    plt.xlim(-0.1, ts[-1] + 0.1)
+    plt.legend()
     plt.show()
