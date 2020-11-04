@@ -5,14 +5,8 @@ import matplotlib.pyplot as plt
 
 ## define Leaky Integrate-and-Fire model
 def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refPeriod = 5.//0.02, noise = 0.):
-    ST = bp.types.NeuState(
-        {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0, 'isFire': 0}
-    )  
-    '''Leaky Integrate-and-Fire neuron model.
-    
-    ..math::
-        \\tau_m \\frac{d V_m}{d t} &= - ( V_m - V_{rest}) + RI(t)
-    
+    '''
+    Leaky Integrate-and-Fire neuron model.    
     
     Args:
         Vrest (float): Resting potential.
@@ -27,6 +21,10 @@ def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., r
     Returns:
         bp.Neutype: return description of LIF model.
     '''
+    
+    ST = bp.types.NeuState(
+        {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0, 'isFire': 0}
+    )  
     
     @bp.integrate
     def int_v(V, _t_, I_syn):  # integrate u(t)

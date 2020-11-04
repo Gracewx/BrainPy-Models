@@ -6,13 +6,7 @@ import matplotlib.pyplot as plt
 ## define Exponential Leaky Integrate-and-Fire model
 def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.48, 
                   Rm = 10., Cm = 1., tau_m = 10., refTime = 1.7, noise = 0.):
-    ST = bp.types.NeuState(
-        {'Vm': -65., 'refState': 0, 'input':0, 'isFire':0, 'spikeCnt':0}
-    )  
     '''Exponential Integrate-and-Fire neuron model.
-    
-    ..math::
-        \\tau_m \\frac{d V_m}{d t} &= - ( V_m - V_{rest}) + \\varDelta_T e^{\\frac{V_m-V_{rest}{\\varDelta_T}}} + RI(t)
         
     Args:
         Vrest (float): Resting potential.
@@ -29,6 +23,10 @@ def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.
     Returns:
         bp.Neutype: return description of ExpIF model.
     '''
+    
+    ST = bp.types.NeuState(
+        {'Vm': -65., 'refState': 0, 'input':0, 'isFire':0, 'spikeCnt':0}
+    )  
     
     @bp.integrate
     def int_v(V, _t_, I_syn):  # integrate u(t)
