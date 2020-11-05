@@ -4,7 +4,7 @@ import brainpy as bp
 import matplotlib.pyplot as plt
 
 ## define Leaky Integrate-and-Fire model
-def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refPeriod = 5.//0.02, noise = 0.):
+def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., noise = 0.):
     '''
     Leaky Integrate-and-Fire neuron model.    
     
@@ -15,7 +15,7 @@ def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., r
         Rm (float): Membrane Resistance.
         Cm (float): Membrane Capacitance.
         tau_m (float): Membrane time constant. Compute by Rm * Cm.
-        refPeriod (int): Refractory period length.
+        refTime (int): Refractory period length.(ms)
         noise (float): noise.   
         
     Returns:
@@ -32,6 +32,7 @@ def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., r
 
     def update(ST, _t_):  
         # update variables
+        refPeriod = refTime//bp.profile._dt
         ST['isFire'] = 0
         if ST['refState'] <= 0:
             V = int_v(ST['Vm'], _t_, ST['input'])

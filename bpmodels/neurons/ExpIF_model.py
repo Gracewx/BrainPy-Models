@@ -30,15 +30,14 @@ def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.
     
     @bp.integrate
     def int_v(V, _t_, I_syn):  # integrate u(t)
-        return (- ( V - Vrest ) + delta_T * exp((V - VT)/delta_T) + Rm * I_syn) / tau_m, noise / tau_m
+        return (- ( V - Vrest ) + delta_T * np.exp((V - VT)/delta_T) + Rm * I_syn) / tau_m, noise / tau_m
 
     def update(ST, _t_):  
         # update variables
-        refPeriod = refTime // dt  #refractory
+        refPeriod = refTime//bp.profile._dt
         ST['isFire'] = 0
         if ST['refState'] <= 0:
             V = int_v(ST['Vm'], _t_, ST['input'])
-            #print(V, Vrest, delta_T, VT, Rm, ST['input'], tau_m)
             if V >= Vth:
                 V = Vreset
                 ST['refState'] = refPeriod
@@ -49,7 +48,7 @@ def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.
             ST['refState'] -= 1
         ST['input'] = 0.  #ST['input'] is current input (only valid for current step, need reset each step)
     
-    return bp.NeuType(name = 'Exp_LIF_neuron', requires = dict(ST=ST), steps = update, vector_based = False)
+    return bp.NeuType(name = 'ExpIF_neuron', requires = dict(ST=ST), steps = update, vector_based = False)
 
 if __name__ == '__main__':
     print("version：", bp.__version__)
