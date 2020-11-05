@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 ## define Exponential Leaky Integrate-and-Fire model
 def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.48, 
-                  Rm = 10., Cm = 1., tau_m = 10., refTime = 1.7, noise = 0.):
+                  Rm = 10., Cm = 1., tau_m = 10., refPeriod = 1.7//0.02, noise = 0.):
     '''Exponential Integrate-and-Fire neuron model.
         
     Args:
@@ -34,7 +34,6 @@ def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.
 
     def update(ST, _t_):  
         # update variables
-        refPeriod = refTime // dt  #refractory
         ST['isFire'] = 0
         if ST['refState'] <= 0:
             V = int_v(ST['Vm'], _t_, ST['input'])
