@@ -4,20 +4,20 @@ import brainpy as bp
 import matplotlib.pyplot as plt
 
 ## define Exponential Leaky Integrate-and-Fire model
-def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.48, 
-                  Rm = 10., Cm = 1., tau_m = 10., refTime = 1.7, noise = 0.):
+def get_ExpIF(V_rest = -65., V_reset = -68. , V_th = -30., V_T = -59.9, delta_T = 3.48, 
+                  R = 10., C = 1., tau = 10., t_refractory = 1.7, noise = 0.):
     '''Exponential Integrate-and-Fire neuron model.
         
     Args:
-        Vrest (float): Resting potential.
-        Vreset (float): Reset potential after spike.
-        Vth (float): Threshold potential of spike.
-        VT (float): Threshold potential of steady/non-steady.
+        V_rest (float): Resting potential.
+        V_reset (float): Reset potential after spike.
+        V_th (float): Threshold potential of spike.
+        V_T (float): Threshold potential of steady/non-steady.
         delta_T (float): Spike slope factor.
-        Rm (float): Membrane Resistance.
-        Cm (float): Membrane Capacitance.
-        tau_m (float): Membrane time constant. Compute by Rm * Cm.
-        refPeriod (int): Refractory period length.
+        R (float): Membrane Resistance.
+        C (float): Membrane Capacitance.
+        tau (float): Membrane time constant. Compute by Rm * Cm.
+        t_refractory (int): Refractory period length.
         noise (float): noise.   
         
     Returns:
@@ -25,30 +25,29 @@ def get_ExpIF(Vrest = -65., Vreset = -68. , Vth = -30., VT = -59.9, delta_T = 3.
     '''
     
     ST = bp.types.NeuState(
-        {'Vm': -65., 'refState': 0, 'input':0, 'isFire':0, 'spikeCnt':0}
+        {'V': 0, 'input':0, 'spike':0, 'refractory': 0, 't_last_spike': -1e7}
     )  
     
     @bp.integrate
-    def int_v(V, _t_, I_syn):  # integrate u(t)
-        return (- ( V - Vrest ) + delta_T * np.exp((V - VT)/delta_T) + Rm * I_syn) / tau_m, noise / tau_m
+    def int_V(V, _t_, I_ext):  # integrate u(t)
+        return (- ( V - V_rest ) + delta_T * np.exp((V - V_T)/delta_T) + R * I_ext) / tau, noise / tau
 
     def update(ST, _t_):  
         # update variables
-        refPeriod = refTime//bp.profile._dt
-        ST['isFire'] = 0
-        if ST['refState'] <= 0:
-            V = int_v(ST['Vm'], _t_, ST['input'])
-            if V >= Vth:
-                V = Vreset
-                ST['refState'] = refPeriod
-                ST['spikeCnt'] += 1
-                ST['isFire'] = 1
-            ST['Vm'] = V
-        else:
-            ST['refState'] -= 1
-        ST['input'] = 0.  #ST['input'] is current input (only valid for current step, need reset each step)
+        ST['spike'] = 0
+        ST['refractory'] = True if _t_ - ST['t_last_spike'] <= t_refractory else False
+        if not ST['refractory']:
+            V = int_V(ST['V'], _t_, ST['input'])
+            if V >= V_th:
+                V = V_reset
+                ST['spike'] = 1
+                ST['t_last_spike'] = _t_
+            ST['V'] = V
     
-    return bp.NeuType(name = 'ExpIF_neuron', requires = dict(ST=ST), steps = update, vector_based = False)
+    def reset(ST):
+        ST['input'] = 0.
+    
+    return bp.NeuType(name = 'ExpIF_neuron', requires = dict(ST=ST), steps = [update, reset], vector_based = False)
 
 if __name__ == '__main__':
     print("version：", bp.__version__)
@@ -61,9 +60,9 @@ if __name__ == '__main__':
     Exp_LIF_neuron = get_ExpIF()
     
     # build neuron group
-    neu = bp.NeuGroup(Exp_LIF_neuron, geometry = (10, ), monitors = ['Vm'])
-    neu.pars['Vrest'] = np.random.randint(-65, -63, size = (10,))
-    neu.pars['tau_m'] = np.random.randint(5, 10, size = (10,))
+    neu = bp.NeuGroup(Exp_LIF_neuron, geometry = (10, ), monitors = ['V'])
+    neu.pars['V_rest'] = np.random.randint(-65, -63, size = (10,))
+    neu.pars['tau'] = np.random.randint(5, 10, size = (10,))
     neu.pars['noise'] = 1.
     
     # create input
@@ -77,8 +76,8 @@ if __name__ == '__main__':
     ts = neu.mon.ts
     fig, gs = bp.visualize.get_figure(1, 1, 4, 8)
     fig.add_subplot(gs[0, 0])
-    plt.plot(ts, neu.mon.Vm[:, 0], label = f'neuron No.{0}, Vr = {neu.pars.get("Vrest")[0]}mV, tau_m = {neu.pars.get("tau_m")[0]}ms.')
-    plt.plot(ts, neu.mon.Vm[:, 6], label = f'neuron No.{6}, Vr = {neu.pars.get("Vrest")[6]}mV, tau_m = {neu.pars.get("tau_m")[6]}ms.')
+    plt.plot(ts, neu.mon.V[:, 0], label = f'neuron No.{0}, V_rest = {neu.pars.get("V_rest")[0]}mV, tau = {neu.pars.get("tau")[0]}ms.')
+    plt.plot(ts, neu.mon.V[:, 6], label = f'neuron No.{6}, V_rest = {neu.pars.get("V_rest")[6]}mV, tau = {neu.pars.get("tau")[6]}ms.')
     plt.xlabel('Time (ms)')
     plt.ylabel('Membrane potential')
     plt.xlim(-0.1, ts[-1] + 0.1)

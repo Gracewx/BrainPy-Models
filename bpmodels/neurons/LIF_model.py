@@ -4,18 +4,18 @@ import brainpy as bp
 import matplotlib.pyplot as plt
 
 ## define Leaky Integrate-and-Fire model
-def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., refTime = 5., noise = 0.):
+def get_LIF(V_rest = 0., V_reset = -5.,  V_th = 20., R = 1., C = 10., tau = 10., t_refractory = 5., noise = 0.):
     '''
     Leaky Integrate-and-Fire neuron model.    
     
     Args:
-        Vrest (float): Resting potential.
-        Vreset (float): Reset potential after spike.
-        Vth (float): Threshold potential of spike.
-        Rm (float): Membrane Resistance.
-        Cm (float): Membrane Capacitance.
-        tau_m (float): Membrane time constant. Compute by Rm * Cm.
-        refTime (int): Refractory period length.(ms)
+        V_rest (float): Resting potential.
+        V_reset (float): Reset potential after spike.
+        V_th (float): Threshold potential of spike.
+        R (float): Membrane Resistance.
+        C (float): Membrane Capacitance.
+        tau (float): Membrane time constant. Compute by Rm * Cm.
+        t_refractory (int): Refractory period length.(ms)
         noise (float): noise.   
         
     Returns:
@@ -23,27 +23,24 @@ def get_LIF(Vr = 0., Vreset = -5.,  Vth = 20., Rm = 1., Cm = 10., tau_m = 10., r
     '''
     
     ST = bp.types.NeuState(
-        {'Vm': 0, 'refState': 0, 'input':0, 'spikeCnt':0, 'isFire': 0}
+        {'V': 0, 'input':0, 'spike':0, 'refractory': 0, 't_last_spike': -1e7}
     )  
     
     @bp.integrate
-    def int_v(V, _t_, I_syn):  # integrate u(t)
-        return (- ( V - Vr ) + Rm * I_syn) / tau_m, noise / tau_m
+    def int_V(V, _t_, I_ext):  # integrate u(t)
+        return (- ( V - V_rest ) + R * I_ext) / tau, noise / tau
 
     def update(ST, _t_):  
         # update variables
-        refPeriod = refTime//bp.profile._dt
-        ST['isFire'] = 0
-        if ST['refState'] <= 0:
-            V = int_v(ST['Vm'], _t_, ST['input'])
-            if V >= Vth:
-                V = Vreset
-                ST['refState'] = refPeriod
-                ST['spikeCnt'] += 1
-                ST['isFire'] = 1
-            ST['Vm'] = V
-        else:
-            ST['refState'] -= 1
+        ST['spike'] = 0
+        ST['refractory'] = True if _t_ - ST['t_last_spike'] <= t_refractory else False
+        if not ST['refractory']:
+            V = int_V(ST['V'], _t_, ST['input'])
+            if V >= V_th:
+                V = V_reset
+                ST['spike'] = 1
+                ST['t_last_spike'] = _t_
+            ST['V'] = V
     
     def reset(ST):
         ST['input'] = 0.  #ST['input'] is current input (only valid for current step, need reset each step)
@@ -61,22 +58,22 @@ if __name__ == '__main__':
     LIF_neuron = get_LIF(noise = 1.)
     
     # build neuron group
-    neu = bp.NeuGroup(LIF_neuron, geometry = (10, ), monitors = ['Vm'])  
-    neu.pars['Vr'] = np.random.randint(0, 2, size = (10,))
-    neu.pars['tau_m'] = np.random.randint(5, 10, size = (10,))
+    neu = bp.NeuGroup(LIF_neuron, geometry = (10, ), monitors = ['V', 'refractory', "spike", "t_last_spike"])  
+    neu.pars['V_rest'] = np.random.randint(0, 2, size = (10,))
+    neu.pars['tau'] = np.random.randint(5, 10, size = (10,))
     neu.pars['noise'] = 1.
     neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 
     #simulate
     neu.run(duration = duration, inputs = ["ST.input", 26.], report = True)  
-    #simulate for 100 ms. Give external input = [receiver, field name, strength]
+    #simulate for 100 ms. Give external input = 26.
 
     #paint
     ts = neu.mon.ts
     fig, gs = bp.visualize.get_figure(1, 1, 4, 8)
     fig.add_subplot(gs[0, 0])
-    plt.plot(ts, neu.mon.Vm[:, 0], label = f'neuron No.{0}, Vr = {neu.pars.get("Vr")[0]}mV, tau_m = {neu.pars.get("tau_m")[0]}ms.')
-    plt.plot(ts, neu.mon.Vm[:, 6], label = f'neuron No.{6}, Vr = {neu.pars.get("Vr")[6]}mV, tau_m = {neu.pars.get("tau_m")[6]}ms.')
+    plt.plot(ts, neu.mon.V[:, 0], label = f'neuron No.{0}, Vr = {neu.pars.get("V_rest")[0]}mV, tau_m = {neu.pars.get("tau")[0]}ms.')
+    plt.plot(ts, neu.mon.V[:, 6], label = f'neuron No.{6}, Vr = {neu.pars.get("V_rest")[6]}mV, tau_m = {neu.pars.get("tau")[6]}ms.')
     plt.xlabel('Time (ms)')
     plt.ylabel('Membrane potential')
     plt.xlim(-0.1, ts[-1] + 0.1)
