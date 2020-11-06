@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import brainpy as bp
 import brainpy.numpy as np
 
-
 def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., mode=None):
     """Izhikevich two-variable neuron model.
     Parameters

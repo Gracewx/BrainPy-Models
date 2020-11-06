@@ -10,5 +10,5 @@ bpmodels.neurons
 
     get_LIF
     get_HH
-    Izhikevich_model
+    get_Izhikevich
     get_ExpIF
