@@ -31,19 +31,18 @@ def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
     """
 
     ST = bp.types.NeuState(
-        {'V': -20, 'W': 0.02, 'sp': 0., 'inp': 0.},
+        {'V': -20, 'W': 0.02, 'input': 0.},
         help='MorrisLecar model neuron state.\n'
              '"V" denotes membrane potential.\n'
              '"W" denotes fraction of open K+ channels.\n'
-             '"sp" denotes spiking state.\n'
-             '"inp" denotes synaptic input.\n'
+             '"input" denotes synaptic input.\n'
     )
 
     @bp.integrate
     def int_W(W, t, V):
-        Tau_W = 1 / (phi * np.cosh((V - V3) / (2 * V4)))
+        tau_W = 1 / (phi * np.cosh((V - V3) / (2 * V4)))
         W_inf = (1 / 2) * (1 + np.tanh((V - V3) / V4))
-        dWdt = (W_inf - W) / Tau_W
+        dWdt = (W_inf - W) / tau_W
         return dWdt
 
     @bp.integrate
@@ -57,10 +56,10 @@ def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
 
     def update(ST, _t_):
         W = int_W(ST['W'], _t_, ST['V'])
-        V = int_V(ST['V'], _t_, ST['W'], ST['inp'])
+        V = int_V(ST['V'], _t_, ST['W'], ST['input'])
         ST['V'] = V
         ST['W'] = W
-        ST['inp'] = 0.
+        ST['input'] = 0.
 
     return bp.NeuType(name='MorrisLecar_neuron', requires={"ST": ST}, steps=update, vector_based=True)
 
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     #The current is constant
     neu = bp.NeuGroup(ML, geometry=(100,), monitors=['V', 'W'])
     current = bp.inputs.ramp_current(90, 90, 1000, 0, 1000)
-    neu.run(duration=1000., inputs=['ST.inp', current], report=False)
+    neu.run(duration=1000., inputs=['ST.input', current], report=False)
 
     fig, gs = bp.visualize.get_figure(2, 2, 3, 6)
     fig.add_subplot(gs[0, 0])
@@ -97,10 +96,10 @@ if __name__ == '__main__':
     plt.legend()
 
     fig.add_subplot(gs[1, 1])
-    plt.plot(neu.mon.ts, current, label='inp')
+    plt.plot(neu.mon.ts, current, label='input')
     plt.xlabel('Time (ms)')
     plt.ylabel('Input')
-    plt.title('Inp - t')
+    plt.title('Input - t')
     plt.legend()
 
     plt.show()
