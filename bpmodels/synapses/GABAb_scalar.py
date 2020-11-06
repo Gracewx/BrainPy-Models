@@ -5,9 +5,33 @@ import brainpy.numpy as np
 import bpmodels
 from bpmodels.neurons import get_LIF
 
-def get_GABAb(g_max=0.2, E=-95., k1=0.52, k2=0.0013, k3=0.098, k4=0.033, T=0.5, T_duration=0.3):
+def get_GABAb_scalar(g_max=0.2, E=-95., k1=0.52, k2=0.0013, k3=0.098, k4=0.033, T=0.5, T_duration=0.3):
     '''
-    GABAb synapse model.
+    GABAb synapse model.(scalar)
+    
+    .. math::
+
+        &\\frac{d[R]}{dt} = k_3 [T](1-[R])- k_4 [R]
+
+        &\\frac{d[G]}{dt} = k_1 [R]- k_2 [G]
+
+        I_{GABA_{B}} &=\\overline{g}_{GABA_{B}} (\\frac{[G]^{4}} {[G]^{4}+100}) (V-E_{GABA_{B}})
+
+
+    - [G] is the concentration of activated G protein.
+    - [R] is the fraction of activated receptor.
+    - [T] is the transmitter concentration.
+
+    Parameters
+    ----------
+    g_max : float
+    E : float
+    k1 : float
+    k2 : float
+    k3 : float
+    k4 : float
+    T : float
+    T_duration : float
     '''
 
     requires = {

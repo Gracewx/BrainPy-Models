@@ -40,6 +40,7 @@ BrainPy for neurons, synapses and topological networks.
    
    apis/apis
    apis/neurons
+   apis/synapses
 
 Indices and tables
 ==================

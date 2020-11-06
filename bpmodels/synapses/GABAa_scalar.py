@@ -5,10 +5,25 @@ import brainpy.numpy as np
 import bpmodels
 from bpmodels.neurons import get_LIF
 
-def get_GABAa(g_max = 0.4, E = -80., tau_decay = 6.):
-    '''
-    GABAa synapse model.
-    '''
+def get_GABAa_scalar(g_max = 0.4, E = -80., tau_decay = 6.):
+    """
+    GABAa synapse model.(scalar)
+    
+    .. math::
+
+        I_{syn}&= - \\bar{g}_{syn} s (V-E_{syn})
+
+        \\frac{d s}{d t}&=-\\frac{s}{\\tau_{decay}}+\\sum_{k} \\delta(t-t_{j}^{k})
+
+    Parameters
+    ----------
+    g_max : float
+        Maximum conductance.
+    E : float
+        Reversal potential.
+    tau_decay : float
+        Tau for decay.
+    """
 
     requires = {
         'ST': bp.types.SynState(['s'], 
