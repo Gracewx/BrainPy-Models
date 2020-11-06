@@ -57,11 +57,11 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
     )
 
     @bp.integrate(method='exponential')
-    def int_u(u, t):
+    def int_u(u, _t_):
         return - u / tau_f
 
     @bp.integrate(method='exponential')
-    def int_x(x, t):
+    def int_x(x, _t_):
         return (1 - x) / tau_d
 
     def update(ST, pre, pre2syn):

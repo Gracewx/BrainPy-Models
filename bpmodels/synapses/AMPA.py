@@ -30,7 +30,7 @@ def get_AMPA1_scalar(g_max=0.10, E=0., tau_decay=2.0):
     )
 
     @bp.integrate
-    def ints(s, t):
+    def ints(s, _t_):
         return - s / tau_decay
 
     def update(ST, _t_, pre):
@@ -40,8 +40,8 @@ def get_AMPA1_scalar(g_max=0.10, E=0., tau_decay=2.0):
 
     @bp.delayed
     def output(ST, post):
-        post_val = - g_max * ST['s'] * (post['V'] - E)
-        post['input'] += post_val
+        I_syn = - g_max * ST['s'] * (post['V'] - E)
+        post['input'] += I_syn
 
     return bp.SynType(name='AMPA',
                       requires=requires,
@@ -68,7 +68,7 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
     """
 
     @bp.integrate
-    def ints(s, t):
+    def ints(s, _t_):
         return - s / tau_decay
 
     # requirements
@@ -96,10 +96,10 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
 
     @bp.delayed
     def output(ST, post, post2syn):
-        post_cond = np.zeros(len(post2syn), dtype=np.float_)
+        g = np.zeros(len(post2syn), dtype=np.float_)
         for post_id, syn_ids in enumerate(post2syn):
-            post_cond[post_id] = np.sum(ST['g'][syn_ids])
-        post['input'] -= post_cond * (post['V'] - E)
+            g[post_id] = np.sum(ST['g'][syn_ids])
+        post['input'] -= g * (post['V'] - E)
 
     return bp.SynType(name='AMPA1',
                       requires=requires,
@@ -128,22 +128,22 @@ def get_AMPA2_scalar(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=
     """
 
     requires = {
-        'ST': bp.types.SynState({'s': 0., 'sp_t': -1e7},
+        'ST': bp.types.SynState({'s': 0., 't_last_spike': -1e7},
                                 help=""" "s": Synaptic state.
-                                    "sp_t": Pre-synaptic neuron spike time.
+                                    "t_last_spike": Pre-synaptic neuron spike time.
                                 """),
         'pre': bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         'post': bp.types.NeuState(['V', 'input'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
     }
 
     @bp.integrate
-    def int_s(s, t, TT):
+    def int_s(s, _t_, TT):
         return alpha * TT * (1 - s) - beta * s
 
     def update(ST, _t_, pre):
         if pre['spike'] > 0.:
-            ST['sp_t'] = _t_
-        TT = ((_t_ - ST['sp_t']) < T_duration) * T
+            ST['t_last_spike'] = _t_
+        TT = ((_t_ - ST['t_last_spike']) < T_duration) * T
         s = np.clip(int_s(ST['s'], _t_, TT), 0., 1.)
         ST['s'] = s
 
@@ -179,14 +179,14 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
     """
 
     @bp.integrate
-    def int_s(s, t, TT):
+    def int_s(s, _t_, TT):
         return alpha * TT * (1 - s) - beta * s
 
     requires = dict(
-        ST=bp.types.SynState({'s': 0., 'sp_t': -1e7, 'g': 0.},
+        ST=bp.types.SynState({'s': 0., 't_last_spike': -1e7, 'g': 0.},
                              help='AMPA synapse state.\n'
                                   '"s": Synaptic state.\n'
-                                  '"sp_t": Pre-synaptic neuron spike time.'),
+                                  '"t_last_spike": Pre-synaptic neuron spike time.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
         pre2syn=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
@@ -196,8 +196,8 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
     def update(ST, _t_, pre, pre2syn):
         for i in np.where(pre['spike'] > 0.)[0]:
             syn_idx = pre2syn[i]
-            ST['sp_t'][syn_idx] = _t_
-        TT = ((_t_ - ST['sp_t']) < T_duration) * T
+            ST['t_last_spike'][syn_idx] = _t_
+        TT = ((_t_ - ST['t_last_spike']) < T_duration) * T
         s = np.clip(int_s(ST['s'], _t_, TT), 0., 1.)
         ST['s'] = s
         ST['g'] = g_max * s

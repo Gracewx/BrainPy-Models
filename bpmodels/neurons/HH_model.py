@@ -13,14 +13,14 @@ V_THRESHOLD = 20.
 
 NOISE = 1.
 
-def get_HH (noise=NOISE, V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
+def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
              E_leak = E_LEAK, g_Na = G_NA, g_K = G_K, g_leak = G_LEAK):
     '''
     A Hodgkin–Huxley neuron implemented in BrainPy.
     
     Args:
         noise (float): the noise fluctuation. default = 0.
-        V_threshold (float): the spike threshold. default = 20. (mV)
+        V_th (float): the spike threshold. default = 20. (mV)
         C (float): capacitance. default = 1.0 (ufarad)
         E_Na (float): reversal potential of sodium. default = 50. (mV)
         E_K (float): reversal potential of potassium. default = -77. (mV)
@@ -50,30 +50,30 @@ def get_HH (noise=NOISE, V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_
     # call bp.integrate to solve the differential equations
     
     @bp.integrate
-    def int_m(m, t, V):
+    def int_m(m, _t_, V):
         alpha = 0.1 * (V + 40) / (1 - np.exp(-(V + 40) / 10))
         beta = 4.0 * np.exp(-(V + 65) / 18)
         return alpha * (1 - m) - beta * m
     
     @bp.integrate
-    def int_h(h, t, V):
+    def int_h(h, _t_, V):
         alpha = 0.07 * np.exp(-(V + 65) / 20.)
         beta = 1 / (1 + np.exp(-(V + 35) / 10))
         return alpha * (1 - h) - beta * h
     
     @bp.integrate
-    def int_n(n, t, V):
+    def int_n(n, _t_, V):
         alpha = 0.01 * (V + 55) / (1 - np.exp(-(V + 55) / 10))
         beta = 0.125 * np.exp(-(V + 65) / 80)
         return alpha * (1 - n) - beta * n
     
     @bp.integrate
-    def int_V(V, t, m, h, n, input_current):
+    def int_V(V, _t_, m, h, n, I_ext):
         I_Na = (g_Na * np.power(m, 3.0) * h) * (V - E_Na)
         I_K = (g_K * np.power(n, 4.0))* (V - E_K)
         I_leak = g_leak * (V - E_K)
-        int_V = (- I_Na - I_K - I_leak + input_current)/C 
-        return int_V, noise / C
+        dVdt = (- I_Na - I_K - I_leak + I_ext)/C 
+        return dVdt, noise / C
     
     # update the variables change over time (for each step)
     def update(ST, _t_):
@@ -81,7 +81,7 @@ def get_HH (noise=NOISE, V_threshold = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_
         h = np.clip(int_h(ST['h'], _t_, ST['V']), 0., 1.)
         n = np.clip(int_n(ST['n'], _t_, ST['V']), 0., 1.)
         V = int_V(ST['V'], _t_, m, h, n, ST['input'])  # solve V from int_V equation.
-        spike = np.logical_and(ST['V'] < V_threshold, V >= V_threshold) # spike when reach threshold.
+        spike = np.logical_and(ST['V'] < V_th, V >= V_th) # spike when reach threshold.
         ST['spike'] = spike
         ST['V'] = V
         ST['m'] = m

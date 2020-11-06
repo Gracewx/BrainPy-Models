@@ -51,11 +51,11 @@ def get_NMDA_scalar(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_deca
     )
 
     @bp.integrate
-    def int_x(x, t):
+    def int_x(x, _t_):
         return -x / tau_rise
 
     @bp.integrate
-    def int_s(s, t, x):
+    def int_s(s, _t_, x):
         return -s / tau_decay + a * x * (1 - s)
 
     def update(ST, _t_, pre):
@@ -124,11 +124,11 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_decay=100.,
     )
 
     @bp.integrate
-    def int_x(x, t):
+    def int_x(x, _t_):
         return -x / tau_rise
 
     @bp.integrate
-    def int_s(s, t, x):
+    def int_s(s, _t_, x):
         return -s / tau_decay + a * x * (1 - s)
 
     def update(ST, _t_, pre, pre2syn):
@@ -143,12 +143,12 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_decay=100.,
 
     @bp.delayed
     def output(ST, post, post2syn):
-        post_cond = np.zeros(len(post2syn), dtype=np.float_)
+        g = np.zeros(len(post2syn), dtype=np.float_)
         for post_id, syn_ids in enumerate(post2syn):
-            post_cond[post_id] = np.sum(ST['g'][syn_ids])
-        g = post_cond * (post['V'] - E)
+            g[post_id] = np.sum(ST['g'][syn_ids])
+        I_syn = g * (post['V'] - E)
         g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
-        post['input'] -= g * g_inf
+        post['input'] -= I_syn * g_inf
 
     return bp.SynType(name='NMDA',
                       requires=requires,
