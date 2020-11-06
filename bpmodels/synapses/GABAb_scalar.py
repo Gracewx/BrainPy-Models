@@ -35,12 +35,12 @@ def get_GABAb_scalar(g_max=0.2, E=-95., k1=0.52, k2=0.0013, k3=0.098, k4=0.033, 
     '''
 
     requires = {
-        'ST': bp.types.SynState({'R': 0., 'G': 0., 'sp_t': -1e7, 'g': 0.}, 
+        'ST': bp.types.SynState({'R': 0., 'G': 0., 'g': 0., 't_last_spike': -1e7, }, 
                                 help = 'GABAa synapse gating variable.'),
-        'pre': bp.types.NeuState(['isFire'], help = 
-                                 'pre-synaptic neuron state must have "isFire"'),
-        'post': bp.types.NeuState(['input', 'Vm'], help = 
-                                 'post-synaptic neuron state must include "input" and "Vm"')
+        'pre': bp.types.NeuState(['spike'], help = 
+                                 'pre-synaptic neuron state must have "spike"'),
+        'post': bp.types.NeuState(['input', 'V'], help = 
+                                 'post-synaptic neuron state must include "input" and "V"')
     }
 
     @bp.integrate
@@ -52,9 +52,9 @@ def get_GABAb_scalar(g_max=0.2, E=-95., k1=0.52, k2=0.0013, k3=0.098, k4=0.033, 
         return k1 * R - k2 * G
 
     def update(ST, _t_, pre):
-        if pre['isFire'] > 0.:
-            ST['sp_t'] = _t_
-        TT = ((_t_ - ST['sp_t']) < T_duration) * T
+        if pre['spike'] > 0.:
+            ST['t_last_spike'] = _t_
+        TT = ((_t_ - ST['t_last_spike']) < T_duration) * T
         R = int_R(ST['R'], _t_, TT)
         G = int_G(ST['G'], _t_, R)
         ST['R'] = R
@@ -63,10 +63,10 @@ def get_GABAb_scalar(g_max=0.2, E=-95., k1=0.52, k2=0.0013, k3=0.098, k4=0.033, 
 
     @bp.delayed
     def output(ST, _t_, post):
-        I_syn = ST['g'] * (post['Vm'] - E)
+        I_syn = ST['g'] * (post['V'] - E)
         post['input'] -= I_syn
 
-    return bp.SynType(name = 'GABAb', 
+    return bp.SynType(name = 'GABAb_synapse', 
                       requires = requires, 
                       steps = (update, output), 
                       vector_based = False)
@@ -77,17 +77,17 @@ if __name__ == '__main__':
     dt = 0.02
     bp.profile.set(backend = "numba", dt = dt, merge_steps = True, show_code = False)
     LIF_neuron = get_LIF()
-    GABAb_syn = get_GABAb()
+    GABAb_syn = get_GABAb_scalar()
     
     # build and simulate gabab net
-    pre = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['Vm', 'isFire', 'input'])
-    post = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['Vm', 'isFire', 'input'])
+    pre = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['V', 'input', 'spike'])
+    post = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['V', 'input', 'spike'])
     pre.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
-    pre.pars['Vr'] = -65.
-    pre.ST['Vm'] = -65.
+    pre.pars['V_rest'] = -65.
+    pre.ST['V'] = -65.
     post.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
-    post.pars['Vr'] = -65.
-    post.ST['Vm'] = -65.
+    post.pars['V_rest'] = -65.
+    post.ST['V'] = -65.
     
     gabab = bp.SynConn(model = GABAb_syn, pre_group = pre, post_group = post, 
                        conn = bp.connect.All2All(), monitors = ['g'], delay = 10.)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     
     current = bp.inputs.spike_current([5., 10., 15., 20., 25.], 
                                       bp.profile._dt, 1., duration = duration)
-    net.run(duration = duration, inputs = [gabab, 'pre.isFire', current, "="], report = True)
+    net.run(duration = duration, inputs = [gabab, 'pre.spike', current, "="], report = True)
 
     
     
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     plt.legend()
 
     fig.add_subplot(gs[1, 0])
-    plt.plot(ts, post.mon.Vm[:, 0], label = 'post.Vr')
+    plt.plot(ts, post.mon.V[:, 0], label = 'post.V')
     plt.legend()
     
     fig.add_subplot(gs[0, 1])

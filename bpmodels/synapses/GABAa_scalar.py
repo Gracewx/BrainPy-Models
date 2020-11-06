@@ -28,10 +28,10 @@ def get_GABAa_scalar(g_max = 0.4, E = -80., tau_decay = 6.):
     requires = {
         'ST': bp.types.SynState(['s'], 
                                 help = 'GABAa synapse gating variable.'),
-        'pre': bp.types.NeuState(['isFire'], help = 
-                                 'pre-synaptic neuron state must have "isFire"'),
-        'post': bp.types.NeuState(['input', 'Vm'], help = 
-                                 'post-synaptic neuron state must include "input" and "Vr"')
+        'pre': bp.types.NeuState(['spike'], help = 
+                                 'pre-synaptic neuron state must have "spike"'),
+        'post': bp.types.NeuState(['input', 'V'], help = 
+                                 'post-synaptic neuron state must include "input" and "V"')
     }
 
     @bp.integrate
@@ -40,15 +40,15 @@ def get_GABAa_scalar(g_max = 0.4, E = -80., tau_decay = 6.):
 
     def update(ST, _t_, pre):
         s = int_s(ST['s'], _t_)
-        s += pre['isFire']
+        s += pre['spike']
         ST['s'] = s
 
     @bp.delayed
     def output(ST, _t_, post):
-        I_syn = - g_max * ST['s'] * (post['Vm'] - E)
+        I_syn = - g_max * ST['s'] * (post['V'] - E)
         post['input'] += I_syn
 
-    return bp.SynType(name = 'GABAa', 
+    return bp.SynType(name = 'GABAa_synapse', 
                       requires = requires, 
                       steps = (update, output), 
                       vector_based = False)
@@ -58,17 +58,17 @@ if __name__ == '__main__':
     dt = 0.02
     bp.profile.set(backend = "numba", dt = dt, merge_steps = True, show_code = False)
     LIF_neuron = get_LIF()
-    GABAa_syn = get_GABAa()
+    GABAa_syn = get_GABAa_scalar()
 
     #build and simulate gabaa net
-    pre = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['Vm', 'isFire', 'input'])
+    pre = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['V', 'input', 'spike'])
     pre.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
-    pre.pars['Vr'] = -65.
-    pre.ST['Vm'] = -65.
-    post = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['Vm', 'isFire', 'input'])
+    pre.pars['V_rest'] = -65.
+    pre.ST['V'] = -65.
+    post = bp.NeuGroup(LIF_neuron, geometry = (10,), monitors = ['V', 'input', 'spike'])
     post.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
-    post.pars['Vr'] = -65.
-    post.ST['Vm'] = -65.
+    post.pars['V_rest'] = -65.
+    post.ST['V'] = -65.
 
     gabaa = bp.SynConn(model = GABAa_syn, pre_group = pre, post_group = post, 
                        conn = bp.connect.All2All(), monitors = ['s'], delay = 10.)
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     
     current = bp.inputs.spike_current([10, 110, 210, 300, 305, 310, 315, 320], 
                                       bp.profile._dt, 1., duration = duration)
-    net.run(duration = duration, inputs = [gabaa, 'pre.isFire', current, "="], report = True)
+    net.run(duration = duration, inputs = [gabaa, 'pre.spike', current, "="], report = True)
 
     # paint gabaa
     ts = net.ts
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     plt.legend()
 
     fig.add_subplot(gs[1, 0])
-    plt.plot(ts, post.mon.Vm[:, 0], label = 'post.Vr')
+    plt.plot(ts, post.mon.V[:, 0], label = 'post.V')
     plt.legend()
     
     fig.add_subplot(gs[0, 1])
