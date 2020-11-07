@@ -22,3 +22,19 @@ Install ``BrainPy-Models`` using ``pip``::
 
     > pip install bpmodels
 
+Install from source code::
+
+    > python setup.py install
+	
+The following packages need to be installed to use ``BrainPy-Models``:
+
+- Python >= 3.5
+- NumPy >= 1.13
+- Sympy >= 1.2
+- Matplotlib >= 2.0
+- autopep8
+- BrainPy
+
+Packages recommended to install:
+
+- Numba >= 0.40.0
