@@ -71,7 +71,7 @@ def get_NMDA_scalar(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_deca
         g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
         post['input'] -= g * g_inf
 
-    return bp.SynType(name='NMDA',
+    return bp.SynType(name='NMDA_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=False)
@@ -150,7 +150,7 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_decay=100.,
         g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
         post['input'] -= I_syn * g_inf
 
-    return bp.SynType(name='NMDA',
+    return bp.SynType(name='NMDA_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)

@@ -83,7 +83,7 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] += post_cond
 
-    return bp.SynType(name='STP',
+    return bp.SynType(name='STP_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
