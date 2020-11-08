@@ -18,27 +18,33 @@ BrainPy for neurons, synapses and topological networks.
    `networks` and `paper examples`. https://github.com/PKU-NIP-Lab/BrainPy-Models
 
 
+Tutorials
+=================
+In this section, you can learn classical neuron models, synapse models and implementations of learning rules. With ``BrainPy``, our goal is to reveal the world of computational neuroscience to new learners.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Tutorials
    
-   tutorials/tutorials
    tutorials/neurons
    tutorials/synapses
    tutorials/learning_rules
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Examples
-   
-   examples/examples
+Examples
+=================
+Here you can see some examples of using `bpmodels` to simplify networks implementation.
 
 .. toctree::
    :maxdepth: 1
-   :caption: APIs
    
-   apis/apis
+   examples/EI_balanced
+
+
+APIs
+=================
+
+.. toctree::
+   :maxdepth: 1
+   
    apis/neurons
    apis/synapses
 
