@@ -13,12 +13,9 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
         Args:
             mode (str): The neuron spiking mode..
             a (float): It determines the time scale of the recovery variable :math:`u`.
-            b (float): It describes the sensitivity of the recovery variable :math:`u`
-        to the sub-threshold fluctuations of the membrane potential :math:`v`.
-            c (float): It describes the after-spike reset value of the membrane potential
-        :math:`v` caused by the fast high-threshold :math:`K^{+}` conductance.
-            d (float): It describes after-spike reset of the recovery variable :math:`u` caused
-        by slow high-threshold :math:`Na^{+}` and :math:`K^{+}` conductance.
+            b (float): It describes the sensitivity of the recovery variable :math:`u` to the sub-threshold fluctuations of the membrane potential :math:`v`.
+            c (float): It describes the after-spike reset value of the membrane potential :math:`v` caused by the fast high-threshold :math:`K^{+}` conductance.
+            d (float): It describes after-spike reset of the recovery variable :math:`u` caused by slow high-threshold :math:`Na^{+}` and :math:`K^{+}` conductance.
             t_refractory (float): Refractory period length. [ms]
             noise(float): The noise fluctuation.
             V_th (float): The membrane potential threshold.
