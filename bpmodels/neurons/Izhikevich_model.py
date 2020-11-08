@@ -5,34 +5,33 @@ import matplotlib.pyplot as plt
 import brainpy as bp
 import brainpy.numpy as np
 
-
 def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., mode=None):
-    """Izhikevich two-variable neuron model.
-    Parameters
-    ----------
-    mode : optional, str
-        The neuron spiking mode.
-    a : float
-        It determines the time scale of the recovery variable :math:`u`.
-    b : float
-        It describes the sensitivity of the recovery variable :math:`u` to
-        the sub-threshold fluctuations of the membrane potential :math:`v`.
-    c : float
-        It describes the after-spike reset value of the membrane potential
+
+    '''
+        The Morris-Lecar  neuron model.
+
+        Args:
+            mode (str): The neuron spiking mode..
+            a (float): It determines the time scale of the recovery variable :math:`u`.
+            b (float): It describes the sensitivity of the recovery variable :math:`u`
+        to the sub-threshold fluctuations of the membrane potential :math:`v`.
+            c (float): It describes the after-spike reset value of the membrane potential
         :math:`v` caused by the fast high-threshold :math:`K^{+}` conductance.
-    d : float
-        It describes after-spike reset of the recovery variable :math:`u` caused
+            d (float): It describes after-spike reset of the recovery variable :math:`u` caused
         by slow high-threshold :math:`Na^{+}` and :math:`K^{+}` conductance.
-    t_refractory : float
-        Refractory period length. [ms]
-    noise : float
-        The noise fluctuation.
-    V_th : float
-        The membrane potential threshold.
-    ----------
-    Returns:
-        bp.Neutype: return description of Izhikevich model.
-    """
+            t_refractory (float): Refractory period length. [ms]
+            noise(float): The noise fluctuation.
+            V_th (float): The membrane potential threshold.
+            V1 (float): Potential at which M_inf = 0.5.(mV)
+            V2 (float): Reciprocal of slope of voltage dependence of M_inf.(mV)
+            V3 (float): Potential at which W_inf = 0.5.(mV)
+            V4 (float): Reciprocal of slope of voltage dependence of W_inf.(mV)
+            phi (float): A temperature factor.(1/s)
+
+        Returns:
+            bp.Neutype: return description of Izhikevich model.
+    '''
+
     state = bp.types.NeuState(
         {'V': -65., 'u': 1., 'spike': 0., 't_last_spike': -1e7, 'input': 0.},
         help='''
