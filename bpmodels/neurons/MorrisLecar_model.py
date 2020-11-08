@@ -6,38 +6,27 @@ import brainpy.numpy as np
 
 def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
                     g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04):
+    '''
+        The Morris-Lecar  neuron model.
 
-    """The MorrisLecar neuron model.
-    Parameters
-    ----------
-    noise : float
-        The noise fluctuation.
-    V_Ca : float
-        Equilibrium potentials of Ca+.(mV)
-    g_Ca : float
-        Maximum conductance of corresponding Ca+.(mS/cm2)
-    V_K : float
-        Equilibrium potentials of K+.(mV)
-    g_K : float
-        Maximum conductance of corresponding K+.(mS/cm2)
-    V_Leak : float
-        Equilibrium potentials of leak current.(mV)
-    g_Leak : float
-        Maximum conductance of leak current.(mS/cm2)
-    C : float
-        Membrane capacitance.(uF/cm2)
-    V1 : float
-        Potential at which M_inf = 0.5.(mV)
-    V2 : float
-        Reciprocal of slope of voltage dependence of M_inf.(mV)
-    V3 : float
-        Potential at which W_inf = 0.5.(mV)
-    V4 : float
-        Reciprocal of slope of voltage dependence of W_inf.(mV)
-    phi : float
-        A temperature factor.(1/s)
-    -------
-    """
+        Args:
+            noise (float): The noise fluctuation.
+            V_Ca (float): Equilibrium potentials of Ca+.(mV)
+            g_Ca (float): Maximum conductance of corresponding Ca+.(mS/cm2)
+            V_K (float): Equilibrium potentials of K+.(mV)
+            g_K (float): Maximum conductance of corresponding K+.(mS/cm2)
+            V_Leak (float): Equilibrium potentials of leak current.(mV)
+            g_Leak (float): Maximum conductance of leak current.(mS/cm2)
+            C (float): Membrane capacitance.(uF/cm2)
+            V1 (float): Potential at which M_inf = 0.5.(mV)
+            V2 (float): Reciprocal of slope of voltage dependence of M_inf.(mV)
+            V3 (float): Potential at which W_inf = 0.5.(mV)
+            V4 (float): Reciprocal of slope of voltage dependence of W_inf.(mV)
+            phi (float): A temperature factor.(1/s)
+
+        Returns:
+            bp.Neutype: return description of Morris-Lecar model.
+    '''
 
     ST = bp.types.NeuState(
         {'V': -20, 'W': 0.02, 'input': 0.},

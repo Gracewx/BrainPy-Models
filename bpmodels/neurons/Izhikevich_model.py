@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import brainpy as bp
 import brainpy.numpy as np
 
+
 def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., mode=None):
     """Izhikevich two-variable neuron model.
     Parameters
@@ -28,6 +29,9 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
         The noise fluctuation.
     V_th : float
         The membrane potential threshold.
+    ----------
+    Returns:
+        bp.Neutype: return description of Izhikevich model.
     """
     state = bp.types.NeuState(
         {'V': -65., 'u': 1., 'spike': 0., 't_last_spike': -1e7, 'input': 0.},
