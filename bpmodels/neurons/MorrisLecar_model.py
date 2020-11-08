@@ -13,21 +13,30 @@ def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
     noise : float
         The noise fluctuation.
     V_Ca : float
+        Equilibrium potentials of Ca+.(mV)
     g_Ca : float
+        Maximum conductance of corresponding Ca+.(mS/cm2)
     V_K : float
+        Equilibrium potentials of K+.(mV)
     g_K : float
+        Maximum conductance of corresponding K+.(mS/cm2)
     V_Leak : float
+        Equilibrium potentials of leak current.(mV)
     g_Leak : float
+        Maximum conductance of leak current.(mS/cm2)
     C : float
+        Membrane capacitance.(uF/cm2)
     V1 : float
+        Potential at which M_inf = 0.5.(mV)
     V2 : float
+        Reciprocal of slope of voltage dependence of M_inf.(mV)
     V3 : float
+        Potential at which W_inf = 0.5.(mV)
     V4 : float
+        Reciprocal of slope of voltage dependence of W_inf.(mV)
     phi : float
-    Returns
+        A temperature factor.(1/s)
     -------
-    return_dict : dict
-        The necessary variables.
     """
 
     ST = bp.types.NeuState(
@@ -68,7 +77,7 @@ if __name__ == '__main__':
     bp.profile.set(backend='numba', dt=0.02, merge_steps=True)
     ML = get_MorrisLecar(noise=0.)
 
-    #The current is constant
+    '''The current is constant'''
     neu = bp.NeuGroup(ML, geometry=(100,), monitors=['V', 'W'])
     current = bp.inputs.ramp_current(90, 90, 1000, 0, 1000)
     neu.run(duration=1000., inputs=['ST.input', current], report=False)
