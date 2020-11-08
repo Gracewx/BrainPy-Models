@@ -55,6 +55,7 @@ Let's see how to use ``bpmodels`` to quickly implement a network by seeing the e
 First import necessary packages and set parameters.
 
 ::
+
     import brainpy as bp
     import brainpy.numpy as np
     from bpmodels.neurons import get_LIF
