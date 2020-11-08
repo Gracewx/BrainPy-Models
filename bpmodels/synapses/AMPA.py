@@ -121,10 +121,14 @@ def get_AMPA2_scalar(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=
         Maximum conductance.
     E : float
         Reversal potential.
-    alpha
-    beta
-    T
-    T_duration
+    alpha : float
+        Binding constant.
+    beta : float
+        Unbinding constant.
+    T : float
+        Neurotransmitter.
+    T_duration : float
+        Binding of neurotransmitter.
     """
 
     requires = {
@@ -172,10 +176,14 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
         Maximum conductance.
     E : float
         Reversal potential.
-    alpha
-    beta
-    T
-    T_duration
+    alpha : float
+        Binding constant.
+    beta : float
+        Unbinding constant.
+    T : float
+        Neurotransmitter.
+    T_duration : float
+        Binding of neurotransmitter.
     """
 
     @bp.integrate

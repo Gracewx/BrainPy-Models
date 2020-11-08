@@ -3,6 +3,15 @@ import brainpy.numpy as np
 
 def get_alpha(tau_decay = 2.):
 
+    """alpha conductance-based synapse.
+
+    Parameters
+    ----------
+    tau_decay : float
+        The time constant of decay.
+    """
+
+
     requires = dict(
         ST = bp.types.SynState(['s', 'g', 'w']),
         pre=bp.types.NeuState(['spike']),

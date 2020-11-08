@@ -34,8 +34,11 @@ def get_NMDA_scalar(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_deca
     E : float
         The reversal potential.
     alpha : float
+        Binding constant.
     beta : float
+        Unbinding constant.
     cc_Mg : float
+        concentration of Magnesium ion.
     tau_decay : float
         The time constant of decay.
     tau_rise : float
@@ -107,8 +110,11 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.75, cc_Mg=1.2, tau_decay=100.,
     E : float
         The reversal potential.
     alpha : float
+        Binding constant.
     beta : float
+        Unbinding constant.
     cc_Mg : float
+        concentration of Magnesium ion.
     tau_decay : float
         The time constant of decay.
     tau_rise : float
