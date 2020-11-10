@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import brainpy as bp
-from brainpy import numpy as np
+#from brainpy import numpy as np
+import numpy as np
 import bpmodels
 from bpmodels.neurons import get_LIF
 
@@ -106,12 +107,10 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     @bp.delayed
     def output(ST, post, post2syn):
         #I_syn = - g_max * ST['g'] * (post['V'] - E)
-
         #post['input'] += I_syn
-            
         post_cond = np.zeros(len(post2syn), dtype=np.float_)
         for post_id, syn_ids in enumerate(post2syn):
-            post_cond[post_id] = np.sum(- g_max * ST['g'][syn_ids] * (post['V'] - E))
+            post_cond[post_id] = np.sum(- g_max * ST['g'][syn_ids] * (post['V'][post_id] - E))
         post['input'] += post_cond
 
     return bp.SynType(name='STDP_AMPA_synapse',
@@ -212,28 +211,9 @@ if __name__ == '__main__':
     duration = 550.
     dt = 0.02
     bp.profile.set(backend = "numpy", dt = dt, merge_steps = True, show_code = False)
-    LIF_neuron = get_LIF()
     STDP_syn = get_STDP1()
 
     #build and simulate
-    pre = bp.NeuGroup(LIF_neuron, geometry = (3,), monitors = ['V', 'input', 'spike'])
-    pre.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
-    pre.pars['V_rest'] = -65.
-    pre.ST['V'] = -65.
-    post = bp.NeuGroup(LIF_neuron, geometry = (3,), monitors = ['V', 'input', 'spike'])
-    post.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
-    post.pars['V_rest'] = -65.
-    post.ST['V'] = -65.
-
-    stdp = bp.SynConn(model = STDP_syn, pre_group = pre, post_group = post, 
-                       conn = bp.connect.All2All(), monitors = ['w', 'A_s', 'A_t', 'g'], delay = 10.)
-    stdp.ST["A_s"] = 0.
-    stdp.ST["A_t"] = 0.
-    stdp.ST['w'] = 5.
-    stdp.runner.set_schedule(['input', 'update', 'output', 'monitor'])
-    
-    net = bp.Network(pre, stdp, post)
-    
     delta_t = [-20, -15, -10, -8, -6, -4, -3, -2, -1, -0.6, -0.3, -0.2, -0.1, 0, 
                0.1, 0.2, 0.3, 0.6, 1, 2, 3, 4, 6, 8, 10, 15, 20]
     base_t = range(50, 550, 50)
@@ -242,54 +222,79 @@ if __name__ == '__main__':
     delta_w_list = []
     step = 0
     epoch = leng_delta
+    # build SynConn
+    stdp = bp.SynConn(model = STDP_syn, num = leng_delta, 
+                      monitors = ['w', 'A_s', 'A_t', 'g'], delay = 10.)
+    stdp.ST["A_s"] = 0.
+    stdp.ST["A_t"] = 0.
+    stdp.ST['w'] = 10.
+    stdp.runner.set_schedule(['input', 'update', 'output', 'monitor'])
+    stdp.pre = bp.types.NeuState(['spike'])(leng_delta)
+    stdp.post = bp.types.NeuState(['V', 'input', 'spike'])(leng_delta)
+
+    pre2syn_list = []
+    post2syn_list = []
     for i in range(leng_delta):
-        stdp.ST["A_s"] = 0.
-        stdp.ST["A_t"] = 0.
-        stdp.ST['w'] = 10.
+        pre2syn_list.append([i, i])
+        post2syn_list.append([i, i])
+    stdp.pre2syn = stdp.requires['pre2syn'].make_copy(pre2syn_list)
+    stdp.post2syn = stdp.requires['post2syn'].make_copy(post2syn_list)
+    net = bp.Network(stdp)
+    
+    # create input matrix
+    current_pre_mat = []
+    current_post_mat = []
+    for i in range(leng_delta):
         
         I_ext_pre = []
         I_ext_post = []
         for j in range(leng_ext):
             I_ext_pre.append(base_t[j])
             I_ext_post.append(base_t[j] + delta_t[i])
-    
+
         current_pre = bp.inputs.spike_current(I_ext_pre, 
                                               bp.profile._dt, 1., duration = duration)
         current_post = bp.inputs.spike_current(I_ext_post, 
                                                bp.profile._dt, 1., duration = duration)
                                                
-        net.run(duration = duration, 
-                inputs = (
-                [stdp, 'pre.spike', current_pre, "="], 
-                [stdp, 'post.spike', current_post, "="]
-                ), 
-                report = False)
-        avg_w = np.mean(stdp.mon.w, axis = 1)
+        if i==0:
+            current_pre_mat = current_pre
+            current_post_mat = current_post
+        else:
+            current_pre_mat = np.vstack((current_pre_mat, current_pre))
+            current_post_mat = np.vstack((current_post_mat, current_post))
+
+    # simulate                              
+    net.run(duration = duration, 
+            inputs = (
+            [stdp, 'pre.spike', current_pre_mat.T, "="], 
+            [stdp, 'post.spike', current_post_mat.T, "="]
+            ), 
+            report = True)
+
+    #process data
+    for i in range(leng_delta):
+        output = stdp.mon.w[:, i]
         delta_w = 0
         for j in range(leng_ext):
             base = int(I_ext_pre[j]//dt)
             bias = int(I_ext_post[j]//dt)
             if base > bias:
-            	deltaw = avg_w[base + 10] - avg_w[bias - 10]
+        	    deltaw = output[base + 10] - output[bias - 10]
             else:
-            	deltaw = avg_w[bias + 10] - avg_w[base - 10]
+        	    deltaw = output[bias + 10] - output[base - 10]
             delta_w += deltaw
         delta_w /= leng_ext
         delta_w_list.append(delta_w)
         
-        step += 1
-        print("epoch %2i/%3i, delta_t = %5.1f, delat_w = %f"
-              %(step, epoch, delta_t[i], delta_w_list[i]))
 
-        
+    # paint
     ts = net.ts
     fig, gs = bp.visualize.get_figure(1, 1, 6, 8)
     ax = fig.add_subplot(gs[0, 0])
     fig.add_subplot(ax)
     ax.spines['bottom'].set_position(('data',0))
     ax.spines['left'].set_position(('data',0.))
-    plt.scatter(delta_t, delta_w_list, label = 'delta_w-delta_t')
-    #plt.xlabel('Delta T')
-    #plt.ylabel('Delta synapse weight')
+    plt.plot(delta_t, delta_w_list, label = 'delta_w-delta_t')
     plt.legend()
     plt.show()
