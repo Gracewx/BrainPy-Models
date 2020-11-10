@@ -19,15 +19,18 @@ BrainPy for neurons, synapses and topological networks.
 
 The documentation includes three parts.
 
-In `Tutorials` section, you can learn classical neuron models, synapse models 
-and implementations of learning rules. With ``BrainPy``, 
-our goal is to reveal the world of computational neuroscience to new learners.
+In `Tutorials` section, you can learn implementations of classical neuron 
+models, synapse models and learning rules. With ``BrainPy``, our goal is to 
+reveal the world of computational neuroscience to new learners.
 
-In `Examples` section, you can see some examples of using `bpmodels` to simplify 
-networks implementation.
+In `Examples` section, we provide implentations of widely known and used 
+networks (ex. Excitatort-inhibitory balanced network). We hope users can see 
+these as examples of using `bpmodels` to simplify network implementation.
 
-And in `APIs` section, you can see details about all the models that we provided 
-and how to use them.
+In `APIs` section, we give details about all the models that we provided and how
+to use them with our API.
+
+
 
 .. toctree::
    :maxdepth: 2
@@ -49,6 +52,7 @@ and how to use them.
    
    apis/neurons
    apis/synapses
+   apis/learning_rules
 
 Indices and tables
 ==================
