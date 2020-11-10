@@ -196,7 +196,7 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
                                   '"s": Synaptic state.\n'
                                   '"t_last_spike": Pre-synaptic neuron spike time.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        post=bp.types.NeuState(['V', 'input'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
+        post=bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
         pre2syn=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
         post2syn=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
     )
