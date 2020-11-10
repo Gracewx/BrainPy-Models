@@ -15,3 +15,5 @@ bpmodels.synapses
 	get_GABAa_scalar
 	get_GABAb_scalar
     get_STP
+    get_STDP1
+        get_STDP2
