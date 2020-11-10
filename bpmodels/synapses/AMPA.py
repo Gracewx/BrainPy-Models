@@ -26,7 +26,7 @@ def get_AMPA1_scalar(g_max=0.10, E=0., tau_decay=2.0):
     requires = dict(
         ST=bp.types.SynState(['s'], help='AMPA synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        post=bp.types.NeuState(['V', 'input'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
+        post=bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
     )
 
     @bp.integrate
@@ -47,6 +47,7 @@ def get_AMPA1_scalar(g_max=0.10, E=0., tau_decay=2.0):
                       requires=requires,
                       steps=(update, output),
                       vector_based=False)
+
 
 def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
     """AMPA conductance-based synapse (type 1).
@@ -77,7 +78,7 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
     requires = {
         'ST': bp.types.SynState(['s', 'g'], help='AMPA synapse state.'),
         'pre': bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        'post': bp.types.NeuState(['V', 'input'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
+        'post': bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
         'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
         'post2syn': bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
     }
@@ -105,6 +106,7 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
+
 
 def get_AMPA2_scalar(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
     """AMPA conductance-based synapse (type 2).
@@ -137,7 +139,7 @@ def get_AMPA2_scalar(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=
                                     "t_last_spike": Pre-synaptic neuron spike time.
                                 """),
         'pre': bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        'post': bp.types.NeuState(['V', 'input'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
+        'post': bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
     }
 
     @bp.integrate
@@ -160,6 +162,7 @@ def get_AMPA2_scalar(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=
                       requires=requires,
                       steps=(update, output),
                       vector_based=False)
+
 
 def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
     """AMPA conductance-based synapse (type 2).
@@ -197,8 +200,10 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
                                   '"t_last_spike": Pre-synaptic neuron spike time.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
-        pre2syn=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
-        post2syn=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
+        pre2syn=bp.types.ListConn(
+            help='Pre-synaptic neuron index -> synapse index'),
+        post2syn=bp.types.ListConn(
+            help='Post-synaptic neuron index -> synapse index'),
     )
 
     def update(ST, _t_, pre, pre2syn):
