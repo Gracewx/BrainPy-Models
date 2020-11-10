@@ -26,7 +26,7 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
         
         A_{source}&= A_{source} + \\delta A_{source}
         
-        w&= min([w+A_{target}]^+, w_{max})
+        w&= min([w-A_{target}]^+, w_{max})
         
     After a post-synaptic spike:
     
@@ -130,19 +130,19 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
       
         g_{post}&= g_{post}+w
         
-        A_{source}&= A_{source}*e^{\\frac{last_update-t}{\\tau_{source}}} + \\delta A_{source}
+        A_{source}&= A_{source}*e^{\\frac{last update-t}{\\tau_{source}}} + \\delta A_{source}
         
-        A_{target}&= A_{target}*e^{\\frac{last_update-t}{\\tau_{target}}}
+        A_{target}&= A_{target}*e^{\\frac{last update-t}{\\tau_{target}}}
         
-        w&= min([w+A_{target}]^+, w_{max})
+        w&= min([w-A_{target}]^+, w_{max})
         
     After a post-synaptic spike:
     
     .. math::
         
-        A_{source}&= A_{source}*e^{\\frac{last_update-t}{\\tau_{source}}}
+        A_{source}&= A_{source}*e^{\\frac{last update-t}{\\tau_{source}}}
         
-        A_{target}&= A_{target}*e^{\\frac{last_update-t}{\\tau_{target}}} + \\delta A_{target}
+        A_{target}&= A_{target}*e^{\\frac{last update-t}{\\tau_{target}}} + \\delta A_{target}
         
         w&= min([w+A_{source}]^+, w_{max})
     
@@ -213,50 +213,55 @@ if __name__ == '__main__':
     bp.profile.set(backend = "numpy", dt = dt, merge_steps = True, show_code = False)
     STDP_syn = get_STDP1()
 
-    #build and simulate
-    delta_t = [-20, -15, -10, -8, -6, -4, -3, -2, -1, -0.6, -0.3, -0.2, -0.1, 0, 
-               0.1, 0.2, 0.3, 0.6, 1, 2, 3, 4, 6, 8, 10, 15, 20]
-    base_t = range(50, 550, 50)
-    leng_delta = len(delta_t)
-    leng_ext = len(base_t)
-    delta_w_list = []
-    step = 0
-    epoch = leng_delta
+    # set params
+    delta_t = [-20, -15, -10, -8, -6, -4, -3, 
+               -2, -1, -0.6, -0.3, -0.2, -0.1, 
+               0, 
+               0.1, 0.2, 0.3, 0.6, 1, 2, 3, 
+               4, 6, 8, 10, 15, 20] 
+    # delta_t: time difference between post and pre-synaptic spikes
+    pre_spike_t = range(50, 550, 50) #pre neuron spike time train
+    delta_t_num = len(delta_t)
+    spike_num = len(pre_spike_t)
+
     # build SynConn
-    stdp = bp.SynConn(model = STDP_syn, num = leng_delta, 
+    stdp = bp.SynConn(model = STDP_syn, num = delta_t_num, 
                       monitors = ['w', 'A_s', 'A_t', 'g'], delay = 10.)
+                     # 1 synapse corresponds to 1 delta_t (for parallel computing)
     stdp.ST["A_s"] = 0.
     stdp.ST["A_t"] = 0.
     stdp.ST['w'] = 10.
     stdp.runner.set_schedule(['input', 'update', 'output', 'monitor'])
-    stdp.pre = bp.types.NeuState(['spike'])(leng_delta)
-    stdp.post = bp.types.NeuState(['V', 'input', 'spike'])(leng_delta)
+    stdp.pre = bp.types.NeuState(['spike'])(delta_t_num)
+    stdp.post = bp.types.NeuState(['V', 'input', 'spike'])(delta_t_num)
 
+    # build pre-syn-post connection
     pre2syn_list = []
     post2syn_list = []
-    for i in range(leng_delta):
+    for i in range(delta_t_num):
         pre2syn_list.append([i, i])
         post2syn_list.append([i, i])
     stdp.pre2syn = stdp.requires['pre2syn'].make_copy(pre2syn_list)
     stdp.post2syn = stdp.requires['post2syn'].make_copy(post2syn_list)
+
+    # build network
     net = bp.Network(stdp)
     
     # create input matrix
+    ## combine input of different delta_t (for parallel computing)
     current_pre_mat = []
     current_post_mat = []
-    for i in range(leng_delta):
-        
+    for i in range(delta_t_num):
         I_ext_pre = []
         I_ext_post = []
-        for j in range(leng_ext):
-            I_ext_pre.append(base_t[j])
-            I_ext_post.append(base_t[j] + delta_t[i])
+        for j in range(spike_num):
+            I_ext_pre.append(pre_spike_t[j])
+            I_ext_post.append(pre_spike_t[j] + delta_t[i])
 
         current_pre = bp.inputs.spike_current(I_ext_pre, 
                                               bp.profile._dt, 1., duration = duration)
         current_post = bp.inputs.spike_current(I_ext_post, 
-                                               bp.profile._dt, 1., duration = duration)
-                                               
+                                               bp.profile._dt, 1., duration = duration)                                    
         if i==0:
             current_pre_mat = current_pre
             current_post_mat = current_post
@@ -273,10 +278,11 @@ if __name__ == '__main__':
             report = True)
 
     #process data
-    for i in range(leng_delta):
+    delta_w_list = []
+    for i in range(delta_t_num):
         output = stdp.mon.w[:, i]
         delta_w = 0
-        for j in range(leng_ext):
+        for j in range(spike_num):
             base = int(I_ext_pre[j]//dt)
             bias = int(I_ext_post[j]//dt)
             if base > bias:
@@ -284,7 +290,7 @@ if __name__ == '__main__':
             else:
         	    deltaw = output[bias + 10] - output[base - 10]
             delta_w += deltaw
-        delta_w /= leng_ext
+        delta_w /= spike_num
         delta_w_list.append(delta_w)
         
 
