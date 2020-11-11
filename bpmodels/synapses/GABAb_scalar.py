@@ -22,16 +22,18 @@ def get_GABAb_scalar(g_max=0.2, E=-95., k1=0.52, k2=0.0013, k3=0.098, k4=0.033, 
     - [R] is the fraction of activated receptor.
     - [T] is the transmitter concentration.
 
-    Parameters
-    ----------
-    g_max : float
-    E : float
-    k1 : float
-    k2 : float
-    k3 : float
-    k4 : float
-    T : float
-    T_duration : float
+    Args: 
+        g_max (float): 
+        E (float):
+        k1 (float):
+        k2 (float):
+        k3 (float):
+        k4 (float):
+        T (float):
+        T_duration (float):
+    
+    Returns:
+        bp.Syntype: return description of GABAb model.
     '''
 
     requires = {

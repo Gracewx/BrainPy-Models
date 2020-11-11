@@ -168,7 +168,7 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     requires = dict(
         ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w', 'last_spike'], help='AMPA synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        post=bp.types.NeuState(['V', 'input', 'spike'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
+        post=bp.types.NeuState(['V', 'input', 'spike'], help='Post-synaptic neuron state must have "V", "input" and "spike" item.'),
     )
 
     @bp.integrate

@@ -15,14 +15,13 @@ def get_GABAa_scalar(g_max = 0.4, E = -80., tau_decay = 6.):
 
         \\frac{d s}{d t}&=-\\frac{s}{\\tau_{decay}}+\\sum_{k} \\delta(t-t_{j}^{k})
 
-    Parameters
-    ----------
-    g_max : float
-        Maximum conductance.
-    E : float
-        Reversal potential.
-    tau_decay : float
-        Tau for decay.
+    Args:
+        g_max (float): Maximum conductance.
+        E (float): Reversal potential.
+        tau_decay (float): Time constant for s decay.
+        
+    Returns:
+        bp.Syntype: return description of GABAa model.
     """
 
     requires = {
@@ -97,4 +96,3 @@ if __name__ == '__main__':
     plt.legend()
     
     plt.show()
-    

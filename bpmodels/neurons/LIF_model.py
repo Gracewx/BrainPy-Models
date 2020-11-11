@@ -5,22 +5,26 @@ import matplotlib.pyplot as plt
 
 ## define Leaky Integrate-and-Fire model
 def get_LIF(V_rest = 0., V_reset = -5.,  V_th = 20., R = 1., C = 10., tau = 10., t_refractory = 5., noise = 0.):
-    '''
-    Leaky Integrate-and-Fire neuron model.    
+    """
+    Leaky Integrate-and-Fire neuron model.
+        
+    .. math::
+
+        \\tau \\frac{d V}{d t}&=-(V-V_{rest}) + RI(t)
     
     Args:
         V_rest (float): Resting potential.
         V_reset (float): Reset potential after spike.
         V_th (float): Threshold potential of spike.
-        R (float): Membrane Resistance.
-        C (float): Membrane Capacitance.
-        tau (float): Membrane time constant. Compute by Rm * Cm.
+        R (float): Membrane resistance.
+        C (float): Membrane capacitance.
+        tau (float): Membrane time constant. Compute by R * C.
         t_refractory (int): Refractory period length.(ms)
         noise (float): noise.   
         
     Returns:
         bp.Neutype: return description of LIF model.
-    '''
+    """
     
     ST = bp.types.NeuState(
         {'V': 0, 'input':0, 'spike':0, 'refractory': 0, 't_last_spike': -1e7}
