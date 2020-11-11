@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import brainpy as bp
-#from brainpy import numpy as np
-import numpy as np
+from brainpy import numpy as np
 import bpmodels
 from bpmodels.neurons import get_LIF
 
@@ -78,27 +77,20 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     def int_g(g, _t_):
         return -g / tau_decay
 
-    def my_relu(w):
-        #return w if w > 0 else 0  # scalar
-        for i in range(len(w)):    # vector
-            w[i] = w[i] if w[i] > 0 else 0
-        return w
-
     def update(ST, _t_, pre, post, pre2syn, post2syn):
         A_s = int_A_s(ST['A_s'], _t_)
         A_t = int_A_t(ST['A_t'], _t_)
         g = int_g(ST['g'], _t_)
         w = ST['w']
-        
         for i in np.where(pre['spike'] > 0.)[0]:
             syn_ids = pre2syn[i]
             g[syn_ids] += ST['w'][syn_ids]
             A_s[syn_ids] = A_s[syn_ids] + delta_A_s
-            w[syn_ids] = np.clip(my_relu(ST['w'][syn_ids] - A_t[syn_ids]), w_min, w_max)
+            w[syn_ids] = np.clip(ST['w'][syn_ids] - ST['A_t'][syn_ids], w_min, w_max)
         for i in np.where(post['spike'] > 0.)[0]:
             syn_ids = post2syn[i]
             A_t[syn_ids] = A_t[syn_ids] + delta_A_t
-            w[syn_ids] = np.clip(my_relu(ST['w'][syn_ids] + A_s[syn_ids]), w_min, w_max)
+            w[syn_ids] = np.clip(ST['w'][syn_ids] + ST['A_s'][syn_ids], w_min, w_max)
         ST['A_s'] = A_s
         ST['A_t'] = A_t
         ST['g'] = g
@@ -106,19 +98,16 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
 
     @bp.delayed
     def output(ST, post, post2syn):
-        #I_syn = - g_max * ST['g'] * (post['V'] - E)
-        #post['input'] += I_syn
         post_cond = np.zeros(len(post2syn), dtype=np.float_)
         for post_id, syn_ids in enumerate(post2syn):
             post_cond[post_id] = np.sum(- g_max * ST['g'][syn_ids] * (post['V'][post_id] - E))
         post['input'] += post_cond
 
-    return bp.SynType(name='STDP_AMPA_synapse',
+    return bp.SynType(name='STDP_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
-                      
-                      
+               
 def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10., 
                    w_min = 0., w_max = 20., delta_A_s = 0.5, delta_A_t = 0.5):
     """
@@ -174,9 +163,6 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     @bp.integrate
     def int_g(g, _t_):
         return -g / tau_decay
-    
-    def my_relu(w):
-        return w if w > 0 else 0
 
     def update(ST, _t_, pre, post):
         g = int_g(ST['g'], _t_)
@@ -185,12 +171,12 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
             g += w
             ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t_) / tau_s) + delta_A_s
             ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t_) / tau_t)
-            w = np.clip(my_relu(ST['w'] - ST['A_t']), w_min, w_max)
+            w = np.clip(ST['w'] - ST['A_t'], w_min, w_max)
             ST['last_spike'] = _t_
         if post['spike']:
             ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t_) / tau_s)
             ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t_) / tau_t) + delta_A_t
-            w = np.clip(my_relu(ST['w'] + ST['A_s']), w_min, w_max)
+            w = np.clip(ST['w'] + ST['A_s'], w_min, w_max)
             ST['last_spike']  =_t_
         ST['w'] = w
         ST['g'] = g
@@ -198,19 +184,19 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
 
     @bp.delayed
     def output(ST, post):
-        I_syn = - g_max * ST['w'] * (post['V'] - E)
+        I_syn = - g_max * ST['g'] * (post['V'] - E)
         post['input'] += I_syn
 
-    return bp.SynType(name='STDP_AMPA_synapse',
+    return bp.SynType(name='STDP_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=False)
-                    
-                    
+
+
 if __name__ == '__main__':
     duration = 550.
     dt = 0.02
-    bp.profile.set(backend = "numpy", dt = dt, merge_steps = True, show_code = False)
+    bp.profile.set(backend = "numba", dt = dt, merge_steps = True, show_code = False)
     STDP_syn = get_STDP1()
 
     # set params
