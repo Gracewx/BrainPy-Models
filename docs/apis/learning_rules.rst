@@ -9,4 +9,6 @@ bpmodels.learning_rules
     :toctree: _autosummary
 
     get_STDP1
+    get_STDP1_scalar
     get_STDP2
+    get_STDP2_scalar
