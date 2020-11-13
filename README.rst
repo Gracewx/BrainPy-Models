@@ -1,15 +1,15 @@
 BrainPy-Models
 ===================
 
-**Note**: *BrainPy-Models is a project under development.*
-*More features are coming soon. Contributions are welcome.*
+**Note**: *We welcome your contributions for model implementations.*
 
 
 ``BrainPy-Models`` is a repository accompany with 
 `BrainPy <https://github.com/PKU-NIP-Lab/BrainPy>`_, 
 which is a framework for spiking neural network simulation. 
-With BrainPy, we implements the most cononical and 
-effective neuron models and synapse models, and show them in ``BrainPy-Models``.
+With BrainPy, we implements the most canonical and
+effective neuron models and synapse models,
+and show them in ``BrainPy-Models``.
 
 Here, users can directly import our models into your network,
 and also can learn examples of how to use BrainPy from 
@@ -34,16 +34,9 @@ Install from source code::
 	
 The following packages need to be installed to use ``BrainPy-Models``:
 
-- Python >= 3.5
-- NumPy >= 1.13
-- Sympy >= 1.2
+- Python >= 3.7
 - Matplotlib >= 2.0
-- autopep8
 - BrainPy
-
-Packages recommended to install:
-
-- Numba >= 0.40.0
 
 
 

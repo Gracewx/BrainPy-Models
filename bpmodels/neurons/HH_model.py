@@ -71,7 +71,7 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
     def int_V(V, _t_, m, h, n, I_ext):
         I_Na = (g_Na * np.power(m, 3.0) * h) * (V - E_Na)
         I_K = (g_K * np.power(n, 4.0))* (V - E_K)
-        I_leak = g_leak * (V - E_K)
+        I_leak = g_leak * (V - E_leak)
         dVdt = (- I_Na - I_K - I_leak + I_ext)/C 
         return dVdt, noise / C
     

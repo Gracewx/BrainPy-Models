@@ -47,8 +47,8 @@ to use them with our API.
    examples/EI_balanced
 
 .. toctree::
-   :maxdepth: 1
-   :caption: APIs
+   :maxdepth: 2
+   :caption: API documentation
    
    apis/neurons
    apis/synapses

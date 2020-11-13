@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import brainpy as bp
-import matplotlib.pyplot as plt
 
-## define Leaky Integrate-and-Fire model
-def get_LIF(V_rest = 0., V_reset = -5.,  V_th = 20., R = 1., C = 10., tau = 10., t_refractory = 5., noise = 0.):
-    """
-    Leaky Integrate-and-Fire neuron model.
+import brainpy as bp
+
+
+def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
+            tau=10., t_refractory=5., noise=0.):
+    """Leaky Integrate-and-Fire neuron model.
         
     .. math::
 
@@ -25,61 +24,32 @@ def get_LIF(V_rest = 0., V_reset = -5.,  V_th = 20., R = 1., C = 10., tau = 10.,
     Returns:
         bp.Neutype: return description of LIF model.
     """
-    
+
     ST = bp.types.NeuState(
-        {'V': 0, 'input':0, 'spike':0, 'refractory': 0, 't_last_spike': -1e7}
-    )  
-    
+        {'V': 0, 'input': 0, 'spike': 0, 'refractory': 0, 't_last_spike': -1e7}
+    )
+
     @bp.integrate
     def int_V(V, _t_, I_ext):  # integrate u(t)
-        return (- ( V - V_rest ) + R * I_ext) / tau, noise / tau
+        return (- (V - V_rest) + R * I_ext) / tau, noise / tau
 
-    def update(ST, _t_):  
+    def update(ST, _t_):
         # update variables
         ST['spike'] = 0
-        ST['refractory'] = True if _t_ - ST['t_last_spike'] <= t_refractory else False
-        if not ST['refractory']:
+        if _t_ - ST['t_last_spike'] <= t_refractory:
+            ST['refractory'] = 1.
+        else:
+            ST['refractory'] = 0.
             V = int_V(ST['V'], _t_, ST['input'])
             if V >= V_th:
                 V = V_reset
                 ST['spike'] = 1
                 ST['t_last_spike'] = _t_
             ST['V'] = V
-    
-    def reset(ST):
-        ST['input'] = 0.  #ST['input'] is current input (only valid for current step, need reset each step)
-    
-    return bp.NeuType(name = 'LIF_neuron', requires = dict(ST=ST), steps = [update, reset], vector_based = False)
-    
-if __name__ == '__main__':
-    print("version：", bp.__version__)
-    ## set global params
-    dt = 0.02        # update variables per <dt> ms
-    duration = 100.  # simulate duration
-    bp.profile.set(backend = "numba", dt = dt, merge_steps = True)
-    
-    # define neuron type
-    LIF_neuron = get_LIF(noise = 1.)
-    
-    # build neuron group
-    neu = bp.NeuGroup(LIF_neuron, geometry = (10, ), monitors = ['V', 'refractory', "spike", "t_last_spike"])  
-    neu.pars['V_rest'] = np.random.randint(0, 2, size = (10,))
-    neu.pars['tau'] = np.random.randint(5, 10, size = (10,))
-    neu.pars['noise'] = 1.
-    neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
+        # ST['input'] is current input (only valid for current step, need reset each step)
+        ST['input'] = 0.
 
-    #simulate
-    neu.run(duration = duration, inputs = ["ST.input", 26.], report = True)  
-    #simulate for 100 ms. Give external input = 26.
-
-    #paint
-    ts = neu.mon.ts
-    fig, gs = bp.visualize.get_figure(1, 1, 4, 8)
-    fig.add_subplot(gs[0, 0])
-    plt.plot(ts, neu.mon.V[:, 0], label = f'neuron No.{0}, Vr = {neu.pars.get("V_rest")[0]}mV, tau_m = {neu.pars.get("tau")[0]}ms.')
-    plt.plot(ts, neu.mon.V[:, 6], label = f'neuron No.{6}, Vr = {neu.pars.get("V_rest")[6]}mV, tau_m = {neu.pars.get("tau")[6]}ms.')
-    plt.xlabel('Time (ms)')
-    plt.ylabel('Membrane potential')
-    plt.xlim(-0.1, ts[-1] + 0.1)
-    plt.legend()
-    plt.show()
+    return bp.NeuType(name='LIF_neuron',
+                      requires=dict(ST=ST),
+                      steps=update,
+                      vector_based=False)
