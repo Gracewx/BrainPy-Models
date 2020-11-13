@@ -108,100 +108,6 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
                       vector_based=True)
 
 
-def get_STDP1_scalar(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10., 
-                   w_min = 0., w_max = 20., delta_A_s = 0.5, delta_A_t = 0.5):
-    """
-    Spike-time dependent plasticity (in differential form).
-    
-    .. math::
-
-        \\frac{d A_{source}}{d t}&=-\\frac{A_{source}}{\\tau_{source}}
-        
-        \\frac{d A_{target}}{d t}&=-\\frac{A_{target}}{\\tau_{target}}
-    
-    After a pre-synaptic spike:
-
-    .. math::      
-      
-        g_{post}&= g_{post}+w
-        
-        A_{source}&= A_{source} + \\delta A_{source}
-        
-        w&= min([w-A_{target}]^+, w_{max})
-        
-    After a post-synaptic spike:
-    
-    .. math::
-        
-        A_{target}&= A_{target} + \\delta A_{target}
-        
-        w&= min([w+A_{source}]^+, w_{max})
-    
-    Args:
-        g_max (float): Maximum conductance.
-        E (float): Reversal potential.
-        tau_decay (float): Time constant of decay.
-        tau_s (float): Time constant of source neuron (i.e. pre-synaptic neuron)
-        tau_t (float): Time constant of target neuron (i.e. post-synaptic neuron)
-        w_min (float): Minimal possible synapse weight.
-        w_max (float): Maximal possible synapse weight.
-        delta_A_s (float): Change on source neuron traces elicited by a source neuron spike.
-        delta_A_t (float): Change on target neuron traces elicited by a target neuron spike.
-        
-    Returns:
-        bp.Syntype: return description of STDP.
-        
-    References:
-        .. [1] Stimberg, Marcel, et al. "Equation-oriented specification of neural models for
-               simulations." Frontiers in neuroinformatics 8 (2014): 6.
-    """
-
-    requires = dict(
-        ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w'], help='STDP synapse state.'),
-        pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        post=bp.types.NeuState(['V', 'input', 'spike'], help='Post-synaptic neuron state must have "V", "input" and spike item.'),
-    )
-
-    @bp.integrate
-    def int_A_s(A_s, _t_):
-        return -A_s / tau_s
-
-    @bp.integrate
-    def int_A_t(A_t, _t_):
-        return -A_t / tau_t
-
-    @bp.integrate
-    def int_g(g, _t_):
-        return -g / tau_decay
-
-    def update(ST, _t_, pre, post):
-        A_s = int_A_s(ST['A_s'], _t_)
-        A_t = int_A_t(ST['A_t'], _t_)
-        g = int_g(ST['g'], _t_)
-        w = ST['w']
-        if pre['spike']:
-            g += ST['w']
-            A_s = A_s + delta_A_s
-            w = np.clip(ST['w'] - A_t, w_min, w_max)
-        if post['spike']:
-            A_t = A_t + delta_A_t
-            w = np.clip(ST['w'] + A_s, w_min, w_max)
-        ST['A_s'] = A_s
-        ST['A_t'] = A_t
-        ST['g'] = g
-        ST['w'] = w
-
-    @bp.delayed
-    def output(ST, post):
-        I_syn = - g_max * ST['g'] * (post['V'] - E)
-        post['input'] += I_syn
-
-    return bp.SynType(name='STDP_synapse',
-                      requires=requires,
-                      steps=(update, output),
-                      vector_based=False)
-
-
 def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10., 
                    w_min = 0., w_max = 20., delta_A_s = 0.5, delta_A_t = 0.5):
     """
@@ -285,99 +191,15 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
 
     @bp.delayed
     def output(ST, post, post2syn):
-        I_syn = - g_max * ST['g'] * (post['V'] - E)
-        post['input'] += I_syn
+        post_cond = np.zeros(len(post2syn), dtype=np.float_)
+        for post_id, syn_ids in enumerate(post2syn):
+            post_cond[post_id] = np.sum(- g_max * ST['g'][syn_ids] * (post['V'][post_id] - E))
+        post['input'] += post_cond
 
     return bp.SynType(name='STDP_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
-
-
-  
-def get_STDP2_scalar(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10., 
-                   w_min = 0., w_max = 20., delta_A_s = 0.5, delta_A_t = 0.5):
-    """
-    Spike-time dependent plasticity (in integrated form).
-    
-    After a pre-synaptic spike:
-
-    .. math::      
-      
-        g_{post}&= g_{post}+w
-        
-        A_{source}&= A_{source}*e^{\\frac{last update-t}{\\tau_{source}}} + \\delta A_{source}
-        
-        A_{target}&= A_{target}*e^{\\frac{last update-t}{\\tau_{target}}}
-        
-        w&= min([w-A_{target}]^+, w_{max})
-        
-    After a post-synaptic spike:
-    
-    .. math::
-        
-        A_{source}&= A_{source}*e^{\\frac{last update-t}{\\tau_{source}}}
-        
-        A_{target}&= A_{target}*e^{\\frac{last update-t}{\\tau_{target}}} + \\delta A_{target}
-        
-        w&= min([w+A_{source}]^+, w_{max})
-    
-    Args:
-        g_max (float): Maximum conductance.
-        E (float): Reversal potential.
-        tau_decay (float): Time constant of decay.
-        tau_s (float): Time constant of source neuron (i.e. pre-synaptic neuron)
-        tau_t (float): Time constant of target neuron (i.e. post-synaptic neuron)
-        w_min (float): Minimal possible synapse weight.
-        w_max (float): Maximal possible synapse weight.
-        delta_A_s (float): Change on source neuron traces elicited by a source neuron spike.
-        delta_A_t (float): Change on target neuron traces elicited by a target neuron spike.
-        
-    Returns:
-        bp.Syntype: return description of STDP.
-        
-    References:
-        .. [1] Stimberg, Marcel, et al. "Equation-oriented specification of neural models for
-               simulations." Frontiers in neuroinformatics 8 (2014): 6.
-    """
-
-    requires = dict(
-        ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w', 'last_spike'], help='STDP synapse state.'),
-        pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        post=bp.types.NeuState(['V', 'input', 'spike'], help='Post-synaptic neuron state must have "V", "input" and "spike" item.'),
-    )
-
-    @bp.integrate
-    def int_g(g, _t_):
-        return -g / tau_decay
-
-    def update(ST, _t_, pre, post):
-        g = int_g(ST['g'], _t_)
-        w = ST['w']
-        if pre['spike']:
-            g += w
-            ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t_) / tau_s) + delta_A_s
-            ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t_) / tau_t)
-            w = np.clip(ST['w'] - ST['A_t'], w_min, w_max)
-            ST['last_spike'] = _t_
-        if post['spike']:
-            ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t_) / tau_s)
-            ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t_) / tau_t) + delta_A_t
-            w = np.clip(ST['w'] + ST['A_s'], w_min, w_max)
-            ST['last_spike']  =_t_
-        ST['w'] = w
-        ST['g'] = g
-
-
-    @bp.delayed
-    def output(ST, post):
-        I_syn = - g_max * ST['g'] * (post['V'] - E)
-        post['input'] += I_syn
-
-    return bp.SynType(name='STDP_synapse',
-                      requires=requires,
-                      steps=(update, output),
-                      vector_based=False)
 
 
 if __name__ == '__main__':
