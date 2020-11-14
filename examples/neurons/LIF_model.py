@@ -19,7 +19,6 @@ neu = bp.NeuGroup(LIF_neuron, geometry=(10,), monitors=['V', 'refractory', "spik
 neu.pars['V_rest'] = np.random.randint(0, 2, size=(10,))
 neu.pars['tau'] = np.random.randint(5, 10, size=(10,))
 neu.pars['noise'] = 1.
-neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 
 # simulate
 neu.run(duration=duration, inputs=["ST.input", 26.], report=True)
