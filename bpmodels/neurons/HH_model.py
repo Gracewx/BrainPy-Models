@@ -20,10 +20,12 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
     
     .. math::
 
-         C \\frac {dV} {dt} = -(\\bar{g}_{Na} m^3 h (V-E_{Na}) 
-         + \\bar{g}_K n^4 (V-E_K) + g_{leak} (V - E_{leak})) + I(t) 
+        C \\frac {dV} {dt} &= -(\\bar{g}_{Na} m^3 h (V-E_{Na})  
+        + \\bar{g}_K n^4 (V-E_K) + g_{leak} (V - E_{leak})) + I(t) 
 
-        \\frac {dx} {dt} = \\alpha_x (1-x)  - \\beta_x, , \\quad x\\in \\ {Na, K, leak}
+        \\frac {dx} {dt} &= \\alpha_x (1-x)  - \\beta_x, , 
+        \\quad x\\in \\ {Na, K, leak}
+
 
     Args:
         noise (float): the noise fluctuation.
