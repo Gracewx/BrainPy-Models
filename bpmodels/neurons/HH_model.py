@@ -18,19 +18,26 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
     '''
     A Hodgkin–Huxley neuron implemented in BrainPy.
     
+    .. math::
+
+         C \\frac {dV} {dt} = -(\\bar{g}_{Na} m^3 h (V-E_{Na}) 
+         + \\bar{g}_K n^4 (V-E_K) + g_{leak} (V - E_{leak})) + I(t) 
+
+        \\frac {dx} {dt} = \\alpha_x (1-x)  - \\beta_x, , \\quad x\\in \\ {Na, K, leak}
+
     Args:
-        noise (float): the noise fluctuation. default = 0.
-        V_th (float): the spike threshold. default = 20. (mV)
-        C (float): capacitance. default = 1.0 (ufarad)
-        E_Na (float): reversal potential of sodium. default = 50. (mV)
-        E_K (float): reversal potential of potassium. default = -77. (mV)
-        E_leak (float): reversal potential of unspecific. default = -54.387 (mV)
-        g_Na (float): conductance of sodium channel. default = 120. (msiemens)
-        g_K (float): conductance of potassium channel. default = 36. (msiemens)
-        g_leak (float): conductance of unspecific channels. default = 0.03 (msiemens)
+        noise (float): the noise fluctuation.
+        V_th (float): the spike threshold (mV).
+        C (float): capacitance (ufarad).
+        E_Na (float): reversal potential of sodium (mV).
+        E_K (float): reversal potential of potassium (mV).
+        E_leak (float): reversal potential of unspecific (mV).
+        g_Na (float): conductance of sodium channel (msiemens).
+        g_K (float): conductance of potassium channel (msiemens).
+        g_leak (float): conductance of unspecific channels (msiemens).
         
     Returns:
-        HH_neuron (NeuType).
+        bp.NeuType
         
     '''
     
@@ -77,11 +84,11 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
     
     # update the variables change over time (for each step)
     def update(ST, _t_):
-        m = np.clip(int_m(ST['m'], _t_, ST['V']), 0., 1.) # use np.clip to limit the int_m to between 0 and 1.
+        m = np.clip(int_m(ST['m'], _t_, ST['V']), 0., 1.)   # use np.clip to limit the int_m to between 0 and 1.
         h = np.clip(int_h(ST['h'], _t_, ST['V']), 0., 1.)
         n = np.clip(int_n(ST['n'], _t_, ST['V']), 0., 1.)
-        V = int_V(ST['V'], _t_, m, h, n, ST['input'])  # solve V from int_V equation.
-        spike = np.logical_and(ST['V'] < V_th, V >= V_th) # spike when reach threshold.
+        V = int_V(ST['V'], _t_, m, h, n, ST['input'])       # solve V from int_V equation.
+        spike = np.logical_and(ST['V'] < V_th, V >= V_th)   # spike when reach threshold.
         ST['spike'] = spike
         ST['V'] = V
         ST['m'] = m
@@ -89,4 +96,7 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
         ST['n'] = n
         ST['input'] = 0.   
     
-    return bp.NeuType(name='HH_neuron', requires={"ST": ST}, steps=update, vector_based=True)
+    return bp.NeuType(name='HH_neuron', 
+                      requires={"ST": ST}, 
+                      steps=update, 
+                      vector_based=True)
