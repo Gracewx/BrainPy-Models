@@ -26,6 +26,15 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
         \\frac {dx} {dt} &= \\alpha_x (1-x)  - \\beta_x, , 
         \\quad x\\in \\ {Na, K, leak}
 
+        \\alpha_m(V) &= \\frac {0.1(V+40)}{1-exp(\\frac{-(V + 40)} {10})} \\qquad
+        \\beta_m(V) &= 4.0 exp(\\frac{-(V + 65)} {18})
+
+        \\alpha_h(V) &= 0.07 exp(\\frac{-(V+65)}{20}) \\qquad
+        \\beta_h(V) &= \\frac 1 {1 + exp(\\frac{-(V + 35)} {10})}
+
+        \\alpha_n(V) &= \\frac {0.01(V+55)}{1-exp(-(V+55)/10)}  \\qquad
+        \\beta_n(V) &= 0.125 exp(\\frac{-(V + 65)} {80})
+
 
     Args:
         noise (float): the noise fluctuation.
@@ -55,8 +64,6 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
              '"input" denotes synaptic input.\n'
     )
     
-    
-    # call bp.integrate to solve the differential equations
     
     @bp.integrate
     def int_m(m, _t_, V):
