@@ -49,7 +49,7 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] -= post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAa1',
+    return bp.SynType(name='GABAa1_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
@@ -105,7 +105,7 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] -= post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAa2',
+    return bp.SynType(name='GABAa2_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)

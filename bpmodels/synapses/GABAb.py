@@ -68,7 +68,7 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] -= post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAb1',
+    return bp.SynType(name='GABAb1_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
@@ -157,7 +157,7 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] += post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAb2',
+    return bp.SynType(name='GABAb2_synapse',
                       requires=requires,
                       steps=(update, output),
                       vector_based=True)
