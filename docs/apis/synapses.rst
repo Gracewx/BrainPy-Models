@@ -19,3 +19,5 @@ bpmodels.synapses
     get_STP
     get_STDP1
         get_STDP2
+    get_exponential
+    get_two_exponentials
