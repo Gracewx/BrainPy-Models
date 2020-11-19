@@ -4,18 +4,19 @@ import brainpy as bp
 import brainpy.numpy as np
 
 
-def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57, cc_Mg=1.2, tau_decay=100., a=0.5, tau_rise=2.):
+def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57, 
+            cc_Mg=1.2, tau_decay=100., a=0.5, tau_rise=2.):
     """NMDA conductance-based synapse.
 
     .. math::
 
         I_{syn} &= \\bar{g}_{syn} s (V-E_{syn})
 
-        g(t) &= \\bar{g} \\cdot (V-E_{syn}) \\cdot g_{\\infty}
+        g(t) &= \\bar{g} \\cdot g_{\\infty}
         \\cdot \\sum_j s_j(t)
 
         g_{\\infty}(V,[{Mg}^{2+}]_{o}) &= (1+{e}^{-\\alpha V}
-        [{Mg}^{2+}]_{o}/\\beta)^{-1} 
+        \\frac{[{Mg}^{2+}]_{o}} {\\beta})^{-1} 
 
         \\frac{d s_{j}(t)}{dt} &= -\\frac{s_{j}(t)}
         {\\tau_{decay}}+a x_{j}(t)(1-s_{j}(t)) 
@@ -25,7 +26,7 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57, cc_Mg=1.2, tau_decay=100.,
 
     where the decay time of NMDA currents is taken to be :math:`\\tau_{decay}` =100 ms,
     :math:`a= 0.5 ms^{-1}`, and :math:`\\tau_{rise}` =2 ms (Hestrin et al., 1990;
-    Spruston et al., 1995).
+    Spruston et al., 1995)[1]_[2]_.
 
     Parameters
     ----------
@@ -44,6 +45,12 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57, cc_Mg=1.2, tau_decay=100.,
     tau_rise : float
         The time constant of rise.
     a : float
+
+    References
+    ----------
+
+    .. [1] Hestrin, S., et al. "Analysis of excitatory synaptic action in pyramidal cells using whole‐cell recording from rat hippocampal slices." *The Journal of Physiology* 422.1 (1990): 203-225.
+    .. [2]Spruston, Nelson, Peter Jonas, and Bert Sakmann. "Dendritic glutamate receptor channels in rat hippocampal CA3 and CA1 pyramidal neurons." *The Journal of physiology* 482.2 (1995): 325-352.
     """
     requires = dict(
         ST=bp.types.SynState(['x', 's', 'g']),
