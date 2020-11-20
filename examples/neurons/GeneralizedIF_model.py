@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import brainpy as bp
 import bpmodels
 from bpmodels.neurons import get_GeneralizedIF
 
