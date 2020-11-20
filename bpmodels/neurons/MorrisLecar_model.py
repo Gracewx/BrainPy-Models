@@ -57,7 +57,10 @@ def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
         ST['W'] = W
         ST['input'] = 0.
 
+    def reset(ST):
+        ST['input'] = 0.
+
     return bp.NeuType(name='MorrisLecar_neuron',
                       requires={"ST": ST},
-                      steps=update,
+                      steps=[update, reset],
                       vector_based=True)
