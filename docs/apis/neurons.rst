@@ -13,3 +13,4 @@ bpmodels.neurons
     get_Izhikevich
     get_ExpIF
     get_MorrisLecar
+    get_GeneralizedIF
