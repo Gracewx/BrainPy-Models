@@ -16,6 +16,7 @@ LIF_neuron = bpmodels.neurons.get_LIF(noise=1.)
 
 # build neuron group
 neu = bp.NeuGroup(LIF_neuron, geometry=(10,), monitors=['V', 'refractory', "spike", "t_last_spike"])
+neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 neu.pars['V_rest'] = np.random.randint(0, 2, size=(10,))
 neu.pars['tau'] = np.random.randint(5, 10, size=(10,))
 neu.pars['noise'] = 1.

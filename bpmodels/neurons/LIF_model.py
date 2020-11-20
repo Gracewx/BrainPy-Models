@@ -46,10 +46,11 @@ def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
                 ST['spike'] = 1
                 ST['t_last_spike'] = _t_
             ST['V'] = V
-        # ST['input'] is current input (only valid for current step, need reset each step)
+    
+    def reset(ST):
         ST['input'] = 0.
 
     return bp.NeuType(name='LIF_neuron',
                       requires=dict(ST=ST),
-                      steps=update,
+                      steps=(update, reset),
                       vector_based=False)
