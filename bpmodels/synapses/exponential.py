@@ -8,9 +8,9 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
 
     .. math::
 
-    I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
+        I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
 
-    g_{syn} (t) &= \\bar{g}_{syn} exp(- \\frac{t-t_f}{\\tau})  
+        g_{syn} (t) &= \\bar{g}_{syn} exp(- \\frac{t-t_f}{\\tau})  
 
     Args:
         g_max (float): The peak conductance change in µmho (µS).

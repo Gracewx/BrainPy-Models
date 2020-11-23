@@ -8,10 +8,10 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
     alpha conductance-based synapse.
 
     .. math::
+    
+        I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
 
-    I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
-
-    g_{syn} (t) &= \\bar{g}_{syn} \\frac{t-t_f} {\\tau} exp(- \\frac{t-t_f}{\\tau})  
+        g_{syn} (t) &= \\bar{g}_{syn} \\frac{t-t_f} {\\tau} exp(- \\frac{t-t_f}{\\tau})  
 
 
     Args:
