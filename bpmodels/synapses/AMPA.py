@@ -12,14 +12,13 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
 
         \\frac{d s}{d t}&=-\\frac{s}{\\tau_{decay}}+\\sum_{k} \\delta(t-t_{j}^{k})
 
-    Parameters
-    ----------
-    g_max : float
-        Maximum conductance.
-    E : float
-        Reversal potential.
-    tau_decay : float
-        Tau for decay.
+    Args:
+        g_max (float): Maximum conductance in µmho (µS).
+        E (float): The reversal potential for the synaptic current.
+        tau_decay (float): The time constant of decay.
+
+    Returns:
+        bp.Neutype
     """
 
     @bp.integrate
@@ -72,20 +71,16 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
 
         \\frac{ds}{dt} &=\\alpha[T](1-s)-\\beta s
 
-    Parameters
-    ----------
-    g_max : float
-        Maximum conductance.
-    E : float
-        Reversal potential.
-    alpha : float
-        Binding constant.
-    beta : float
-        Unbinding constant.
-    T : float
-        Neurotransmitter.
-    T_duration : float
-        Binding of neurotransmitter.
+    Args:
+        g_max (float): Maximum conductance in µmho (µS).
+        E (float): The reversal potential for the synaptic current.
+        alpha (float): Binding constant.
+        beta (float): Unbinding constant.
+        T (float): Neurotransmitter binding coefficient.
+        T_duration (float): Duration of the binding of neurotransmitter.
+
+    Returns:
+        bp.Neutype
     """
 
     @bp.integrate
