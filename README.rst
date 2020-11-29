@@ -19,6 +19,11 @@ and also can learn examples of how to use BrainPy from
 Installation
 ============
 
+Install from source code::
+
+    > python setup.py git+https://github.com/PKU-NIP-Lab/BrainPy-Models
+
+
 Install ``BrainPy-Models`` using ``conda``::
 
     > conda install -c brainpy bpmodels
@@ -28,16 +33,12 @@ Install ``BrainPy-Models`` using ``pip``::
 
     > pip install bpmodels
 
-Install from source code::
 
-    > python setup.py install
-	
 The following packages need to be installed to use ``BrainPy-Models``:
 
 - Python >= 3.7
 - Matplotlib >= 2.0
 - BrainPy
-
 
 
 Quick Start
