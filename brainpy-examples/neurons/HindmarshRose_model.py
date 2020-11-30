@@ -5,7 +5,6 @@ import brainpy.numpy as np
 import bpmodels
 import matplotlib.pyplot as plt
 
-print("version：", bp.__version__)
 # set global params
 dt = 0.02  # update variables per <dt> ms
 bp.profile.set(backend="numba", dt=dt, merge_steps=True)

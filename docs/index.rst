@@ -44,7 +44,10 @@ to use them with our API.
    :maxdepth: 1
    :caption: Examples
    
-   examples/EI_balanced
+   examples/neurons
+   examples/synapses
+   examples/learning_rules
+   examples/networks
 
 .. toctree::
    :maxdepth: 2
