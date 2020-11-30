@@ -9,7 +9,7 @@ def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
         
     .. math::
 
-        \\tau \\frac{d V}{d t}&=-(V-V_{rest}) + RI(t)
+        \\tau \\frac{d V}{d t}=-(V-V_{rest}) + RI(t)
     
     Args:
         V_rest (float): Resting potential.

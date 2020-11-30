@@ -10,7 +10,7 @@ def get_ExpIF(V_rest=-65., V_reset=-68., V_th=-30., V_T=-59.9, delta_T=3.48,
     
     .. math::
     
-        \\tau\\frac{d u}{d t}&= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\delta_T}} + RI(t)
+        \\tau\\frac{d u}{d t}= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\Delta_T}} + RI(t)
         
     Args:
         V_rest (float): Resting potential.
