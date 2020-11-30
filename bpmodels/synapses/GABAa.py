@@ -20,7 +20,11 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
 
     Returns:
         bp.SynType: return description of GABAa synapse model.
-
+    
+    References:
+        .. [1] Gerstner, Wulfram, et al. Neuronal dynamics: From single 
+               neurons to networks and models of cognition. Cambridge 
+               University Press, 2014.
     """
     requires = dict(
         ST=bp.types.SynState(['s', 'g'], help = "GABAa synapse state"),
@@ -76,6 +80,10 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
     Returns:
         bp.SynType: return description of GABAa synapse model.
 
+    References:
+        .. [1] Destexhe, Alain, and Denis Paré. "Impact of network activity
+               on the integrative properties of neocortical pyramidal neurons
+               in vivo." Journal of neurophysiology 81.4 (1999): 1531-1547.
     """
     requires = dict(
         ST=bp.types.SynState({'s': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAa synapse state"),

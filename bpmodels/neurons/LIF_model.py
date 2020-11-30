@@ -23,6 +23,11 @@ def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
         
     Returns:
         bp.Neutype: return description of LIF model.
+        
+    References:
+        .. [1] Gerstner, Wulfram, et al. Neuronal dynamics: From single 
+               neurons to networks and models of cognition. Cambridge 
+               University Press, 2014.
     """
 
     ST = bp.types.NeuState(

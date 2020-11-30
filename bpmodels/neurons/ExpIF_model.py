@@ -26,6 +26,11 @@ def get_ExpIF(V_rest=-65., V_reset=-68., V_th=-30., V_T=-59.9, delta_T=3.48,
         
     Returns:
         bp.Neutype: return description of ExpIF model.
+    
+    References:
+        .. [1] Fourcaud-Trocmé, Nicolas, et al. "How spike generation 
+               mechanisms determine the neuronal response to fluctuating 
+               inputs." Journal of Neuroscience 23.37 (2003): 11628-11640.
     """
 
     ST = bp.types.NeuState(

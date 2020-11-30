@@ -32,6 +32,11 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
 
     Returns:
         bp.SynType: return description of GABAb synapse model.
+        
+    References:
+        .. [1] Gerstner, Wulfram, et al. Neuronal dynamics: From single 
+               neurons to networks and models of cognition. Cambridge 
+               University Press, 2014.
     """
 
     requires = dict(
@@ -114,6 +119,12 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
 
     Returns:
         bp.SynType: return decription of GABAb synapse model.
+    
+    References:
+        .. [1] Destexhe, Alain, et al. "G-protein activation kinetics and 
+               spillover of GABA may account for differences between 
+               inhibitory responses in the hippocampus and thalamus." 
+               Proc. Natl. Acad. Sci. USA v92 (1995): 9515-9519.
 
     """
     requires = dict(
