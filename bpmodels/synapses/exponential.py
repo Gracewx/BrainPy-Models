@@ -10,7 +10,17 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
 
         I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
 
-        g_{syn} (t) &= \\bar{g}_{syn} exp(- \\frac{t-t_f}{\\tau})  
+        g_{syn} (t) &= \\bar{g}_{syn} exp(- \\frac{t-t_f}{\\tau})
+
+    ST refers to synapse state, members of ST are listed below:
+    
+    ================ ======== =========================================================
+    **Member name**  **Type** **Explanation**
+    ---------------- -------- ---------------------------------------------------------     
+    g                float    Synapse conductance on post-synaptic neuron.
+                             
+    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    ================ ======== =========================================================
 
     Args:
         g_max (float): The peak conductance change in µmho (µS).
@@ -22,7 +32,7 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
     '''
 
     requires = {
-        'ST': bp.types.SynState(['g', 'last_spike'],help='The conductance defined by exponential function.'),
+        'ST': bp.types.SynState(['g', 't_last_pre_spike'],help='The conductance defined by exponential function.'),
         'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
         'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
         'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
@@ -33,8 +43,8 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
     def update(ST, _t_, pre, pre2syn):
         for pre_idx in np.where(pre['spike'] > 0.)[0]:
             syn_idx = pre2syn[pre_idx]
-            ST['last_spike'][syn_idx] = _t_
-        g = g_max * np.exp(-(_t_-ST['last_spike']) / tau)
+            ST['t_last_pre_spike'][syn_idx] = _t_
+        g = g_max * np.exp(-(_t_-ST['t_last_pre_spike']) / tau)
         ST['g'] = g
 
     @bp.delayed

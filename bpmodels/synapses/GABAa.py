@@ -13,6 +13,16 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
 
         \\frac{d s}{d t}&=-\\frac{s}{\\tau_{decay}}+\\sum_{k}\\delta(t-t-{j}^{k})
 
+    ST refers to synapse state, members of ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    s               float    Gating variable.
+    
+    g               float    Synapse conductance on post-synaptic neuron.
+    =============== ======== =========================================================
+
     Args:
         g_max (float): Maximum synapse conductance.
         E (float): Reversal potential of synapse.
@@ -68,6 +78,18 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
         I_{syn}&= - \\bar{g}_{max} s (V - E)
 
         \\frac{d r}{d t}&=\\alpha[T]^2(1-s) - \\beta s
+        
+    ST refers to synapse state, members of ST are listed below:
+    
+    ================ ======== =========================================================
+    **Member name**  **Type** **Explanation**
+    ---------------- -------- ---------------------------------------------------------
+    s                float    Gating variable.
+     
+    g                float    Synapse conductance on post-synaptic neuron.
+                             
+    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    ================ ======== =========================================================
 
     Args:
         g_max (float): Maximum synapse conductance.

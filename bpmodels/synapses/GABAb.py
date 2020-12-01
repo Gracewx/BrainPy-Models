@@ -19,6 +19,20 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
     - [G] is the concentration of activated G protein.
     - [R] is the fraction of activated receptor.
     - [T] is the transmitter concentration.
+    
+    ST refers to synapse state, members of ST are listed below:
+    
+    ================ ======== =========================================================
+    **Member name**  **Type** **Explanation**
+    ---------------- -------- ---------------------------------------------------------
+    R                float    The fraction of activated receptor.
+    
+    G                float    The concentration of activated G protein.
+     
+    g                float    Synapse conductance on post-synaptic neuron.
+                             
+    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    ================ ======== =========================================================
 
     Args:
         g_max (float): Maximum synapse conductance.
@@ -40,7 +54,7 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
     """
 
     requires = dict(
-        ST=bp.types.SynState({'R': 0., 'G': 0., 't_last_pre_spike': -1e7, 'g': 0.}, help = "GABAb synapse state"),
+        ST=bp.types.SynState({'R': 0., 'G': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAb synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help = "Pre-synaptic neuron index -> synapse index"),
@@ -100,9 +114,25 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
         I_{GABA_{B}}&=\\bar{g}_{GABA_{B}} \\frac{[G]^{n}}{[G]^{n}+K_{d}}(V-E_{GABA_{B}})
 
     - [R] is the fraction of activated receptor.
-    - [D] is the fraction of activated receptor.
+    - [D] is the fraction of desensitized receptor.
     - [G] is the concentration of activated G-protein (μM).
     - [T] is the transmitter concentration.
+    
+    ST refers to synapse state, members of ST are listed below:
+    
+    ================ ======== =========================================================
+    **Member name**  **Type** **Explanation**
+    ---------------- -------- ---------------------------------------------------------
+    D                float    The fraction of desensitized receptor.
+    
+    R                float    The fraction of activated receptor.
+    
+    G                float    The concentration of activated G protein.
+     
+    g                float    Synapse conductance on post-synaptic neuron.
+                             
+    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    ================ ======== =========================================================
 
     Args:
         g_max (float): Maximum synapse conductance.
@@ -128,7 +158,7 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
 
     """
     requires = dict(
-        ST=bp.types.SynState({'D': 0., 'R': 0., 'G': 0., 't_last_pre_spike': -1e7, 'g': 0.}, help = "GABAb synapse state"),
+        ST=bp.types.SynState({'D': 0., 'R': 0., 'G': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAb synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help = "Pre-synaptic neuron index -> synapse index"),

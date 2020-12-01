@@ -32,6 +32,21 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
         A_{target}&= A_{target} + \\delta A_{target}
         
         w&= min([w+A_{source}]^+, w_{max})
+
+    ST refers to synapse state (note that STDP learning rule can be implemented as synapses),
+    members of ST are listed below:
+    
+    ================ ======== =========================================================
+    **Member name**  **Type** **Explanation**
+    ---------------- -------- ---------------------------------------------------------
+    A_s              float    Source neuron trace.
+    
+    A_t              float    Target neuron trace.
+     
+    g                float    Synapse conductance on post-synaptic neuron.
+                             
+    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    ================ ======== =========================================================
     
     Args:
         g_max (float): Maximum conductance.
@@ -132,6 +147,23 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
         A_{target}&= A_{target}*e^{\\frac{last update-t}{\\tau_{target}}} + \\delta A_{target}
         
         w&= min([w+A_{source}]^+, w_{max})
+
+    ST refers to synapse state (note that STDP learning rule can be implemented as synapses),
+    members of ST are listed below:
+    
+    ================ ======== =========================================================
+    **Member name**  **Type** **Explanation**
+    ---------------- -------- ---------------------------------------------------------
+    A_s              float    Source neuron trace.
+    
+    A_t              float    Target neuron trace.
+     
+    g                float    Synapse conductance on post-synaptic neuron.
+    
+    w                float    Synapse weight.
+                             
+    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    ================ ======== =========================================================
     
     Args:
         g_max (float): Maximum conductance.
