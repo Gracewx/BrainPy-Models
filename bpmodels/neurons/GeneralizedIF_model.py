@@ -30,6 +30,28 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     
     Note that I_j refers to arbitrary number of internal currents.
     
+    ST refers to neuron state, members of ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    V               float    Membrane potential.
+    
+    input           float    External and synaptic input current.
+    
+    spike           float    Flag to mark whether the neuron is spiking. 
+    
+                             Can be seen as bool.
+    
+    V_th            float    Spiking threshold potential.
+                             
+    I1              float    Internal current 1.
+    
+    I2              float    Internal current 2.
+                             
+    t_last_spike    float    Last spike time stamp.
+    =============== ======== =========================================================
+    
     Args:
         V_rest (float): Resting potential.
         V_reset (float): Reset potential after spike.
@@ -43,9 +65,9 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
         k1 (float): Constant pf I1.
         k2 (float): Constant of I2.
         R1 (float): Free parameter.
-        R2 (float): free parameter.
+        R2 (float): Free parameter.
         A1 (float): Free parameter.
-        A2 (float): free parameter.
+        A2 (float): Free parameter.
         noise (float): noise.   
         
     Returns:

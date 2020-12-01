@@ -11,6 +11,26 @@ def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
 
         \\tau \\frac{d V}{d t}=-(V-V_{rest}) + RI(t)
     
+    ST refers to neuron state, members of ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    V               float    Membrane potential.
+    
+    input           float    External and synaptic input current.
+    
+    spike           float    Flag to mark whether the neuron is spiking. 
+    
+                             Can be seen as bool.
+                             
+    refractory      float    Flag to mark whether the neuron is in refractory period. 
+     
+                             Can be seen as bool.
+                             
+    t_last_spike    float    Last spike time stamp.
+    =============== ======== =========================================================
+    
     Args:
         V_rest (float): Resting potential.
         V_reset (float): Reset potential after spike.

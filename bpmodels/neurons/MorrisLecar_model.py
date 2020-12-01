@@ -5,7 +5,20 @@ import brainpy.numpy as np
 
 def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
                     g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04):
-    """The Morris-Lecar  neuron model.
+    """
+    The Morris-Lecar neuron model.
+
+    ST refers to neuron state, members of ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    V               float    Membrane potential.
+    
+    W               float    Gating variable, refers to the fraction of opened K+ channels.
+    
+    input           float    External and synaptic input current.
+    =============== ======== =========================================================
 
     Args:
         noise (float): The noise fluctuation.
@@ -27,11 +40,7 @@ def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
     """
 
     ST = bp.types.NeuState(
-        {'V': -20, 'W': 0.02, 'input': 0.},
-        help='MorrisLecar model neuron state.\n'
-             '"V" denotes membrane potential.\n'
-             '"W" denotes fraction of open K+ channels.\n'
-             '"input" denotes synaptic input.\n'
+        {'V': -20, 'W': 0.02, 'input': 0.}
     )
 
     @bp.integrate

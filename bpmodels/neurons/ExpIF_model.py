@@ -11,6 +11,26 @@ def get_ExpIF(V_rest=-65., V_reset=-68., V_th=-30., V_T=-59.9, delta_T=3.48,
     .. math::
     
         \\tau\\frac{d u}{d t}= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\Delta_T}} + RI(t)
+    
+    ST refers to neuron state, members of ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    V               float    Membrane potential.
+    
+    input           float    External and synaptic input current.
+    
+    spike           float    Flag to mark whether the neuron is spiking. 
+    
+                             Can be seen as bool.
+                             
+    refractory      float    Flag to mark whether the neuron is in refractory period. 
+     
+                             Can be seen as bool.
+                             
+    t_last_spike    float    Last spike time stamp.
+    =============== ======== =========================================================
         
     Args:
         V_rest (float): Resting potential.

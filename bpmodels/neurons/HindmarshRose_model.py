@@ -13,14 +13,29 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
         &\\frac{d y}{d t} = c - d V^2 - y
 
         &\\frac{d z}{d t} = r (s (V - V_{rest}) - z)
+        
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    V               float    Membrane potential.
+    
+    y               float    Gating variable.
+                             
+    z               float    Gating variable.
+    
+    input           float    External and synaptic input current.
+    =============== ======== =========================================================
 
     Args:
-        a (float): Model parameter.
-        b (float): Model parameter.
-        c (float): Model parameter.
-        d (float): Model parameter.
-        r (float): Model parameter.
-        s (float): Model parameter.
+        a (float): Model parameter. Fixed to a value best fit neuron activity.
+        b (float): Model parameter. Allows the model to switch between bursting 
+                   and spiking, controls the spiking frequency.
+        c (float): Model parameter. Fixed to a value best fit neuron activity.
+        d (float): Model parameter. Fixed to a value best fit neuron activity.
+        r (float): Model parameter. Controls slow variable z's variation speed. 
+                   Governs spiking frequency when spiking, and affects the number 
+                   of spikes per burst when bursting.
+        s (float): Model parameter. Governs adaption.
         V_rest (float): Membrane resting potential.
 
     Returns:
