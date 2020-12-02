@@ -5,13 +5,23 @@ import brainpy.numpy as np
 def get_alpha(g_max=.2, E=0., tau_decay = 2.):
 
     """
-    alpha conductance-based synapse.
+    Alpha conductance-based synapse.
 
     .. math::
     
         I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
 
         g_{syn} (t) &= \\bar{g}_{syn} \\frac{t-t_f} {\\tau} exp(- \\frac{t-t_f}{\\tau})  
+
+    ST refers to the synapse state, items in ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    g                 float    Synapse conductance.
+
+    t_last_pre_spike  float    Last spike time stamp of the presynaptic neuron.                                                      
+    =============== ======== =========================================================
 
 
     Args:
@@ -21,11 +31,16 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
 
     Returns:
         bp.Neutype
+
+    References:
+        .. [1] Sterratt, David, Bruce Graham, Andrew Gillies, and David Willshaw. 
+                "The Synapse." Principles of Computational Modelling in Neuroscience. 
+                Cambridge: Cambridge UP, 2011. 172-95. Print.
     """
 
 
     requires = {
-        'ST': bp.types.SynState(['g', 'last_spike'],help='The conductance defined by exponential function.'),
+        'ST': bp.types.SynState(['g', 't_last_pre_spike'],help='The conductance defined by exponential function.'),
         'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
         'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
         'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
@@ -35,8 +50,8 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
     def update(ST, _t_, pre, pre2syn):
         for pre_idx in np.where(pre['spike'] > 0.)[0]:
             syn_idx = pre2syn[pre_idx]
-            ST['last_spike'][syn_idx] = _t_
-        c = (_t_-ST['last_spike']) / tau_decay
+            ST['t_last_pre_spike'][syn_idx] = _t_
+        c = (_t_-ST['t_last_pre_spike']) / tau_decay
         g = g_max * np.exp(-c) * c
         ST['g'] = g
 

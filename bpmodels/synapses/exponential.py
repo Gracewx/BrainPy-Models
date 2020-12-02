@@ -4,7 +4,7 @@ import brainpy.numpy as np
 
 def get_exponential(g_max=0.2, E=-60., tau=8):
     '''
-    exponential synapse model.
+    Exponential decay synapse model.
 
     .. math::
 
@@ -17,9 +17,9 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
     ================ ======== =========================================================
     **Member name**  **Type** **Explanation**
     ---------------- -------- ---------------------------------------------------------     
-    g                float    Synapse conductance on post-synaptic neuron.
+    g                float    Synapse conductance on the post-synaptic neuron.
                              
-    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
+    t_last_pre_spike float    Last spike time stamp of the pre-synaptic neuron.
     ================ ======== =========================================================
 
     Args:
@@ -29,6 +29,11 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
 
     Returns:
         bp.Neutype: return description of exponential synapse model.
+
+    References:
+        .. [1] Sterratt, David, Bruce Graham, Andrew Gillies, and David Willshaw. 
+                "The Synapse." Principles of Computational Modelling in Neuroscience. 
+                Cambridge: Cambridge UP, 2011. 172-95. Print.
     '''
 
     requires = {

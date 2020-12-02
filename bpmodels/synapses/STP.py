@@ -29,6 +29,21 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
     by total release of all the neurotransmitter (:math:`u=x=1`), called
     absolute synaptic efficacy of the connections.
 
+    ST refers to the synapse state, items in ST are listed below:
+    
+    =============== ======== =========================================================
+    **Member name** **Type** **Explanation**
+    --------------- -------- ---------------------------------------------------------
+    u               float    Release probability of the neurotransmitters.
+
+    x               float    A Normalized variable denoting the fraction of remain neurotransmitters.
+
+    w               float    Weights.
+
+    g               float    Synapse conductance.
+    =============== ======== =========================================================
+
+
     Parameters
     ----------
     tau_d : float
