@@ -6,10 +6,13 @@
 BrainPy-Models documentation
 ===============================
 
-``BrainPy-Models`` is based on `BrainPy <https://brainpy.readthedocs.io/>`_ neuronal
-dynamics simulation framework. Here you can find the list of all the models implemented with
-BrainPy for neurons, synapses and topological networks.
+``BrainPy-Models`` is based on `BrainPy <https://brainpy.readthedocs.io/>`_ neuronal dynamics simulation framework. Here you can find neurons, synapses models and topological networks implemented with BrainPy.
 
+The prior goal of ``BrainPy-Models`` is to free users from repeatly implementing the most simple and commonly used models, instead they can import ``get_*()`` functions and take the advantage of our models. 
+
+``BrainPy-Models`` is also designed to display ``BrainPy``. We hope users can learn in our models and examples how to use ``BrainPy`` (better), how to understand it, and the most elegant and appealing features of it.
+
+Enjoy your diving in the sea of dynamical models!
 
 
 .. note::
@@ -17,18 +20,14 @@ BrainPy for neurons, synapses and topological networks.
    We welcome your implementation about `neurons`, `synapses`, `learning rules`,
    `networks` and `paper examples`. https://github.com/PKU-NIP-Lab/BrainPy-Models
 
-The documentation includes three parts.
+The documentation includes three main parts.
 
-In `Tutorials` section, you can learn implementations of classical neuron 
-models, synapse models and learning rules. With ``BrainPy``, our goal is to 
-reveal the world of computational neuroscience to new learners.
+In `Tutorials` section, you can learn mechanisms and implementations of several classical neuron models, synapse models and learning rules. With ``BrainPy``, we want to reveal the world of computational neuroscience to new learners here.
 
-In `Examples` section, we provide implentations of widely known and used 
-networks (ex. Excitatort-inhibitory balanced network). We hope users can see 
-these as examples of using `bpmodels` to simplify network implementation.
+In `APIs` section, we give details about all the provided models, present their mathematical representations, explan their APIs and give biologically plausible meaning to parameters and members.
 
-In `APIs` section, we give details about all the models that we provided and how
-to use them with our API.
+In `Examples` section, we provide examples using our APIs and implentations of widely known and used 
+networks (ex. Excitatory-inhibitory balanced network). Some of them are implemented totally based on our API, others show how easy and flexible can users define models using ``BrainPy``. We hope users can see these as examples of using `bpmodels` to simplify network implementation.
 
 
 
