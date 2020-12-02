@@ -16,6 +16,35 @@ and also can learn examples of how to use BrainPy from
 `Documentations <https://brainpy-models.readthedocs.io/en/latest/>`_.
 
 
+
+We provide the following models:
+
++---------------------------------+---------------------------------+-------------------+----------------------------+
+|   Neuron models                 |   Synapse models                |   Learning rules  | Networks                   |
++=================================+=================================+===================+============================+
+| Hodgkin-Huxley Model            |  Voltage Jump Synapse           |   Oja             |  Echo state network        |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Morris–Lecar model              |  Exponential Decay Synapse      |   BCM             |  Liquid-state machine      |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Hindmarsh–Rose model            |  Alpha Synapse                  |   STDP            |Continuous attractor network| 
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Leaky integrate-and-fire model  |  Difference of Two Exponentials |                   |  Hopfield model            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Quadratic integrate-and-fire    |  AMPA                           |                   |    E/I balance network     |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Generalized integrate-and-fire  |  GABA_A / GABA_B                |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Exponential integrate-and-fire  |  NMDA                           |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Adaptive exponential LIF model  |  Short-term plasticity          |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Wilson Polynomial model         |                                 |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+
+
+
+
+
 Installation
 ============
 
@@ -44,17 +73,14 @@ The following packages need to be installed to use ``BrainPy-Models``:
 Quick Start
 ============
 
-Let's see how to use ``bpmodels`` to quickly implement a network by seeing the example of E-I balanced network.
+The use of ``bpmodels`` is very convenient, let's take an example of exploring different firing types in the izhikevich model.
 
-First import necessary packages and set parameters.
+We start by importing the ``brainpy`` and ``bpmodels`` packages and set profile.
 
 ::
 
     import brainpy as bp
-    import brainpy.numpy as np
-    from bpmodels.neurons import get_LIF
-    from bpmodels.synapses import get_alpha
-    import matplotlib.pyplot as plt
+    import bpmodels
 
     # set profile
     bp.profile.set(backend='numba',
@@ -62,57 +88,53 @@ First import necessary packages and set parameters.
                 merge_steps=True,
                 numerical_method='exponential')
 
-    # set parameters
-    V_rest = -52.
-    V_reset = -60.
-    V_th = -50.
-    num_exc = 500
-    num_inh = 500
-    prob = 0.15
 
-    JE = 1 / np.sqrt(prob * num_exc)
-    JI = 1 / np.sqrt(prob * num_inh)
-
-Then you can get neuron and synapse models, for more details, see `APIs <https://brainpy-models.readthedocs.io/en/latest/>`_.
+The pre-defined izhikevich model provides many different modes, so we can use ``mode='tonic spiking'`` to get a pre-defined model with tonic spiking parameters.
 
 ::
 
-    # get neuron model
-    neu = get_LIF(V_rest=V_rest, V_reset = V_reset, V_th=V_th, noise=0.)
+    izh = bpmodels.neurons.get_Izhikevich(mode='tonic spiking')
+    
+    (step_I, duration) = bp.inputs.constant_current(
+                            [(0, 50), (10, 100), (0, 50)])
 
-    # get synapse model
-    syn = get_alpha(tau_decay = 2.)
+    neuron = bp.NeuGroup(neu_type, 1, monitors= ['V', 'u'])
 
-    # build network
-    group = bp.NeuGroup(neu,
-                        geometry=num_exc + num_inh,
-                        monitors=['spike'])
-    group.ST['V'] = np.random.random(num_exc + num_inh) * (V_th - V_rest) + V_rest
-
-    exc_conn = bp.SynConn(syn,
-                        pre_group=group[:num_exc],
-                        post_group=group,
-                        conn=bp.connect.FixedProb(prob=prob))
-    exc_conn.ST['w'] = JE
-
-    inh_conn = bp.SynConn(syn,
-                        pre_group=group[num_exc:],
-                        post_group=group,
-                        conn=bp.connect.FixedProb(prob=prob))
-    inh_conn.ST['w'] = -JI
-
-    net = bp.Network(group, exc_conn, inh_conn)
-    net.run(duration=1000., inputs=[(group, 'ST.input', 3.)], report=True)
+    neuron.run(duration = duration, inputs = ["ST.input", step_I])
+    
 
     # visualization
 
-    fig, gs = bp.visualize.get_figure(4, 1, 2, 12)
+    ts = neuron.mon.ts
+    fig, gs = bp.visualize.get_figure(3, 1, 3, 6)
 
-    fig.add_subplot(gs[:3, 0])
-    bp.visualize.plot_raster(group.mon, net.ts, xlim=(50, 950))
+    fig.add_subplot(gs[0, 0])
+    plt.plot(ts, step_I, 'r')
+    plt.ylabel('Input Current')
+    plt.xlim(-0.1, duration + 0.1)
+    plt.xlabel('Time (ms)')
+    plt.title('Input Current')
 
-    fig.add_subplot(gs[3, 0])
-    rates = bp.measure.firing_rate(group.mon.spike, 5.)
-    plt.plot(net.ts, rates)
-    plt.xlim(50, 950)
+    fig.add_subplot(gs[1, 0])
+    plt.plot(ts, neuron.mon.V[:, 0], label='V')
+    plt.ylabel('Membrane potential')
+    plt.xlabel('Time (ms)')
+    plt.xlim(-0.1, duration + 0.1)
+    plt.ylim(-95., 40.)
+    plt.title('Membrane potential')
+    plt.legend()
+
+    fig.add_subplot(gs[2, 0])
+    plt.plot(ts, neuron.mon.u[:, 0], label='u')
+    plt.xlim(-0.1, duration + 0.1)
+    plt.ylabel('Recovery variable')
+    plt.xlabel('Time (ms)')
+    plt.title('Recovery variable')
+    plt.legend()
+
     plt.show()
+    
+    
+Then you would expect to see the following output:
+
+.. image:: docs/images/izh_tonic_spiking.png.png
