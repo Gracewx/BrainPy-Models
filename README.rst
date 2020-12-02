@@ -137,4 +137,4 @@ The pre-defined izhikevich model provides many different modes, so we can use ``
     
 Then you would expect to see the following output:
 
-.. image:: docs/images/izh_tonic_spiking.png.png
+.. image:: docs/images/izh_tonic_spiking.png
