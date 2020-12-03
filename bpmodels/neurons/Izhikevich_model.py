@@ -37,66 +37,45 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     =============== ======== =========================================================
     
     
-    We provide following firing types:
+    We provide following types of firing neurons [1]_:
     
-    =============== ======= ======= ===== ======
-    **Type**    **a**   **b**  **c** **d**
-    --------------- ------- ------- ----- ------
-    Regular Spiking    0.02, 0.2, -65, 8
-
-    Intrinsically Bursting    0.02, 0.2, -55, 4
-
-    Chattering    0.02, 0.2, -50, 2
-
-    Fast Spiking    0.1, 0.2, -65, 2
-
-    Thalamo-cortical    0.02, 0.25, -65, 0.05
-
-    Resonator    0.1, 0.26, -65, 2
-
-    Low-threshold Spiking    0.02, 0.25, -65, 2
+    ====================== ======= ======= ===== ======================================
+    **Type**                **a**   **b**  **c** **d**
+    ---------------------- ------- ------- ----- --------------------------------------
+    Regular Spiking          0.02   0.2     -65     8
+    Intrinsically Bursting   0.02   0.2     -55     4
+    Chattering               0.02   0.2     -50     2
+    Fast Spiking             0.1    0.2     -65     2
+    Thalamo-cortical         0.02   0.25    -65     0.05
+    Resonator                0.1    0.26    -65     2
+    Low-threshold Spiking    0.02   0.25    -65     2
+    ====================== ======= ======= ===== ======================================
 
 
-    tonic spiking 0.02 0.40 -65.0 2.0
-    
-    phasic spiking 0.02 0.25 -65.0 6.0
-
-    tonic bursting 0.02 0.20 -50.0 2.0
-
-    phasic bursting 0.02 0.25 -55.0 0.05
-
-    mixed mode 0.02, 0.20, -55.0, 4.0
-
-    spike frequency adaptation 0.01, 0.20, -65.0, 8.0
-
-    Class 1    0.02, -0.1, -55.0, 6.0
-
-    Class 2    0.20, 0.26, -65.0, 0.0
-
-    spike latency     0.02, 0.20, -65.0, 6.0
-
-    subthreshold oscillation    0.05, 0.26, -60.0, 0.0
-
-    resonator    0.10, 0.26, -60.0, -1.0
-
-    integrator    0.02, -0.1, -55.0, 6.0
-
-    rebound spike    0.03, 0.25, -60.0, 4.0
-
-    rebound burst   0.03, 0.25, -52.0, 0.0
-
-    threshold variability    0.03, 0.25, -60.0, 4.0
-
-    bistability    1.00, 1.50, -60.0, 0.0
-
-    depolarizing afterpotential    1.00, 0.20, -60.0, -21.0
-
-    accommodation    0.02, 1.00, -55.0, 4.0
-
-    inhibition-induced spiking    -0.02, -1.00, -60.0, 8.0
-
-    inhibition-induced bursting   -0.026, -1.00, -45.0, 0
-    =============== ======= ======= ===== ======
+    ============================ ======= ======= ===== =============================
+    **Type**                      **a**   **b**  **c** **d**
+    ---------------------------- ------- ------- ----- -----------------------------
+    tonic spiking                 0.02    0.40    -65.0    2.0
+    phasic spiking                0.02    0.25    -65.0    6.0
+    tonic bursting                0.02    0.20    -50.0    2.0
+    phasic bursting               0.02    0.25    -55.0    0.05
+    mixed mode                    0.02    0.20    -55.0    4.0
+    spike frequency adaptation    0.01    0.20    -65.0    8.0
+    Class 1                       0.02    -0.1    -55.0    6.0
+    Class 2                       0.20    0.26    -65.0    0.0
+    spike latency                 0.02    0.20    -65.0    6.0
+    subthreshold oscillation      0.05    0.26    -60.0    0.0
+    resonator                     0.10    0.26    -60.0    -1.0
+    integrator                    0.02    -0.1    -55.0    6.0
+    rebound spike                 0.03    0.25    -60.0    4.0
+    rebound burst                 0.03    0.25    -52.0    0.0
+    threshold variability         0.03    0.25    -60.0    4.0
+    bistability                   1.00    1.50    -60.0    0.0
+    depolarizing afterpotential   1.00    0.20    -60.0    -21.0
+    accommodation                 0.02    1.00    -55.0    4.0
+    inhibition-induced spiking    -0.02   -1.00   -60.0    8.0
+    inhibition-induced bursting   -0.026  -1.00   -45.0    0
+    ============================ ======= ======= ===== =============================
 
 
 
