@@ -22,23 +22,23 @@ We provide the following models:
 +---------------------------------+---------------------------------+-------------------+----------------------------+
 |   Neuron models                 |   Synapse models                |   Learning rules  | Networks                   |
 +=================================+=================================+===================+============================+
-| Hodgkin-Huxley Model            |  Voltage Jump Synapse           |   Oja             |  Echo state network        |
+| Leaky integrate-and-fire model  | Alpha Synapse                   |   STDP            |Continuous attractor network|
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Morris–Lecar model              |  Exponential Decay Synapse      |   BCM             |  Liquid-state machine      |
+| Hodgkin-Huxley model            | AMPA / NMDA                     |                   |    E/I balance network     |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Hindmarsh–Rose model            |  Alpha Synapse                  |   STDP            |Continuous attractor network| 
+| Izhikevich model                | GABA_A / GABA_B                 |                   |                            | 
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Leaky integrate-and-fire model  |  Difference of Two Exponentials |                   |  Hopfield model            |
+| Morris–Lecar model              | Exponential Decay Synapse       |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Quadratic integrate-and-fire    |  AMPA                           |                   |    E/I balance network     |
+| Generalized integrate-and-fire  | Difference of Two Exponentials  |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Generalized integrate-and-fire  |  GABA_A / GABA_B                |                   |                            |
+| Exponential integrate-and-fire  |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Exponential integrate-and-fire  |  NMDA                           |                   |                            |
+| Hindmarsh–Rose model            |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Adaptive exponential LIF model  |  Short-term plasticity          |                   |                            |
+|                                 |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Wilson Polynomial model         |                                 |                   |                            |
+|                                 |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
 
 
