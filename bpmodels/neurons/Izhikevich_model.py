@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import brainpy as bp
 import brainpy.numpy as np
 
-def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., mode=None):
+def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., type=None):
 
     '''
     The Izhikevich neuron model.
@@ -36,24 +36,11 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     t_last_spike    float    Last spike time stamp.
     =============== ======== =========================================================
     
-    Args:
-        mode (str): The neuron spiking mode. (List below)
-        a (float): It determines the time scale of the recovery variable :math:`u`.
-        b (float): It describes the sensitivity of the recovery variable :math:`u` to the sub-threshold fluctuations of the membrane potential :math:`v`.
-        c (float): It describes the after-spike reset value of the membrane potential :math:`v` caused by the fast high-threshold :math:`K^{+}` conductance.
-        d (float): It describes after-spike reset of the recovery variable :math:`u` caused by slow high-threshold :math:`Na^{+}` and :math:`K^{+}` conductance.
-        t_refractory (float): Refractory period length. [ms]
-        noise(float): The noise fluctuation.
-        V_th (float): The membrane potential threshold.
-
-    Returns:
-        bp.Neutype: return description of Izhikevich model.
-
-
-    We provide following modes:
+    
+    We provide following firing types:
     
     =============== ======= ======= ===== ======
-    **Mode Name**    **a**   **b**  **c** **d**
+    **Type**    **a**   **b**  **c** **d**
     --------------- ------- ------- ----- ------
     Regular Spiking    0.02, 0.2, -65, 8
 
@@ -112,6 +99,21 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     =============== ======= ======= ===== ======
 
 
+
+    Args:
+        type (str): The neuron spiking type. (List above)
+        a (float): It determines the time scale of the recovery variable :math:`u`.
+        b (float): It describes the sensitivity of the recovery variable :math:`u` to the sub-threshold fluctuations of the membrane potential :math:`v`.
+        c (float): It describes the after-spike reset value of the membrane potential :math:`v` caused by the fast high-threshold :math:`K^{+}` conductance.
+        d (float): It describes after-spike reset of the recovery variable :math:`u` caused by slow high-threshold :math:`Na^{+}` and :math:`K^{+}` conductance.
+        t_refractory (float): Refractory period length. [ms]
+        noise(float): The noise fluctuation.
+        V_th (float): The membrane potential threshold.
+
+    Returns:
+        bp.Neutype: return description of Izhikevich model.
+
+
     References:
         .. [1] Izhikevich, Eugene M. "Simple model of spiking neurons." IEEE
                Transactions on neural networks 14.6 (2003): 1569-1572.
@@ -124,61 +126,61 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
            {'V': -65., 'u': 1., 'input': 0., 'spike': 0., 't_last_spike': -1e7}
     )
 
-    if mode in ['tonic', 'tonic spiking']:
+    if type in ['tonic', 'tonic spiking']:
         a, b, c, d = [0.02, 0.40, -65.0, 2.0]
-    elif mode in ['phasic', 'phasic spiking']:
+    elif type in ['phasic', 'phasic spiking']:
         a, b, c, d = [0.02, 0.25, -65.0, 6.0]
-    elif mode in ['tonic bursting']:
+    elif type in ['tonic bursting']:
         a, b, c, d = [0.02, 0.20, -50.0, 2.0]
-    elif mode in ['phasic bursting']:
+    elif type in ['phasic bursting']:
         a, b, c, d = [0.02, 0.25, -55.0, 0.05]
-    elif mode in ['mixed mode']:
+    elif type in ['mixed mode']:
         a, b, c, d = [0.02, 0.20, -55.0, 4.0]
-    elif mode in ['SFA', 'spike frequency adaptation']:
+    elif type in ['SFA', 'spike frequency adaptation']:
         a, b, c, d = [0.01, 0.20, -65.0, 8.0]
-    elif mode in ['Class 1', 'class 1']:
+    elif type in ['Class 1', 'class 1']:
         a, b, c, d = [0.02, -0.1, -55.0, 6.0]
-    elif mode in ['Class 2', 'class 2']:
+    elif type in ['Class 2', 'class 2']:
         a, b, c, d = [0.20, 0.26, -65.0, 0.0]
-    elif mode in ['spike latency', ]:
+    elif type in ['spike latency', ]:
         a, b, c, d = [0.02, 0.20, -65.0, 6.0]
-    elif mode in ['subthreshold oscillation']:
+    elif type in ['subthreshold oscillation']:
         a, b, c, d = [0.05, 0.26, -60.0, 0.0]
-    elif mode in ['resonator', ]:
+    elif type in ['resonator', ]:
         a, b, c, d = [0.10, 0.26, -60.0, -1.0]
-    elif mode in ['integrator', ]:
+    elif type in ['integrator', ]:
         a, b, c, d = [0.02, -0.1, -55.0, 6.0]
-    elif mode in ['rebound spike', ]:
+    elif type in ['rebound spike', ]:
         a, b, c, d = [0.03, 0.25, -60.0, 4.0]
-    elif mode in ['rebound burst', ]:
+    elif type in ['rebound burst', ]:
         a, b, c, d = [0.03, 0.25, -52.0, 0.0]
-    elif mode in ['threshold variability', ]:
+    elif type in ['threshold variability', ]:
         a, b, c, d = [0.03, 0.25, -60.0, 4.0]
-    elif mode in ['bistability', ]:
+    elif type in ['bistability', ]:
         a, b, c, d = [1.00, 1.50, -60.0, 0.0]
-    elif mode in ['DAP', 'depolarizing afterpotential']:
+    elif type in ['DAP', 'depolarizing afterpotential']:
         a, b, c, d = [1.00, 0.20, -60.0, -21.0]
-    elif mode in ['accommodation', ]:
+    elif type in ['accommodation', ]:
         a, b, c, d = [0.02, 1.00, -55.0, 4.0]
-    elif mode in ['inhibition-induced spiking', ]:
+    elif type in ['inhibition-induced spiking', ]:
         a, b, c, d = [-0.02, -1.00, -60.0, 8.0]
-    elif mode in ['inhibition-induced bursting', ]:
+    elif type in ['inhibition-induced bursting', ]:
         a, b, c, d = [-0.026, -1.00, -45.0, 0]
 
     # Neurons
-    elif mode in ['Regular Spiking', 'RS']:
+    elif type in ['Regular Spiking', 'RS']:
         a, b, c, d = [0.02, 0.2, -65, 8]
-    elif mode in ['Intrinsically Bursting', 'IB']:
+    elif type in ['Intrinsically Bursting', 'IB']:
         a, b, c, d = [0.02, 0.2, -55, 4]
-    elif mode in ['Chattering', 'CH']:
+    elif type in ['Chattering', 'CH']:
         a, b, c, d = [0.02, 0.2, -50, 2]
-    elif mode in ['Fast Spiking', 'FS']:
+    elif type in ['Fast Spiking', 'FS']:
         a, b, c, d = [0.1, 0.2, -65, 2]
-    elif mode in ['Thalamo-cortical', 'TC']:
+    elif type in ['Thalamo-cortical', 'TC']:
         a, b, c, d = [0.02, 0.25, -65, 0.05]
-    elif mode in ['Resonator', 'RZ']:
+    elif type in ['Resonator', 'RZ']:
         a, b, c, d = [0.1, 0.26, -65, 2]
-    elif mode in ['Low-threshold Spiking', 'LTS']:
+    elif type in ['Low-threshold Spiking', 'LTS']:
         a, b, c, d = [0.02, 0.25, -65, 2]
 
     @bp.integrate

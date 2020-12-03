@@ -89,11 +89,11 @@ We start by importing the ``brainpy`` and ``bpmodels`` packages and set profile.
                 numerical_method='exponential')
 
 
-The pre-defined izhikevich model provides many different modes, so we can use ``mode='tonic spiking'`` to get a pre-defined model with tonic spiking parameters.
+The pre-defined izhikevich model provides many different firing types, so we can use ``type='tonic spiking'`` to get a pre-defined model with tonic spiking parameters.
 
 ::
 
-    izh = bpmodels.neurons.get_Izhikevich(mode='tonic spiking')
+    izh = bpmodels.neurons.get_Izhikevich(type='tonic spiking')
     
     (step_I, duration) = bp.inputs.constant_current(
                             [(0, 50), (10, 100), (0, 50)])
