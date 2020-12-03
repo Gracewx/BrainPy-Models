@@ -20,23 +20,22 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
     
     .. math::
 
-        C \\frac {dV} {dt} &= -(\\bar{g}_{Na} m^3 h (V-E_{Na})  
+        & C \\frac {dV} {dt} = -(\\bar{g}_{Na} m^3 h (V-E_{Na})  
         + \\bar{g}_K n^4 (V-E_K) + g_{leak} (V - E_{leak})) + I(t) 
 
-        \\frac {dx} {dt} &= \\alpha_x (1-x)  - \\beta_x, 
-        \\quad x\\in \\ {\rm{Na, K, leak}}
+        & \\frac {dx} {dt} = \\alpha_x (1-x)  - \\beta_x, \\quad x\\in \\ {\\rm{Na, K, leak}}
 
-        \\alpha_m(V) &= \\frac {0.1(V+40)}{1-exp(\\frac{-(V + 40)} {10})}
+        & \\alpha_m(V) = \\frac {0.1(V+40)}{1-exp(\\frac{-(V + 40)} {10})}
 
-        \\beta_m(V) &= 4.0 exp(\\frac{-(V + 65)} {18})
+        & \\beta_m(V) = 4.0 exp(\\frac{-(V + 65)} {18})
 
-        \\alpha_h(V) &= 0.07 exp(\\frac{-(V+65)}{20})
+        & \\alpha_h(V) = 0.07 exp(\\frac{-(V+65)}{20})
         
-        \\beta_h(V) &= \\frac 1 {1 + exp(\\frac{-(V + 35)} {10})}
+        & \\beta_h(V) = \\frac 1 {1 + exp(\\frac{-(V + 35)} {10})}
 
-        \\alpha_n(V) &= \\frac {0.01(V+55)}{1-exp(-(V+55)/10)}
+        & \\alpha_n(V) = \\frac {0.01(V+55)}{1-exp(-(V+55)/10)}
         
-        \\beta_n(V) &= 0.125 exp(\\frac{-(V + 65)} {80})
+        & \\beta_n(V) = 0.125 exp(\\frac{-(V + 65)} {80})
 
 
     ST refers to the neuron state, items in ST are listed below:

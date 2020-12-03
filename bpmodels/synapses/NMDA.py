@@ -10,23 +10,23 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
 
     .. math::
 
-        I_{syn} &= \\bar{g}_{syn} s (V-E_{syn})
+        & I_{syn} = \\bar{g}_{syn} s (V-E_{syn})
 
-        g(t) &= \\bar{g} \\cdot g_{\\infty}
+        & g(t) = \\bar{g} \\cdot g_{\\infty}
         \\cdot \\sum_j s_j(t)
 
-        g_{\\infty}(V,[{Mg}^{2+}]_{o}) &= (1+{e}^{-\\alpha V}
+        & g_{\\infty}(V,[{Mg}^{2+}]_{o}) = (1+{e}^{-\\alpha V}
         \\frac{[{Mg}^{2+}]_{o}} {\\beta})^{-1} 
 
-        \\frac{d s_{j}(t)}{dt} &= -\\frac{s_{j}(t)}
+        & \\frac{d s_{j}(t)}{dt} = -\\frac{s_{j}(t)}
         {\\tau_{decay}}+a x_{j}(t)(1-s_{j}(t)) 
 
-        \\frac{d x_{j}(t)}{dt} &= -\\frac{x_{j}(t)}{\\tau_{rise}}+
+        & \\frac{d x_{j}(t)}{dt} = -\\frac{x_{j}(t)}{\\tau_{rise}}+
         \\sum_{k} \\delta(t-t_{j}^{k})
 
     where the decay time of NMDA currents is taken to be :math:`\\tau_{decay}` =100 ms,
     :math:`a= 0.5 ms^{-1}`, and :math:`\\tau_{rise}` =2 ms (Hestrin et al., 1990 [1]_;
-    Spruston et al., 1995[2]_).
+    Spruston et al., 1995 [2]_).
 
 
     ST refers to the synapse state, items in ST are listed below:

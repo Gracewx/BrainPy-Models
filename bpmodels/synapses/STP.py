@@ -38,7 +38,7 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
 
     x               float    A Normalized variable denoting the fraction of remain neurotransmitters.
 
-    w               float    Weights.
+    w               float    Synapse weight.
 
     g               float    Synapse conductance.
     =============== ======== =========================================================

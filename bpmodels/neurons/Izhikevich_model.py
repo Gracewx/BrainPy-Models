@@ -7,7 +7,17 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
 
     '''
     The Izhikevich neuron model.
-    
+
+    .. math ::
+
+        & \\frac{d V}{d t} = 0.04 V^{2}+5 V+140-u+I
+
+        & \\frac{d u}{d t}=a(b V-u)
+
+        & \\text{if}  v \\geq 30  \\text{mV}, \\text{then}
+        \\begin{cases} v \\leftarrow c \\\\ u \\leftarrow u+d \\end{cases}
+
+
     ST refers to neuron state, members of ST are listed below:
     
     =============== ======== =========================================================
@@ -27,7 +37,7 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     =============== ======== =========================================================
     
     Args:
-        mode (str): The neuron spiking mode..
+        mode (str): The neuron spiking mode. (List below)
         a (float): It determines the time scale of the recovery variable :math:`u`.
         b (float): It describes the sensitivity of the recovery variable :math:`u` to the sub-threshold fluctuations of the membrane potential :math:`v`.
         c (float): It describes the after-spike reset value of the membrane potential :math:`v` caused by the fast high-threshold :math:`K^{+}` conductance.
@@ -39,9 +49,75 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     Returns:
         bp.Neutype: return description of Izhikevich model.
 
+
+    We provide following modes:
+    
+    =============== ======= ======= ===== ======
+    **Mode Name**    **a**   **b**  **c** **d**
+    --------------- ------- ------- ----- ------
+    Regular Spiking    0.02, 0.2, -65, 8
+
+    Intrinsically Bursting    0.02, 0.2, -55, 4
+
+    Chattering    0.02, 0.2, -50, 2
+
+    Fast Spiking    0.1, 0.2, -65, 2
+
+    Thalamo-cortical    0.02, 0.25, -65, 0.05
+
+    Resonator    0.1, 0.26, -65, 2
+
+    Low-threshold Spiking    0.02, 0.25, -65, 2
+
+
+    tonic spiking 0.02 0.40 -65.0 2.0
+    
+    phasic spiking 0.02 0.25 -65.0 6.0
+
+    tonic bursting 0.02 0.20 -50.0 2.0
+
+    phasic bursting 0.02 0.25 -55.0 0.05
+
+    mixed mode 0.02, 0.20, -55.0, 4.0
+
+    spike frequency adaptation 0.01, 0.20, -65.0, 8.0
+
+    Class 1    0.02, -0.1, -55.0, 6.0
+
+    Class 2    0.20, 0.26, -65.0, 0.0
+
+    spike latency     0.02, 0.20, -65.0, 6.0
+
+    subthreshold oscillation    0.05, 0.26, -60.0, 0.0
+
+    resonator    0.10, 0.26, -60.0, -1.0
+
+    integrator    0.02, -0.1, -55.0, 6.0
+
+    rebound spike    0.03, 0.25, -60.0, 4.0
+
+    rebound burst   0.03, 0.25, -52.0, 0.0
+
+    threshold variability    0.03, 0.25, -60.0, 4.0
+
+    bistability    1.00, 1.50, -60.0, 0.0
+
+    depolarizing afterpotential    1.00, 0.20, -60.0, -21.0
+
+    accommodation    0.02, 1.00, -55.0, 4.0
+
+    inhibition-induced spiking    -0.02, -1.00, -60.0, 8.0
+
+    inhibition-induced bursting   -0.026, -1.00, -45.0, 0
+    =============== ======= ======= ===== ======
+
+
     References:
         .. [1] Izhikevich, Eugene M. "Simple model of spiking neurons." IEEE
                Transactions on neural networks 14.6 (2003): 1569-1572.
+
+        .. [2] Izhikevich, Eugene M. "Which model to use for cortical spiking neurons?." 
+               IEEE transactions on neural networks 15.5 (2004): 1063-1070.
     '''
 
     state = bp.types.NeuState(
