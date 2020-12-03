@@ -3,7 +3,7 @@ import brainpy as bp
 import brainpy.numpy as np
 
 
-def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
+def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
                     g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04):
     """
     The Morris-Lecar neuron model.
@@ -37,6 +37,12 @@ def get_MorrisLecar(noise=0., V_Ca=120., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
 
     Returns:
         bp.Neutype: return description of Morris-Lecar model.
+
+    References:
+        .. [1] Meier, Stephen R., Jarrett L. Lancaster, and Joseph M. Starobin.
+               "Bursting regimes in a reaction-diffusion system with action 
+               potential-dependent equilibrium." PloS one 10.3 (2015): 
+               e0122401.
     """
 
     ST = bp.types.NeuState(

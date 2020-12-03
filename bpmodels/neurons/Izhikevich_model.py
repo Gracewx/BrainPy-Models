@@ -38,6 +38,10 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
 
     Returns:
         bp.Neutype: return description of Izhikevich model.
+
+    References:
+        .. [1] Izhikevich, Eugene M. "Simple model of spiking neurons." IEEE
+               Transactions on neural networks 14.6 (2003): 1569-1572.
     '''
 
     state = bp.types.NeuState(
