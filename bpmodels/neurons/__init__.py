@@ -7,3 +7,4 @@ from .ExpIF_model import *
 from .MorrisLecar_model import *
 from .GeneralizedIF_model import *
 from .HindmarshRose_model import *
+from .WilsonCowan_model import *

@@ -15,3 +15,4 @@ bpmodels.neurons
     get_MorrisLecar
     get_GeneralizedIF
 	get_HindmarshRose
+	get_WilsonCowan

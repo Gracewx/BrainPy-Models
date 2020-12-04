@@ -37,10 +37,9 @@ networks (ex. Excitatory-inhibitory balanced network). Some of them are implemen
    
    tutorials/neurons
    tutorials/synapses
-   tutorials/learning_rules
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Examples
    
    examples/neurons
