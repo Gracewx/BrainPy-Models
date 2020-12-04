@@ -14,18 +14,21 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
 
         &\\frac{d z}{d t} = r (s (V - V_{rest}) - z)
         
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    V               float    Membrane potential.
+    =============== ================= =====================================
+    **Member name** **Initial Value** **Explanation**
+    --------------- ----------------- -------------------------------------
+    V               -1.6              Membrane potential.
     
-    y               float    Gating variable.
+    y               -10.              Gating variable.
                              
-    z               float    Gating variable.
+    z               0.                Gating variable.
     
-    input           float    External and synaptic input current.
-    =============== ======== =========================================================
-
+    input           0.                External and synaptic input current.
+    =============== ================= =====================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
+    
     Args:
         a (float): Model parameter. Fixed to a value best fit neuron activity.
         b (float): Model parameter. Allows the model to switch between bursting 

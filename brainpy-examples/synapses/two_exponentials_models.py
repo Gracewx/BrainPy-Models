@@ -8,7 +8,7 @@ import bpmodels
 if __name__ == '__main__':
     duration = 100.
     dt = 0.02
-    bp.profile.set(backend="numba", dt=dt, merge_steps=True, show_code=True)
+    bp.profile.set(backend="numba", dt=dt, merge_steps=True, show_code=False)
     LIF_neuron = get_LIF()
     two_exponentials_syn = bpmodels.synapses.get_two_exponentials()
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     net = bp.Network(pre, two_exponentials, post)
 
     current = bp.inputs.spike_current([5., 10., 15., 20.], bp.profile._dt, 1., duration=duration)
-    net.run(duration=duration, inputs=[two_exponentials, 'pre.spike', current, "="], report=False)
+    net.run(duration=duration, inputs=[two_exponentials, 'pre.spike', current, "="], report=True)
 
     # Figure
     ts = net.ts

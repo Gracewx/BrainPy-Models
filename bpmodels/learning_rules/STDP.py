@@ -36,17 +36,20 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     ST refers to synapse state (note that STDP learning rule can be implemented as synapses),
     members of ST are listed below:
     
-    ================ ======== =========================================================
-    **Member name**  **Type** **Explanation**
-    ---------------- -------- ---------------------------------------------------------
-    A_s              float    Source neuron trace.
+    ================ ================= =========================================================
+    **Member name**  **Initial Value** **Explanation**
+    ---------------- ----------------- ---------------------------------------------------------
+    A_s              0.                Source neuron trace.
     
-    A_t              float    Target neuron trace.
+    A_t              0.                Target neuron trace.
      
-    g                float    Synapse conductance on post-synaptic neuron.
+    g                0.                Synapse conductance on post-synaptic neuron.
                              
-    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
-    ================ ======== =========================================================
+    w                0.                Synapse weight.
+    ================ ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
     
     Args:
         g_max (float): Maximum conductance.
@@ -68,7 +71,7 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     """
 
     requires = dict(
-        ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w'], help='STDP synapse state.'),
+        ST=bp.types.SynState({'A_s': 0., 'A_t': 0., 'g': 0., 'w': 0.}, help='STDP synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input', 'spike'], help='Post-synaptic neuron state must have "V", "input" and "spike" item.'),
         pre2syn=bp.types.ListConn(
@@ -151,19 +154,22 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     ST refers to synapse state (note that STDP learning rule can be implemented as synapses),
     members of ST are listed below:
     
-    ================ ======== =========================================================
-    **Member name**  **Type** **Explanation**
-    ---------------- -------- ---------------------------------------------------------
-    A_s              float    Source neuron trace.
+    ================ ================= =========================================================
+    **Member name**  **Initial Value** **Explanation**
+    ---------------- ----------------- ---------------------------------------------------------
+    A_s              0.                Source neuron trace.
     
-    A_t              float    Target neuron trace.
+    A_t              0.                Target neuron trace.
      
-    g                float    Synapse conductance on post-synaptic neuron.
+    g                0.                Synapse conductance on post-synaptic neuron.
     
-    w                float    Synapse weight.
+    w                0.                Synapse weight.
                              
-    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
-    ================ ======== =========================================================
+    last_spike       -1e7              Last spike time stamp of pre or post-synaptic  neuron.
+    ================ ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
     
     Args:
         g_max (float): Maximum conductance.
@@ -185,7 +191,7 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     """
 
     requires = dict(
-        ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w', 'last_spike'], help='STDP synapse state.'),
+        ST=bp.types.SynState({'A_s': 0., 'A_t': 0., 'g': 0., 'w': 0., 'last_spike':-1e7}, help='STDP synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
 
         post=bp.types.NeuState(['V', 'input', 'spike'], help='Post-synaptic neuron state must have "V", "input" and "spike" item.'),

@@ -15,13 +15,16 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
 
     ST refers to synapse state, members of ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    s               float    Gating variable.
+    =============== ================= =========================================================
+    **Member name** **Initial Value** **Explanation**
+    --------------- ----------------- ---------------------------------------------------------
+    s               0.                Gating variable.
     
-    g               float    Synapse conductance on post-synaptic neuron.
-    =============== ======== =========================================================
+    g               0.                Synapse conductance on post-synaptic neuron.
+    =============== ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         g_max (float): Maximum synapse conductance.
@@ -37,7 +40,7 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
                University Press, 2014.
     """
     requires = dict(
-        ST=bp.types.SynState(['s', 'g'], help = "GABAa synapse state"),
+        ST=bp.types.SynState({'s': 0., 'g': 0.}, help = "GABAa synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help="Pre-synaptic neuron index -> synapse index"),
@@ -81,15 +84,18 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
         
     ST refers to synapse state, members of ST are listed below:
     
-    ================ ======== =========================================================
-    **Member name**  **Type** **Explanation**
-    ---------------- -------- ---------------------------------------------------------
-    s                float    Gating variable.
+    ================ ================= =========================================================
+    **Member name**  **Initial Value** **Explanation**
+    ---------------- ----------------- ---------------------------------------------------------
+    s                0.                Gating variable.
      
-    g                float    Synapse conductance on post-synaptic neuron.
+    g                0.                Synapse conductance on post-synaptic neuron.
                              
-    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
-    ================ ======== =========================================================
+    t_last_pre_spike -1e7              Last spike time stamp of pre-synaptic neuron.
+    ================ ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         g_max (float): Maximum synapse conductance.

@@ -36,6 +36,8 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     t_last_spike    float            -1e7       Last spike time stamp.
     =============== ======== ================== ===========================================
     
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).    
 
     Args:
         type (str): The neuron spiking type.

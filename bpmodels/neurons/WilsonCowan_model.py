@@ -24,17 +24,20 @@ def get_WilsonCowan(c1 = 12., c2 = 4., c3 = 13., c4 = 11.,
 
     ST refers to neuron state, members of ST are listed below:
     
-    =============== ============== =========================================================
-    **Member name** **Init Value** **Explanation**
-    --------------- -------------- ---------------------------------------------------------
-    a_e             0.1            The proportion of excitatory cells firing per unit time.
+    =============== ================= =========================================================
+    **Member name** **Initial Value** **Explanation**
+    --------------- ----------------- ---------------------------------------------------------
+    a_e             0.1               The proportion of excitatory cells firing per unit time.
     
-    a_i             0.05           The proportion of inhibitory cells firing per unit time.
+    a_i             0.05              The proportion of inhibitory cells firing per unit time.
     
-    input_e         0.             External input to excitatory cells.
+    input_e         0.                External input to excitatory cells.
                              
-    input_i         0.             External input to inhibitory cells.
-    =============== ============== =========================================================
+    input_i         0.                External input to inhibitory cells.
+    =============== ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         c1 (float): Weight from E-neurons to E-neurons.

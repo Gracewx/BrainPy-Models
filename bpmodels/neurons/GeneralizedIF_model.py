@@ -32,25 +32,28 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     
     ST refers to neuron state, members of ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    V               float    Membrane potential.
+    =============== ================= ==============================================
+    **Member name** **Initial Value** **Explanation**
+    --------------- ----------------- ----------------------------------------------
+    V               -70.              Membrane potential.
     
-    input           float    External and synaptic input current.
+    input           0.                External and synaptic input current.
     
-    spike           float    Flag to mark whether the neuron is spiking. 
+    spike           0.                Flag to mark whether the neuron is spiking. 
     
-                             Can be seen as bool.
+                                      Can be seen as bool.
     
-    V_th            float    Spiking threshold potential.
+    V_th            -50.              Spiking threshold potential.
                              
-    I1              float    Internal current 1.
+    I1              0.                Internal current 1.
     
-    I2              float    Internal current 2.
+    I2              0.                Internal current 2.
                              
-    t_last_spike    float    Last spike time stamp.
-    =============== ======== =========================================================
+    t_last_spike    -1e7              Last spike time stamp.
+    =============== ================= ==============================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
     
     Args:
         V_rest (float): Resting potential.

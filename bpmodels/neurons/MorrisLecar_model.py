@@ -10,15 +10,19 @@ def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
 
     ST refers to neuron state, members of ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    V               float    Membrane potential.
+    =============== ================= =========================================================
+    **Member name** **Initial Value** **Explanation**
+    --------------- ----------------- ---------------------------------------------------------
+    V               -20.              Membrane potential.
     
-    W               float    Gating variable, refers to the fraction of opened K+ channels.
+    W               0.02              Gating variable, refers to the fraction of 
+                                      opened K+ channels.
     
-    input           float    External and synaptic input current.
-    =============== ======== =========================================================
+    input           0.                External and synaptic input current.
+    =============== ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         noise (float): The noise fluctuation.

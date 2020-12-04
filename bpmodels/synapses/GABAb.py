@@ -22,17 +22,21 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
     
     ST refers to synapse state, members of ST are listed below:
     
-    ================ ======== =========================================================
-    **Member name**  **Type** **Explanation**
-    ---------------- -------- ---------------------------------------------------------
-    R                float    The fraction of activated receptor.
     
-    G                float    The concentration of activated G protein.
+    ================ ================= =========================================================
+    **Member name**  **Initial Value** **Explanation**
+    ---------------- ----------------- ---------------------------------------------------------
+    R                0.                The fraction of activated receptor.
+    
+    G                0.                The concentration of activated G protein.
      
-    g                float    Synapse conductance on post-synaptic neuron.
+    g                0.                Synapse conductance on post-synaptic neuron.
                              
-    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
-    ================ ======== =========================================================
+    t_last_pre_spike -1e7              Last spike time stamp of pre-synaptic neuron.
+    ================ ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         g_max (float): Maximum synapse conductance.
@@ -120,19 +124,22 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
     
     ST refers to synapse state, members of ST are listed below:
     
-    ================ ======== =========================================================
-    **Member name**  **Type** **Explanation**
-    ---------------- -------- ---------------------------------------------------------
-    D                float    The fraction of desensitized receptor.
+    ================ ================= =========================================================
+    **Member name**  **Initial Value** **Explanation**
+    ---------------- ----------------- ---------------------------------------------------------
+    D                0.                The fraction of desensitized receptor.
     
-    R                float    The fraction of activated receptor.
+    R                0.                The fraction of activated receptor.
     
-    G                float    The concentration of activated G protein.
+    G                0.                The concentration of activated G protein.
      
-    g                float    Synapse conductance on post-synaptic neuron.
+    g                0.                Synapse conductance on post-synaptic neuron.
                              
-    t_last_pre_spike float    Last spike time stamp of pre-synaptic neuron.
-    ================ ======== =========================================================
+    t_last_pre_spike -1e7              Last spike time stamp of pre-synaptic neuron.
+    ================ ================= =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         g_max (float): Maximum synapse conductance.
