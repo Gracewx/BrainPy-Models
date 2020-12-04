@@ -15,13 +15,13 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
 
     ST refers to the synapse state, items in ST are listed below:
     
-    =============== ================== =========================================================
-    **Member name** **Initial values** **Explanation**
-    --------------- ------------------ ---------------------------------------------------------    
+    ================ ================== =========================================================
+    **Member name**  **Initial values** **Explanation**
+    ---------------- ------------------ ---------------------------------------------------------    
     g                  0                  Synapse conductance on the post-synaptic neuron.
                              
     t_last_pre_spike   -1e7               Last spike time stamp of the pre-synaptic neuron.
-    =============== ================== =========================================================
+    ================ ================== =========================================================
     
     Note that all ST members are saved as floating point type in BrainPy, 
     though some of them represent other data types (such as boolean).
@@ -71,3 +71,71 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
 
 
 
+def get_alpha2(g_max=.2, E=0., tau_decay = 2.):
+
+    """
+    Alpha conductance-based synapse. 
+
+    .. math::
+    
+        I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
+
+        g_{syn} (t) &= w s
+
+        \\frac{d s}{d t}&=-\\frac{s}{\\tau_{decay}}+\\sum_{k} \\delta(t-t_{j}^{k})
+
+
+    ST refers to the synapse state, items in ST are listed below:
+    
+    ================ ================== =========================================================
+    **Member name**  **Initial values** **Explanation**
+    ---------------- ------------------ ---------------------------------------------------------    
+    g                  0                  Synapse conductance on the post-synaptic neuron.
+    s                  0                  Synapse conductance on the post-synaptic neuron.
+    w                  1                  Synapse conductance on the post-synaptic neuron.  
+    ================ ================== =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
+
+    Args:
+        g_max (float): The peak conductance change in µmho (µS).
+        E (float): The reversal potential for the synaptic current.
+        tau_decay (float): The time constant of decay.
+
+    Returns:
+        bp.Neutype
+    """
+
+
+    requires = {
+        'ST': bp.types.SynState({'g': 0., 's': 0., 'w':1.}, help='The conductance defined by exponential function.'),
+        'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
+        'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
+        'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
+        'post2syn': bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
+    }
+
+
+    @bp.integrate
+    def ints(s, t):
+        return - s / tau_decay
+
+
+    def update(ST, _t_, pre, pre2syn):
+        s = ints(ST['s'], _t_)
+        for i in np.where(pre['spike'] > 0.)[0]:
+            syn_ids = pre2syn[i]
+            s[syn_ids] += 1.
+        ST['s'] = s
+        ST['g'] = ST['w'] * s
+
+
+    def output(ST, post, post2syn):
+        for post_id, syn_id in enumerate(post2syn):
+            post['input'][post_id] += np.sum(ST['g'][syn_id])
+
+    return bp.SynType(name='alpha_synapse',
+                 requires=requires,
+                 steps=(update, output),
+                 vector_based=True)

@@ -92,15 +92,15 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
 
     ST refers to the synapse state, items in ST are listed below:
     
-    =============== ================== =========================================================
-    **Member name** **Initial values** **Explanation**
-    --------------- ------------------ ---------------------------------------------------------
+    ================ ================== =========================================================
+    **Member name**  **Initial values** **Explanation**
+    ---------------- ------------------ ---------------------------------------------------------
     s                 0                 Gating variable.
     
     g                 0                 Synapse conductance.
 
     t_last_pre_spike  -1e7              Last spike time stamp of the pre-synaptic neuron.
-    =============== ================== =========================================================
+    ================ ================== =========================================================
     
     Note that all ST members are saved as floating point type in BrainPy, 
     though some of them represent other data types (such as boolean).

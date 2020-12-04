@@ -14,13 +14,13 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
 
     ST refers to synapse state, members of ST are listed below:
     
-    =============== ================== =========================================================
-    **Member name** **Initial values** **Explanation**
-    --------------- ------------------ ---------------------------------------------------------    
+    ================ ================== =========================================================
+    **Member name**  **Initial values** **Explanation**
+    ---------------- ------------------ ---------------------------------------------------------    
     g                  0                  Synapse conductance on the post-synaptic neuron.
                              
     t_last_pre_spike   -1e7               Last spike time stamp of the pre-synaptic neuron.
-    =============== ================== =========================================================
+    ================ ================== =========================================================
 
     Note that all ST members are saved as floating point type in BrainPy, 
     though some of them represent other data types (such as boolean).
