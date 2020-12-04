@@ -31,17 +31,20 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
 
     ST refers to the synapse state, items in ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    u               float    Release probability of the neurotransmitters.
+    =============== ================== =====================================================================
+    **Member name** **Initial values** **Explanation**
+    --------------- ------------------ ---------------------------------------------------------------------
+    u                 0                 Release probability of the neurotransmitters.
 
-    x               float    A Normalized variable denoting the fraction of remain neurotransmitters.
+    x                 1                 A Normalized variable denoting the fraction of remain neurotransmitters.
 
-    w               float    Synapse weight.
+    w                 1                 Synapse weight.
 
-    g               float    Synapse conductance.
-    =============== ======== =========================================================
+    g                 0                 Synapse conductance.
+    =============== ================== =====================================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
 
     Parameters

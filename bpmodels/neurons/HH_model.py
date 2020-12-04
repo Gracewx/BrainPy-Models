@@ -40,23 +40,25 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
 
     ST refers to the neuron state, items in ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    V               float    Membrane potential.
+    =============== ==================  =========================================================
+    **Member name** **Initial values**  **Explanation**
+    --------------- ------------------  ---------------------------------------------------------
+    V                        -65         Membrane potential.
 
-    m               float    gating variable of the sodium ion channel.
+    m                        0.05        gating variable of the sodium ion channel.
 
-    n               float    gating variable of the potassium ion channel.
+    n                        0.32        gating variable of the potassium ion channel.
 
-    h               float    gating variable of the sodium ion channel.
+    h                        0.60        gating variable of the sodium ion channel.
 
-    input           float    External and synaptic input current.
+    input                     0          External and synaptic input current.
 
-    spike           float    Flag to mark whether the neuron is spiking. 
-    
-                             Can be seen as bool.                                                      
-    =============== ======== =========================================================
+    spike                     0          Flag to mark whether the neuron is spiking. 
+                                         Can be seen as bool.                                                      
+    =============== ==================  =========================================================
+
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         noise (float): the noise fluctuation.

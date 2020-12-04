@@ -15,14 +15,16 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
 
     ST refers to the synapse state, items in ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    g                 float    Synapse conductance.
-
-    t_last_pre_spike  float    Last spike time stamp of the presynaptic neuron.                                                      
-    =============== ======== =========================================================
-
+    =============== ================== =========================================================
+    **Member name** **Initial values** **Explanation**
+    --------------- ------------------ ---------------------------------------------------------    
+    g                  0                  Synapse conductance on the post-synaptic neuron.
+                             
+    t_last_pre_spike   -1e7               Last spike time stamp of the pre-synaptic neuron.
+    =============== ================== =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         g_max (float): The peak conductance change in µmho (µS).
@@ -40,7 +42,7 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
 
 
     requires = {
-        'ST': bp.types.SynState(['g', 't_last_pre_spike'],help='The conductance defined by exponential function.'),
+        'ST': bp.types.SynState({'g': 0., 't_last_pre_spike': -1e7}, help='The conductance defined by exponential function.'),
         'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
         'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
         'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),

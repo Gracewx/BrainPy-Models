@@ -14,6 +14,8 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
 
         \\frac{d u}{d t} &=a(b V-u)
 
+    .. math ::
+    
         \\text{if}  v \\geq 30  \\text{mV}, \\text{then}
         \\begin{cases} v \\leftarrow c \\\\ u \\leftarrow u+d \\end{cases}
 

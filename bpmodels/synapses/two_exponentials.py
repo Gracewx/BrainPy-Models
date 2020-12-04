@@ -14,14 +14,17 @@ def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
         (exp(- \\frac{t-t_f}{\\tau_d}) - exp(- \\frac{t-t_f}{\\tau_r}))
 
     ST refers to synapse state, members of ST are listed below:
-    
-    ================ ======== =========================================================
-    **Member name**  **Type** **Explanation**
-    ---------------- -------- ---------------------------------------------------------     
-    g                float    Synapse conductance on the post-synaptic neuron.
+
+    =============== ================== =========================================================
+    **Member name** **Initial values** **Explanation**
+    --------------- ------------------ ---------------------------------------------------------    
+    g                  0                  Synapse conductance on the post-synaptic neuron.
                              
-    t_last_pre_spike float    Last spike time stamp of the pre-synaptic neuron.
-    ================ ======== =========================================================
+    t_last_pre_spike   -1e7               Last spike time stamp of the pre-synaptic neuron.
+    =============== ================== =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
     Args:
         g_max (float): The peak conductance change in µmho (µS).
@@ -39,7 +42,7 @@ def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
     '''
 
     requires = {
-        'ST': bp.types.SynState(['g', 't_last_pre_spike'],help='The conductance defined by exponential function.'),
+        'ST': bp.types.SynState({'g': 0., 't_last_pre_spike': -1e7}, help='The conductance defined by exponential function.'),
         'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
         'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
         'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),

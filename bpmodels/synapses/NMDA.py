@@ -31,15 +31,18 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
 
     ST refers to the synapse state, items in ST are listed below:
     
-    =============== ======== =========================================================
-    **Member name** **Type** **Explanation**
-    --------------- -------- ---------------------------------------------------------
-    s               float    Gating variable.
+    =============== ================== =========================================================
+    **Member name** **Initial values** **Explanation**
+    --------------- ------------------ --------------------------------------------------------- 
+    s               0                     Gating variable.
     
-    g               float    Synapse conductance.
+    g               0                     Synapse conductance.
 
-    x               float    Gating variable.
-    =============== ======== =========================================================
+    x               0                     Gating variable.
+    =============== ================== =========================================================
+    
+    Note that all ST members are saved as floating point type in BrainPy, 
+    though some of them represent other data types (such as boolean).
 
 
     Args:
@@ -64,7 +67,7 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
     
     """
     requires = dict(
-        ST=bp.types.SynState(['x', 's', 'g']),
+        ST=bp.types.SynState({'s': 0., 'x': 0., 'g': 0.}),
         pre=bp.types.NeuState(['spike']),
         post=bp.types.NeuState(['V', 'input']),
         pre2syn=bp.types.ListConn(),
