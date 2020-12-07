@@ -82,4 +82,4 @@ def get_ExpIF(V_rest=-65., V_reset=-68., V_th=-30., V_T=-59.9, delta_T=3.48,
     return bp.NeuType(name='ExpIF_neuron',
                       requires=dict(ST=ST),
                       steps=(update, reset),
-                      vector_based=False)
+                      mode='scalar')

@@ -121,7 +121,7 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     return bp.SynType(name='STDP_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode='vector')
 
 
 def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10., 
@@ -235,4 +235,4 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     return bp.SynType(name='STDP_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode='vector')

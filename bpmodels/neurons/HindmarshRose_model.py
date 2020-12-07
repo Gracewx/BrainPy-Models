@@ -85,4 +85,4 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
     return bp.NeuType(name="HindmarshRose_neuron",
                             requires=dict(ST=ST),
                             steps=(update, reset),
-                            vector_based=False)
+                            mode='scalar')

@@ -93,4 +93,4 @@ def get_WilsonCowan(c1 = 12., c2 = 4., c3 = 13., c4 = 11.,
     return bp.NeuType(name='WilsonCowan_neuron',
                       requires=dict(ST=ST),
                       steps=(update, reset),
-                      vector_based=False)
+                      mode='scalar')

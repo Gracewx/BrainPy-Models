@@ -104,7 +104,6 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
         return ( - (V - V_rest) + R * I_ext + R * I1 + R * I2) / tau
         
     def update(ST, _t_):
-        #is there refractory??
         ST['spike'] = 0
         I1 = int_I1(ST['I1'], _t_)
         I2 = int_I2(ST['I2'], _t_)
@@ -128,4 +127,4 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     return bp.NeuType(name='GeneralizedIF_neuron',
                       requires=dict(ST=ST),
                       steps=(update, reset),
-                      vector_based=False)
+                      mode='scalar')

@@ -94,7 +94,7 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
     return bp.SynType(name='GABAb1_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode='vector')
 
 
 def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
@@ -208,4 +208,4 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
     return bp.SynType(name='GABAb2_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode='vector')

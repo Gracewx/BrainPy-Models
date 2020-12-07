@@ -81,4 +81,4 @@ def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
     return bp.NeuType(name='LIF_neuron',
                       requires=dict(ST=ST),
                       steps=(update, reset),
-                      vector_based=False)
+                      mode='scalar')
