@@ -77,7 +77,7 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
     return bp.SynType(name='AMPA_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode = 'vector')
 
 
 
@@ -158,4 +158,4 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
     return bp.SynType(name='AMPA_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode = 'vector')

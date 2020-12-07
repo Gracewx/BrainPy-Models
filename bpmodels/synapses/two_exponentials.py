@@ -67,4 +67,4 @@ def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
     return bp.SynType(name='two_exponentials_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode = 'vector')

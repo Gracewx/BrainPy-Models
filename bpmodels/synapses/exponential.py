@@ -65,4 +65,4 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
     return bp.SynType(name='exponential_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode = 'vector')

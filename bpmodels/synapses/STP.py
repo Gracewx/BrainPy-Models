@@ -106,4 +106,4 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
     return bp.SynType(name='STP_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode = 'vector')

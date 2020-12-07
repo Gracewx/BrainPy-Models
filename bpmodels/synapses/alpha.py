@@ -67,7 +67,7 @@ def get_alpha(g_max=.2, E=0., tau_decay = 2.):
     return bp.SynType(name='alpha_synapse',
                  requires=requires,
                  steps=(update, output),
-                 vector_based=True)
+                 mode = 'vector')
 
 
 
@@ -138,4 +138,4 @@ def get_alpha2(g_max=.2, E=0., tau_decay = 2.):
     return bp.SynType(name='alpha_synapse',
                  requires=requires,
                  steps=(update, output),
-                 vector_based=True)
+                 mode = 'vector')

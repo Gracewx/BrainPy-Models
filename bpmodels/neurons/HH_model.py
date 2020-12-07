@@ -139,4 +139,4 @@ def get_HH (noise=NOISE, V_th = V_THRESHOLD, C = C, E_Na = E_NA, E_K = E_K,
     return bp.NeuType(name='HH_neuron', 
                       requires={"ST": ST}, 
                       steps=(update, reset), 
-                      vector_based=True)
+                      mode = 'vector')

@@ -107,5 +107,5 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
     return bp.SynType(name='NMDA_synapse',
                       requires=requires,
                       steps=(update, output),
-                      vector_based=True)
+                      mode = 'vector')
 
