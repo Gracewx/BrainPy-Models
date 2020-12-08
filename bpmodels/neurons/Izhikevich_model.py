@@ -201,5 +201,5 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     return bp.NeuType(name='Izhikevich_neuron',
                       requires={'ST': state},
                       steps=(update, reset),
-                      vector_based=False)
+                      mode="scalar")
 
