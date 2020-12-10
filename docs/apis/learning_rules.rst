@@ -10,3 +10,4 @@ bpmodels.learning_rules
 
     get_STDP1
     get_STDP2
+    get_BCM
