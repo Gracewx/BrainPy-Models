@@ -50,7 +50,7 @@ Installation
 
 Install from source code::
 
-    > python setup.py install
+    > python setup.py git+https://github.com/PKU-NIP-Lab/BrainPy-Models
 
 
 Install ``BrainPy-Models`` using ``conda``::
