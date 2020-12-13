@@ -2,3 +2,4 @@
 from . import *
 from .STDP import *
 from .BCM import *
+from .Oja import *
