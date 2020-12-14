@@ -2,6 +2,7 @@
 
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
 def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012, 
                kd=100., T=0.5, T_duration=0.3, mode='vector'):

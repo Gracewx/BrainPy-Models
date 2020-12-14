@@ -2,8 +2,9 @@
 
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
-def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
+def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
     """
     GABAa conductance-based synapse model (differential form).
 
@@ -39,7 +40,7 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
                neurons to networks and models of cognition. Cambridge 
                University Press, 2014.
     """
-    requires = dict(
+    requires_vector = dict(
         ST=bp.types.SynState({'s': 0., 'g': 0.}, help = "GABAa synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
@@ -47,29 +48,60 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6.):
         post2syn=bp.types.ListConn(help="Post-synaptic neuron index -> synapse index")
     )
 
+    requires_scalar = {
+        'ST': bp.types.SynState(['s'], help = 'GABAa synapse state.'),
+        'pre': bp.types.NeuState(['spike'], help = 
+                                 'Pre-synaptic neuron state must have "isFire"'),
+        'post': bp.types.NeuState(['V', 'input'], help = 
+                                 'Post-synaptic neuron state must include "input" and "Vr"')
+    }
+
     @bp.integrate
     def int_s(s, t):
         return - s / tau_decay
+    
+    if mode=='scalar':
+        def update(ST, _t_, pre):
+            s = int_s(ST['s'], _t_)
+            s += pre['spike']
+            ST['s'] = s
+    elif mode=='vector':
+        def update(ST, pre, pre2syn):
+            s = int_s(ST['s'], 0.)
+            for pre_id in np.where(pre['spike'] > 0.)[0]:
+                syn_ids = pre2syn[pre_id]
+                s[syn_ids] += 1
+            ST['s'] = s
+            ST['g'] = g_max * s
 
-    def update(ST, pre, pre2syn):
-        s = int_s(ST['s'], 0.)
-        for pre_id in np.where(pre['spike'] > 0.)[0]:
-            syn_ids = pre2syn[pre_id]
-            s[syn_ids] += 1
-        ST['s'] = s
-        ST['g'] = g_max * s
 
-    @bp.delayed
-    def output(ST, post, post2syn):
-        post_cond = np.zeros(len(post2syn), dtype=np.float_)
-        for post_id, syn_ids in enumerate(post2syn):
-            post_cond[post_id] = np.sum(ST['g'][syn_ids])
-        post['input'] -= post_cond * (post['V'] - E)
+    if mode=='scalar':
+        @bp.delayed
+        def output(ST, _t_, post):
+            I_syn = - g_max * ST['s'] * (post['V'] - E)
+            post['input'] += I_syn
+    elif mode=='vector':
+        @bp.delayed
+        def output(ST, post, post2syn):
+            post_cond = np.zeros(len(post2syn), dtype=np.float_)
+            for post_id, syn_ids in enumerate(post2syn):
+                post_cond[post_id] = np.sum(ST['g'][syn_ids])
+            post['input'] -= post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAa1_synapse',
-                      requires=requires,
-                      steps=(update, output),
-                      mode='vector')
+    if mode == 'scalar':
+        return bp.SynType(name='GABAa_synapse',
+                          requires=requires_scalar,
+                          steps=(update, output),
+                          mode=mode)
+    elif mode == 'vector':
+        return bp.SynType(name='GABAa_synapse',
+                          requires=requires_vector,
+                          steps=(update, output),
+                          mode=mode)
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
 
 def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
@@ -141,7 +173,7 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] -= post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAa2_synapse',
+    return bp.SynType(name='GABAa_synapse',
                       requires=requires,
                       steps=(update, output),
                       mode='vector')
