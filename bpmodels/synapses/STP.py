@@ -2,9 +2,9 @@
 
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
-
-def get_STP(U=0.15, tau_f=1500., tau_d=200.):
+def get_STP(U=0.15, tau_f=1500., tau_d=200., mode = 'vector'):
     """Short-term plasticity proposed by Tsodyks and Markram (Tsodyks 98) [1]_.
 
     The model is given by
@@ -66,13 +66,6 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
     .. [1] Tsodyks, Misha, Klaus Pawelzik, and Henry Markram. "Neural networks
            with dynamic synapses." Neural computation 10.4 (1998): 821-835.
     """
-    requires = dict(
-        ST=bp.types.SynState({'u': 0., 'x': 1., 'w': 1., 'g': 0.}),
-        pre=bp.types.NeuState(['spike']),
-        post=bp.types.NeuState(['V', 'input']),
-        pre2syn=bp.types.ListConn(),
-        post_slice_syn=bp.types.Array(dim=2),
-    )
 
     @bp.integrate
     def int_u(u, _t_):
@@ -82,28 +75,73 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200.):
     def int_x(x, _t_):
         return (1 - x) / tau_d
 
-    def update(ST, pre, pre2syn):
-        u = int_u(ST['u'], 0)
-        x = int_x(ST['x'], 0)
-        for pre_id in np.where(pre['spike'] > 0.)[0]:
-            syn_ids = pre2syn[pre_id]
-            u_syn = u[syn_ids] + U * (1 - ST['u'][syn_ids])
-            u[syn_ids] = u_syn
-            x[syn_ids] -= u_syn * ST['x'][syn_ids]
-        ST['u'] = np.clip(u, 0., 1.)
-        ST['x'] = np.clip(x, 0., 1.)
-        ST['g'] = ST['w'] * ST['u'] * ST['x']
 
-    @bp.delayed
-    def output(ST, post, post_slice_syn):
-        num_post = post_slice_syn.shape[0]
-        post_cond = np.zeros(num_post, dtype=np.float_)
-        for post_id in range(num_post):
-            idx = post_slice_syn[post_id]
-            post_cond[post_id] = np.sum(ST['g'][idx[0]: idx[1]])
-        post['input'] += post_cond
+    requires = dict(
+        ST=bp.types.SynState({'u': 0., 'x': 1., 'w': 1., 'g': 0.}),
+        pre=bp.types.NeuState(['spike']),
+        post=bp.types.NeuState(['V', 'input'])
+    )
+
+    if mode == 'scalar':
+        def update(ST, pre):
+            u = int_u(ST['u'], 0)
+            x = int_x(ST['x'], 0)
+            if pre['spike'] > 0.:
+                u += U * (1-ST['u'])
+                x -= u * ST['x']
+            ST['u'] = np.clip(u, 0., 1.)
+            ST['x'] = np.clip(x, 0., 1.)
+            ST['g'] = ST['w'] * ST['u'] * ST['x']
+
+        @bp.delayed
+        def output(ST, post):
+            post['input'] += ST['g']
+
+    elif mode == 'vector':
+        requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
+        requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
+
+        def update(ST, pre, pre2syn):
+            u = int_u(ST['u'], 0)
+            x = int_x(ST['x'], 0)
+            for pre_id in np.where(pre['spike'] > 0.)[0]:
+                syn_ids = pre2syn[pre_id]
+                u_syn = u[syn_ids] + U * (1 - ST['u'][syn_ids])
+                u[syn_ids] = u_syn
+                x[syn_ids] -= u_syn * ST['x'][syn_ids]
+            ST['u'] = np.clip(u, 0., 1.)
+            ST['x'] = np.clip(x, 0., 1.)
+            ST['g'] = ST['w'] * ST['u'] * ST['x']
+
+        @bp.delayed
+        def output(ST, post, post2syn):
+            g = np.zeros(len(post2syn), dtype=np.float_)
+            for post_id, syn_ids in enumerate(post2syn):
+                g[post_id] = np.sum(ST['g'][syn_ids])
+                post['input'] += g
+
+    elif mode == 'matrix':
+        requires['conn_mat']=bp.types.MatConn()
+
+        def update(ST, pre, conn_mat):
+            u = int_u(ST['u'], 0)
+            x = int_x(ST['x'], 0)
+            spike_idxs = np.where(pre['spike'] > 0.)[0]
+            #
+            u_syn = u[spike_idxs] + U * (1 - ST['u'][spike_idxs])
+            u[spike_idxs] = u_syn
+            x[spike_idxs] -= u_syn * ST['x'][spike_idxs]
+            #
+            ST['u'] = np.clip(u, 0., 1.)
+            ST['x'] = np.clip(x, 0., 1.)
+            ST['g'] = ST['w'] * ST['u'] * ST['x']
+
+        @bp.delayed
+        def output(ST, post):
+            g = np.sum(ST['g'], axis=0)
+            post['input'] += g
 
     return bp.SynType(name='STP_synapse',
                       requires=requires,
                       steps=(update, output),
-                      mode = 'vector')
+                      mode = mode)
