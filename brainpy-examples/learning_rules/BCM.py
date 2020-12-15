@@ -43,7 +43,7 @@ bcm = bp.SynConn(model=bcm1, pre_group=pre, post_group=post,
                     delay = 0)
 bcm.r_th = np.zeros(n_post)
 bcm.post_r = np.zeros(n_post)
-bcm.sum_r_post = np.zeros(n_post)
+bcm.sum_post_r = np.zeros(n_post)
 
 
 net = bp.Network(pre, bcm, post)

@@ -56,15 +56,11 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
             ['r'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(
             ['r'], help='Post-synaptic neuron state must have "spike" item.'),
-        r_th = bp.types.Array(1),
-        post_r = bp.types.Array(1),
-        sum_r_post = bp.types.Array(1)        
+        r_th = bp.types.Array(dim=1),
+        post_r = bp.types.Array(dim=1),
+        sum_post_r = bp.types.Array(dim=1)        
     )
 
-    def bound(w):
-        w = np.where(0 < w, w, w_min)
-        w = np.where(w < w_max, w, w_max)
-        return w
 
     @bp.integrate
     def int_w(w, t, r_pre, r_post, r_th):
@@ -78,31 +74,31 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
         requires['post2syn']=bp.types.ListConn()
         requires['post2pre']=bp.types.ListConn()
 
-        def learn(ST, _t_, pre, post, post2syn, post2pre, r_th, sum_r_post, post_r):
-            for i , r_i_post in enumerate(post['r']):
-                if r_i_post < r_0:
-                    post_r[i] = r_i_post
-                elif post2syn[i].size > 0 and post2pre[i].size > 0:
+        def learn(ST, _t_, pre, post, post2syn, post2pre, r_th, sum_post_r, post_r):
+            for post_id , post_r_i in enumerate(post['r']):
+                if post_r_i < r_0:
+                    post_r[post_id] = post_r_i
+                elif post2syn[post_id].size > 0 and post2pre[post_id].size > 0:
                     # mapping
-                    ij = post2syn[i]
-                    j = post2pre[i]
-                    r_j_pre = pre['r'][j]
-                    w_ij = ST['w'][ij]
+                    syn_ids = post2syn[post_id]
+                    pre_ids = post2pre[post_id]
+                    pre_r = pre['r'][pre_ids]
+                    w = ST['w'][syn_ids]
 
                     # threshold
-                    sum_r_post[i] += r_i_post
-                    r_threshold = sum_r_post[i] / (_t_ / bp.profile._dt + 1)
-                    r_th[i] = r_threshold
+                    sum_post_r[post_id] += post_r_i
+                    r_threshold = sum_post_r[post_id] / (_t_ / bp.profile._dt + 1)
+                    r_th[post_id] = r_threshold
                     
                     # BCM rule
-                    w_ij, dw_ij = int_w(w_ij, _t_, r_j_pre, r_i_post, r_th[i])
-                    w_ij = bound(w_ij)
-                    ST['w'][ij] = w_ij
-                    ST['dwdt'][ij] = dw_ij
+                    w, dw = int_w(w, _t_, pre_r, post_r_i, r_th[post_id])
+                    w = np.clip(w, w_min, w_max)
+                    ST['w'][syn_ids] = w
+                    ST['dwdt'][syn_ids] = dw
 
                     # output
-                    next_post_r = np.dot(w_ij, r_j_pre)
-                    post_r[i] = next_post_r
+                    next_post_r = np.dot(w, pre_r)
+                    post_r[post_id] = next_post_r
                              
         @bp.delayed
         def output(post, post_r):
@@ -111,27 +107,27 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
     elif mode == 'matrix':
         requires['conn_mat']=bp.types.MatConn()
 
-        def learn(ST, _t_, pre, post, conn_mat, r_th, sum_r_post, post_r):
-            r_i_post = post['r']
-            w_ij = ST['w'] * conn_mat
-            r_j_pre = pre['r']
+        def learn(ST, _t_, pre, post, conn_mat, r_th, sum_post_r, post_r):
+            post_r_i = post['r']
+            w = ST['w'] * conn_mat
+            pre_r = pre['r']
 
             # threshold
-            sum_r_post += r_i_post
-            r_th = sum_r_post / (_t_ / bp.profile._dt + 1)          
+            sum_post_r += post_r_i
+            r_th = sum_post_r / (_t_ / bp.profile._dt + 1)          
 
             # BCM rule
-            dim = np.shape(w_ij)
+            dim = np.shape(w)
             reshape_th = np.vstack((r_th,)*dim[0])
-            reshape_post = np.vstack((r_i_post,)*dim[0])
-            reshape_pre = np.vstack((r_j_pre,)*dim[1]).T
-            w_ij, dw_ij = int_w(w_ij, _t_, reshape_pre, reshape_post, reshape_th)
-            w_ij = bound(w_ij)
-            ST['w'] = w_ij
-            ST['dwdt'] = dw_ij
+            reshape_post = np.vstack((post_r_i,)*dim[0])
+            reshape_pre = np.vstack((pre_r,)*dim[1]).T
+            w, dw = int_w(w, _t_, reshape_pre, reshape_post, reshape_th)
+            w = np.clip(w, w_min, w_max)
+            ST['w'] = w
+            ST['dwdt'] = dw
 
             # output
-            next_post_r = np.dot(w_ij.T, r_j_pre)
+            next_post_r = np.dot(w.T, pre_r)
             post_r = next_post_r
 
         @bp.delayed
