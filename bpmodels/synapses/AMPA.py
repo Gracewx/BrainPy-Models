@@ -2,8 +2,9 @@
 
 import brainpy as bp
 from brainpy import numpy as np
+import sys
 
-def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
+def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0, mode = 'vector'):
     """AMPA conductance-based synapse (type 1).
 
     .. math::
@@ -44,44 +45,70 @@ def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0):
     def ints(s, _t_):
         return - s / tau_decay
 
-    # requirements
-    # ------------
-
     requires = {
         'ST': bp.types.SynState(['s', 'g'], help='AMPA synapse state.'),
         'pre': bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        'post': bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
-        'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
-        'post2syn': bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
+        'post': bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.')
     }
 
-    # model logic
-    # -----------
+    if mode == 'scalar':
+        def update(ST, _t_, pre):
+            s = ints(ST['s'], _t_)
+            s += pre['spike']
+            ST['s'] = s
+            ST['g'] = g_max * s
 
-    def update(ST, _t_, pre, pre2syn):
-        s = ints(ST['s'], _t_)
-        spike_idx = np.where(pre['spike'] > 0.)[0]
-        for i in spike_idx:
-            syn_idx = pre2syn[i]
-            s[syn_idx] += 1.
-        ST['s'] = s
-        ST['g'] = g_max * s
+        @bp.delayed
+        def output(ST, post):
+            post_val = - ST['g'] * (post['V'] - E)
+            post['input'] += post_val
 
-    @bp.delayed
-    def output(ST, post, post2syn):
-        g = np.zeros(len(post2syn), dtype=np.float_)
-        for post_id, syn_ids in enumerate(post2syn):
-            g[post_id] = np.sum(ST['g'][syn_ids])
-        post['input'] -= g * (post['V'] - E)
+    elif mode == 'vector':
+        requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
+        requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
+
+        def update(ST, _t_, pre, pre2syn):
+            s = ints(ST['s'], _t_)
+            spike_idx = np.where(pre['spike'] > 0.)[0]
+            for i in spike_idx:
+                syn_idx = pre2syn[i]
+                s[syn_idx] += 1.
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post, post2syn):
+            g = np.zeros(len(post2syn), dtype=np.float_)
+            for post_id, syn_ids in enumerate(post2syn):
+                g[post_id] = np.sum(ST['g'][syn_ids])
+            post['input'] -= g * (post['V'] - E)
+
+    elif mode == 'matrix':
+        requires['conn_mat']=bp.types.MatConn()
+
+        def update(ST, _t_, pre, conn_mat):
+            s = ints(ST['s'], _t_)
+            s += pre['spike'].reshape((-1, 1)) * conn_mat
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post):
+            g = np.sum(ST['g'], axis=0)
+            post['input'] -= g * (post['V'] - E)
+
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
+
 
     return bp.SynType(name='AMPA_synapse',
                       requires=requires,
                       steps=(update, output),
-                      mode = 'vector')
+                      mode = mode)
 
 
 
-def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
+def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5, mode = 'vector'):
     """AMPA conductance-based synapse (type 2).
 
     .. math::
@@ -132,30 +159,65 @@ def get_AMPA2(g_max=0.42, E=0., alpha=0.98, beta=0.18, T=0.5, T_duration=0.5):
                                   '"s": Synaptic state.\n'
                                   '"t_last_pre_spike": Pre-synaptic neuron spike time.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
-        post=bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.'),
-        pre2syn=bp.types.ListConn(
-            help='Pre-synaptic neuron index -> synapse index'),
-        post2syn=bp.types.ListConn(
-            help='Post-synaptic neuron index -> synapse index'),
+        post=bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.')
     )
 
-    def update(ST, _t_, pre, pre2syn):
-        for i in np.where(pre['spike'] > 0.)[0]:
-            syn_idx = pre2syn[i]
-            ST['t_last_pre_spike'][syn_idx] = _t_
-        TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
-        s = np.clip(int_s(ST['s'], _t_, TT), 0., 1.)
-        ST['s'] = s
-        ST['g'] = g_max * s
+    if mode == 'scalar':
+        def update(ST, _t_, pre):
+            if pre['spike'] > 0.:
+                ST['t_last_pre_spike'] = _t_
+            TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
+            s = np.clip(int_s(ST['s'], _t_, TT), 0., 1.)
+            ST['s'] = s
+            ST['g'] = g_max * s
 
-    @bp.delayed
-    def output(ST, post, post2syn):
-        post_cond = np.zeros(len(post2syn), dtype=np.float_)
-        for post_id, syn_ids in enumerate(post2syn):
-            post_cond[post_id] = np.sum(ST['g'][syn_ids])
-        post['input'] -= post_cond * (post['V'] - E)
+        @bp.delayed
+        def output(ST, post):
+            post_val = - ST['g'] * (post['V'] - E)
+            post['input'] += post_val
+
+    elif mode == 'vector':
+        requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
+        requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
+
+
+        def update(ST, _t_, pre, pre2syn):
+            for i in np.where(pre['spike'] > 0.)[0]:
+                syn_idx = pre2syn[i]
+                ST['t_last_pre_spike'][syn_idx] = _t_
+            TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
+            s = np.clip(int_s(ST['s'], _t_, TT), 0., 1.)
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post, post2syn):
+            g = np.zeros(len(post2syn), dtype=np.float_)
+            for post_id, syn_ids in enumerate(post2syn):
+                g[post_id] = np.sum(ST['g'][syn_ids])
+            post['input'] -= g * (post['V'] - E)
+
+
+    elif mode == 'matrix':
+        requires['conn_mat']=bp.types.MatConn()
+
+        def update(ST, _t_, pre, conn_mat):
+            spike_idxs = np.where(pre['spike'] > 0.)[0]
+            ST['t_last_pre_spike'][spike_idxs] = _t_
+            TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
+            s = np.clip(int_s(ST['s'], _t_, TT), 0., 1.)
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post):
+            g = np.sum(ST['g'], axis=0)
+            post['input'] -= g * (post['V'] - E)
+
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
     return bp.SynType(name='AMPA_synapse',
                       requires=requires,
                       steps=(update, output),
-                      mode = 'vector')
+                      mode = mode)

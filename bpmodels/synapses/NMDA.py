@@ -2,10 +2,11 @@
 
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
 
 def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57, 
-            cc_Mg=1.2, tau_decay=100., a=0.5, tau_rise=2.):
+            cc_Mg=1.2, tau_decay=100., a=0.5, tau_rise=2., mode = 'vector'):
     """NMDA conductance-based synapse.
 
     .. math::
@@ -66,13 +67,6 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
                CA3 and CA1 pyramidal neurons." The Journal of physiology 482.2 (1995): 325-352.
     
     """
-    requires = dict(
-        ST=bp.types.SynState({'s': 0., 'x': 0., 'g': 0.}),
-        pre=bp.types.NeuState(['spike']),
-        post=bp.types.NeuState(['V', 'input']),
-        pre2syn=bp.types.ListConn(),
-        post_slice_syn=bp.types.Array(dim=2),
-    )
 
     @bp.integrate
     def int_x(x, _t_):
@@ -82,30 +76,75 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
     def int_s(s, _t_, x):
         return -s / tau_decay + a * x * (1 - s)
 
-    def update(ST, _t_, pre, pre2syn):
-        for pre_id in range(len(pre2syn)):
-            if pre['spike'][pre_id] > 0.:
-                syn_ids = pre2syn[pre_id]
-                ST['x'][syn_ids] += 1.
-        x = int_x(ST['x'], _t_)
-        s = int_s(ST['s'], _t_, x)
-        ST['x'] = x
-        ST['s'] = s
-        ST['g'] = g_max * s
+    requires = dict(
+        ST=bp.types.SynState({'s': 0., 'x': 0., 'g': 0.}),
+        pre=bp.types.NeuState(['spike']),
+        post=bp.types.NeuState(['V', 'input'])
+    )
 
-    @bp.delayed
-    def output(ST, post, post_slice_syn):
-        num_post = post_slice_syn.shape[0]
-        g = np.zeros(num_post, dtype=np.float_)
-        for post_id in range(num_post):
-            idx = post_slice_syn[post_id]
-            g[post_id] = np.sum(ST['g'][idx[0]: idx[1]])
-        I_syn = g * (post['V'] - E)
-        g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
-        post['input'] -= I_syn * g_inf
+    if mode == 'scalar':
+        def update(ST, _t_, pre):
+            x = int_x(ST['x'], _t_)
+            x += pre['spike']
+            s = int_s(ST['s'], _t_, x)
+            ST['x'] = x
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post):
+            I_syn = ST['g'] * (post['V'] - E)
+            g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
+            post['input'] -= I_syn * g_inf
+
+    elif mode == 'vector':
+        requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
+        requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
+
+        def update(ST, _t_, pre, pre2syn):
+            for pre_id in range(len(pre2syn)):
+                if pre['spike'][pre_id] > 0.:
+                    syn_ids = pre2syn[pre_id]
+                    ST['x'][syn_ids] += 1.
+            x = int_x(ST['x'], _t_)
+            s = int_s(ST['s'], _t_, x)
+            ST['x'] = x
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post, post2syn):
+            g = np.zeros(len(post2syn), dtype=np.float_)
+            for post_id, syn_ids in enumerate(post2syn):
+                g[post_id] = np.sum(ST['g'][syn_ids])    
+            I_syn = g * (post['V'] - E)
+            g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
+            post['input'] -= I_syn * g_inf
+
+    elif mode == 'matrix':
+        requires['conn_mat']=bp.types.MatConn()
+
+        def update(ST, _t_, pre, conn_mat):
+            x = int_x(ST['x'], _t_)
+            x += pre['spike'].reshape((-1, 1)) * conn_mat
+            s = int_s(ST['s'], _t_, x)
+            ST['x'] = x
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post):
+            g = np.sum(ST['g'], axis=0)
+            I_syn = g * (post['V'] - E)
+            g_inf = 1 + cc_Mg / beta * np.exp(-alpha * post['V'])
+            post['input'] -= I_syn * g_inf
+
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
+
 
     return bp.SynType(name='NMDA_synapse',
                       requires=requires,
                       steps=(update, output),
-                      mode = 'vector')
+                      mode = mode)
 
