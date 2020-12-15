@@ -1,12 +1,11 @@
 import brainpy as bp
 from brainpy import numpy as np
 import matplotlib.pyplot as plt
-import pdb
+import sys
 
-
-def get_BCM(learning_rate=0.01, w_max=2., r_0 = 0.):
+def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
     """
-    Bienenstock-Cooper-Munro (BCM) rule. (scalar based)
+    Bienenstock-Cooper-Munro (BCM) rule.
 
     .. math::
 
@@ -29,7 +28,6 @@ def get_BCM(learning_rate=0.01, w_max=2., r_0 = 0.):
     **Member name**  **Initial Value** **Explanation**
     ---------------- ----------------- ---------------------------------------------------------                                  
     w                1.                Synapse weights.
-    r_th             0.                Plasticity threshold.
     ================ ================= =========================================================
 
     Note that all ST members are saved as floating point type in BrainPy, 
@@ -38,6 +36,7 @@ def get_BCM(learning_rate=0.01, w_max=2., r_0 = 0.):
     Args:
         learning_rate (float): learning rate of the synapse weights.
         w_max (float): Maximum of the synapse weights.
+        w_min (float): Minimum of the synapse weights.
         r_0 (float): Minimal plasticity threshold.
 
     Returns:
@@ -51,18 +50,19 @@ def get_BCM(learning_rate=0.01, w_max=2., r_0 = 0.):
 
     requires = dict(
         ST=bp.types.SynState(
-            {'w': 1., 'dwdt': 0., 'r_th': 0., 'post_r': 0., 'sum_r_post':0.}, 
+            {'w': 1., 'dwdt': 0.}, 
             help='BCM synapse state.'),
         pre=bp.types.NeuState(
             ['r'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(
             ['r'], help='Post-synaptic neuron state must have "spike" item.'),
-        post2syn=bp.types.ListConn(),
-        post2pre=bp.types.ListConn()
+        r_th = bp.types.Array(1),
+        post_r = bp.types.Array(1),
+        sum_r_post = bp.types.Array(1)        
     )
 
     def bound(w):
-        w = np.where(0 < w, w, 0.001)
+        w = np.where(0 < w, w, w_min)
         w = np.where(w < w_max, w, w_max)
         return w
 
@@ -71,39 +71,78 @@ def get_BCM(learning_rate=0.01, w_max=2., r_0 = 0.):
         dwdt = learning_rate * r_post * (r_post - r_th) * r_pre
         return (dwdt,),dwdt
 
-    def learn(ST, _t_, pre, post, post2syn, post2pre):
-        for i , r_i_post in enumerate(post['r']):
-            if r_i_post < r_0:
-                ST['post_r'][i] = r_i_post
-            else:
-                # mapping
-                ij = post2syn[i]
-                j = post2pre[i]
-                r_j_pre = pre['r'][j]
-                w_ij = ST['w'][ij]
+    if mode == 'scalar':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
 
-                # output
-                r_i_post = np.dot(w_ij, r_j_pre)
+    elif mode == 'vector':
+        requires['post2syn']=bp.types.ListConn()
+        requires['post2pre']=bp.types.ListConn()
 
-                # threshold
-                ST['sum_r_post'][i] += r_i_post
-                r_th = ST['sum_r_post'][i] / (_t_ / bp.profile.get_dt() + 1)
-                
-                # BCM rule
-                w_ij, dw_ij = int_w(w_ij, _t_, r_j_pre, r_i_post, r_th)
-                w_ij = bound(w_ij)
-                ST['w'][ij] = w_ij
-                ST['dwdt'][ij] = dw_ij
-                ST['post_r'][i] = np.sum(r_i_post)
-                ST['r_th'][i] = r_th
-            
+        def learn(ST, _t_, pre, post, post2syn, post2pre, r_th, sum_r_post, post_r):
+            for i , r_i_post in enumerate(post['r']):
+                if r_i_post < r_0:
+                    post_r[i] = r_i_post
+                elif post2syn[i].size > 0 and post2pre[i].size > 0:
+                    # mapping
+                    ij = post2syn[i]
+                    j = post2pre[i]
+                    r_j_pre = pre['r'][j]
+                    w_ij = ST['w'][ij]
 
-    @bp.delayed
-    def output(ST, post):
-        post['r'] = ST['post_r'][:len(post['r'])]
+                    # threshold
+                    sum_r_post[i] += r_i_post
+                    r_threshold = sum_r_post[i] / (_t_ / bp.profile._dt + 1)
+                    r_th[i] = r_threshold
+                    
+                    # BCM rule
+                    w_ij, dw_ij = int_w(w_ij, _t_, r_j_pre, r_i_post, r_th[i])
+                    w_ij = bound(w_ij)
+                    ST['w'][ij] = w_ij
+                    ST['dwdt'][ij] = dw_ij
+
+                    # output
+                    next_post_r = np.dot(w_ij, r_j_pre)
+                    post_r[i] = next_post_r
+                             
+        @bp.delayed
+        def output(post, post_r):
+            post['r'] = post_r
+
+    elif mode == 'matrix':
+        requires['conn_mat']=bp.types.MatConn()
+
+        def learn(ST, _t_, pre, post, conn_mat, r_th, sum_r_post, post_r):
+            r_i_post = post['r']
+            w_ij = ST['w'] * conn_mat
+            r_j_pre = pre['r']
+
+            # threshold
+            sum_r_post += r_i_post
+            r_th = sum_r_post / (_t_ / bp.profile._dt + 1)          
+
+            # BCM rule
+            dim = np.shape(w_ij)
+            reshape_th = np.vstack((r_th,)*dim[0])
+            reshape_post = np.vstack((r_i_post,)*dim[0])
+            reshape_pre = np.vstack((r_j_pre,)*dim[1]).T
+            w_ij, dw_ij = int_w(w_ij, _t_, reshape_pre, reshape_post, reshape_th)
+            w_ij = bound(w_ij)
+            ST['w'] = w_ij
+            ST['dwdt'] = dw_ij
+
+            # output
+            next_post_r = np.dot(w_ij.T, r_j_pre)
+            post_r = next_post_r
+
+        @bp.delayed
+        def output(post, post_r):
+            post['r'] = post_r
+
+
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
     return bp.SynType(name='BCM_synapse',
                       requires=requires,
                       steps=[learn, output],
-                      mode='vector')
-
+                      mode=mode)
