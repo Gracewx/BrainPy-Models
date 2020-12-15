@@ -2,24 +2,27 @@
 import brainpy as bp
 import brainpy.numpy as np
 
-def get_exponential(g_max=0.2, E=-60., tau=8):
+
+def get_exponential(g_max=0.2, E=-60., tau_decay=8., mode='vector'):
     '''
     Exponential decay synapse model.
 
     .. math::
 
-        I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
+        I_{syn}(t) &= \\bar{g}_{syn} s (t) (V(t)-E_{syn})
 
-        g_{syn} (t) &= \\bar{g}_{syn} exp(- \\frac{t-t_f}{\\tau})
+        \\frac{d s}{d t}&=-\\frac{s}{\\tau_{decay}}+\\sum_{k} \\delta(t-t_{j}^{k})
+
 
     ST refers to synapse state, members of ST are listed below:
     
     ================ ================== =========================================================
     **Member name**  **Initial values** **Explanation**
     ---------------- ------------------ ---------------------------------------------------------    
+    s                  0                  Gating variable.
+
     g                  0                  Synapse conductance on the post-synaptic neuron.
                              
-    t_last_pre_spike   -1e7               Last spike time stamp of the pre-synaptic neuron.
     ================ ================== =========================================================
 
     Note that all ST members are saved as floating point type in BrainPy, 
@@ -28,7 +31,8 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
     Args:
         g_max (float): The peak conductance change in µmho (µS).
         E (float): The reversal potential for the synaptic current.
-        tau (float): The time constant of decay.
+        tau_decay (float): The time constant of decay.
+        mode (string): data structure of ST members.
 
     Returns:
         bp.Neutype: return description of exponential synapse model.
@@ -39,30 +43,67 @@ def get_exponential(g_max=0.2, E=-60., tau=8):
                 Cambridge: Cambridge UP, 2011. 172-95. Print.
     '''
 
+    @bp.integrate
+    def ints(s, _t_):
+        return - s / tau_decay
+
     requires = {
-        'ST': bp.types.SynState({'g': 0., 't_last_pre_spike': -1e7}, help='The conductance defined by exponential function.'),
-        'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
-        'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
-        'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
-        'post2syn': bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
+        'ST': bp.types.SynState(['s', 'g'], help='AMPA synapse state.'),
+        'pre': bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
+        'post': bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.')
     }
 
+    if mode == 'scalar':
+        def update(ST, _t_, pre):
+            s = ints(ST['s'], _t_)
+            s += pre['spike']
+            ST['s'] = s
+            ST['g'] = g_max * s
 
-    def update(ST, _t_, pre, pre2syn):
-        for pre_idx in np.where(pre['spike'] > 0.)[0]:
-            syn_idx = pre2syn[pre_idx]
-            ST['t_last_pre_spike'][syn_idx] = _t_
-        g = g_max * np.exp(-(_t_-ST['t_last_pre_spike']) / tau)
-        ST['g'] = g
+        @bp.delayed
+        def output(ST, post):
+            post_val = - ST['g'] * (post['V'] - E)
+            post['input'] += post_val
 
-    @bp.delayed
-    def output(ST, post, post2syn):
-        I_syn = np.zeros(len(post2syn), dtype=np.float_)
-        for post_id, syn_ids in enumerate(post2syn):
-            I_syn[post_id] = np.sum(ST['g'][syn_ids]*(post['V'] - E))
-        post['input'] -= I_syn
+    elif mode == 'vector':
+        requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
+        requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
+
+        def update(ST, _t_, pre, pre2syn):
+            s = ints(ST['s'], _t_)
+            spike_idx = np.where(pre['spike'] > 0.)[0]
+            for i in spike_idx:
+                syn_idx = pre2syn[i]
+                s[syn_idx] += 1.
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post, post2syn):
+            g = np.zeros(len(post2syn), dtype=np.float_)
+            for post_id, syn_ids in enumerate(post2syn):
+                g[post_id] = np.sum(ST['g'][syn_ids])
+            post['input'] -= g * (post['V'] - E)
+
+    elif mode == 'matrix':
+        requires['conn_mat']=bp.types.MatConn()
+
+        def update(ST, _t_, pre, conn_mat):
+            s = ints(ST['s'], _t_)
+            s += pre['spike'].reshape((-1, 1)) * conn_mat
+            ST['s'] = s
+            ST['g'] = g_max * s
+
+        @bp.delayed
+        def output(ST, post):
+            g = np.sum(ST['g'], axis=0)
+            post['input'] -= g * (post['V'] - E)
+
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
+
 
     return bp.SynType(name='exponential_synapse',
                       requires=requires,
                       steps=(update, output),
-                      mode = 'vector')
+                      mode = mode)
