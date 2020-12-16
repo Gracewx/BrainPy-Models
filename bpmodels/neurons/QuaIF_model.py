@@ -3,13 +3,17 @@ import numpy as np
 import sys
 
 def get_QuaIF(V_rest=-65., V_reset=-68., V_th=-30., 
-            a_0 = 1, V_c = -50, R=1., C=10.,
+            a_0 = .07, V_c = -50, R=1., C=10.,
             tau=10., t_refractory=5., noise=0., mode='scalar'):
     """Quadratic Integrate-and-Fire neuron model.
         
     .. math::
 
         \\tau \\frac{d V}{d t}=a_0(V-V_{rest})(V-V_c) + RI(t)
+    
+    where the parameters are taken to be :math:`a_0` =0.07, and
+    :math:`V_c = -50 mV` (Latham et al., 2000 [2]_).
+    
     
     ST refers to neuron state, members of ST are listed below:
     
@@ -53,13 +57,16 @@ def get_QuaIF(V_rest=-65., V_reset=-68., V_th=-30.,
         .. [1] Gerstner, Wulfram, et al. Neuronal dynamics: From single 
                neurons to networks and models of cognition. Cambridge 
                University Press, 2014.
+        .. [2]  P. E. Latham, B.J. Richmond, P. Nelson and S. Nirenberg 
+                (2000) Intrinsic dynamics in neuronal networks. I. Theory. 
+                J. Neurophysiology 83, pp. 808–827. 
     """
 
     if mode == 'vector':
         raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
     elif mode == 'matrix':
         raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
-    else:
+    elif mode != 'scalar':
         raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
 
