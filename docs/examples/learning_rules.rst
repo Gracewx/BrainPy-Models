@@ -6,3 +6,4 @@ Learning Rules
    :caption: Learning Rules
    
    learning_rules/STDP
+   learning_rules/BCM
