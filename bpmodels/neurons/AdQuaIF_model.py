@@ -94,7 +94,7 @@ def get_AdQuaIF(a = 1, b = .1, a_0 = .07,
             w = int_w(ST['w'], _t_, V)
             if V >= V_th:
                 V = V_reset
-                w += b * tau_w
+                w += b
                 ST['spike'] = 1
                 ST['t_last_spike'] = _t_
             ST['V'] = V
@@ -103,7 +103,7 @@ def get_AdQuaIF(a = 1, b = .1, a_0 = .07,
     def reset(ST):
         ST['input'] = 0.
 
-    return bp.NeuType(name='AdQuasIF_neuron',
+    return bp.NeuType(name='AdQuaIF_neuron',
                       requires=dict(ST=ST),
                       steps=(update, reset),
                       mode=mode)    

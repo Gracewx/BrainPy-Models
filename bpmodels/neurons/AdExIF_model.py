@@ -12,7 +12,7 @@ def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30.,
     
     .. math::
     
-        \\tau_m\\frac{d u}{d t}= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\Delta_T}} -w + RI(t)
+        \\tau_m\\frac{d V}{d t}= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\Delta_T}} -w + RI(t)
     
         \\tau_w \\frac{d w}{d t}=a(V-V_{rest}) - w + b \\tau_w \\sum \\delta (t-t^f)
 
@@ -86,7 +86,7 @@ def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30.,
             w = int_w(ST['w'], _t_, V)
             if V >= V_th:
                 V = V_reset
-                w += b * tau_w
+                w += b
                 ST['spike'] = 1
                 ST['t_last_spike'] = _t_
             ST['V'] = V
