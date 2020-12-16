@@ -2,8 +2,9 @@
 
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
-def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest = -1.6):
+def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest = -1.6, mode='scalar'):
     """
     Hindmarsh-Rose neuron model.
 
@@ -82,7 +83,15 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
     def reset(ST):
         ST['input'] = 0
     
-    return bp.NeuType(name="HindmarshRose_neuron",
-                            requires=dict(ST=ST),
-                            steps=(update, reset),
-                            mode='scalar')
+    
+    if mode == 'scalar':
+        return bp.NeuType(name="HindmarshRose_neuron",
+                          requires=dict(ST=ST),
+                          steps=(update, reset),
+                          mode=mode)
+    elif mode == 'vector':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
+import sys
 
 def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset = -60.,
                       R = 20., C = 1., tau = 20., a = 0., b = 0.01, 
                       k1 = 0.2, k2 = 0.02, R1 = 0., R2 = 1., A1 = 0., A2 = 0.,
-                      noise=0., 
-                      ):
+                      noise=0., mode='scalar'):
     """
     Generalized Integrate-and-Fire model (GeneralizedIF model).
     
@@ -124,7 +124,15 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     def reset(ST):
         ST['input'] = 0.
 
-    return bp.NeuType(name='GeneralizedIF_neuron',
-                      requires=dict(ST=ST),
-                      steps=(update, reset),
-                      mode='scalar')
+    
+    if mode == 'scalar':
+        return bp.NeuType(name='GeneralizedIF_neuron',
+                          requires=dict(ST=ST),
+                          steps=(update, reset),
+                          mode=mode)
+    elif mode == 'vector':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))
