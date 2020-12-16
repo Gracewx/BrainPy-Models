@@ -8,3 +8,6 @@ from .MorrisLecar_model import *
 from .GeneralizedIF_model import *
 from .HindmarshRose_model import *
 from .WilsonCowan_model import *
+from .QuaIF_model import *
+from .adaptiveQuaIF_model import *
+from .adaptiveExpIF_model import *
