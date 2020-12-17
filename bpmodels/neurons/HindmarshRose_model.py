@@ -41,6 +41,7 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
                    of spikes per burst when bursting.
         s (float): Model parameter. Governs adaption.
         V_rest (float): Membrane resting potential.
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.NeuType: return description of Hindmarsh-Rose neuron model.

@@ -55,6 +55,7 @@ def get_WilsonCowan(c1 = 12., c2 = 4., c3 = 13., c4 = 11.,
         slope_i (float): I-neurons' sigmoid function slope parameter.
         theta_e (float): E-neurons' sigmoid function phase parameter.
         theta_i (float): I-neurons' sigmoid function phase parameter.
+        mode (str): Data structure of ST members.
 
     References:
         .. [1] Wilson, Hugh R., and Jack D. Cowan. "Excitatory and inhibitory 

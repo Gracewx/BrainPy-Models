@@ -18,7 +18,7 @@ neu = bp.NeuGroup(RF_neuron, geometry=(10,), monitors=['x', 'V', 'spike'])
 neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 
 # create input
-current = bp.inputs.spike_current([0.1],
+current = bp.inputs.spike_current([0.1, 2.0],
                                   bp.profile._dt, 2., duration=duration)
 
 # simulate
@@ -29,7 +29,7 @@ neu.run(duration=duration, inputs=["ST.input", current], report=True)
 ts = neu.mon.ts
 fig, gs = bp.visualize.get_figure(1, 2, 4, 8)
 fig.add_subplot(gs[0, 0])
-plt.plot(neu.mon.x[:, 0], neu.mon.V[:, 0], label = "V-x plot")
+plt.scatter(neu.mon.x[:, 0], neu.mon.V[:, 0], label = "V-x plot")
 plt.xlabel('x')
 plt.ylabel('V')
 plt.legend()

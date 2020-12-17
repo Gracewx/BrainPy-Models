@@ -29,6 +29,7 @@ def get_Oja(gamma = 0.005, w_max = 1., w_min = 0., mode = 'vector'):
         gamma(float): Learning rate.
         w_max (float): Maximal possible synapse weight.
         w_min (float): Minimal possible synapse weight.
+        mode (str): Data structure of ST members.
         
     Returns:
         bp.Syntype: return description of synapse with Oja's rule.

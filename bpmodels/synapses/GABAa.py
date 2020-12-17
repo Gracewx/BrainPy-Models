@@ -31,6 +31,7 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
         g_max (float): Maximum synapse conductance.
         E (float): Reversal potential of synapse.
         tau_decay (float): Time constant of gating variable decay.
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.SynType: return description of GABAa synapse model.
@@ -136,6 +137,7 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
         beta (float): Closing rate constant of ion channel.
         T (float): Transmitter concentration when synapse is triggered by a pre-synaptic spike.
         T_duration (float): Transmitter concentration duration time after being triggered.
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.SynType: return description of GABAa synapse model.

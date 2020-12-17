@@ -72,6 +72,7 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
         A1 (float): Free parameter.
         A2 (float): Free parameter.
         noise (float): noise.   
+        mode (str): Data structure of ST members.
         
     Returns:
         bp.Neutype: return description of Generalized IF model.

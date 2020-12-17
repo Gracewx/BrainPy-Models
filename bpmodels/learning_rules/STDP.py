@@ -61,6 +61,7 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
         w_max (float): Maximal possible synapse weight.
         delta_A_s (float): Change on source neuron traces elicited by a source neuron spike.
         delta_A_t (float): Change on target neuron traces elicited by a target neuron spike.
+        mode (str): Data structure of ST members.
         
     Returns:
         bp.Syntype: return description of STDP.
@@ -230,6 +231,7 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
         w_max (float): Maximal possible synapse weight.
         delta_A_s (float): Change on source neuron traces elicited by a source neuron spike.
         delta_A_t (float): Change on target neuron traces elicited by a target neuron spike.
+        mode (str): Data structure of ST members.
         
     Returns:
         bp.Syntype: return description of STDP.
