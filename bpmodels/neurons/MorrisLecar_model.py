@@ -39,6 +39,7 @@ def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
         V3 (float): Potential at which W_inf = 0.5.(mV)
         V4 (float): Reciprocal of slope of voltage dependence of W_inf.(mV)
         phi (float): A temperature factor.(1/s)
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.Neutype: return description of Morris-Lecar model.

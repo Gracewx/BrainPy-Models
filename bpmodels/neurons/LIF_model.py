@@ -42,7 +42,8 @@ def get_LIF(V_rest=0., V_reset=-5., V_th=20., R=1.,
         C (float): Membrane capacitance.
         tau (float): Membrane time constant. Compute by R * C.
         t_refractory (int): Refractory period length.(ms)
-        noise (float): noise.   
+        noise (float): noise.
+        mode (str): Data structure of ST members.
         
     Returns:
         bp.Neutype: return description of LIF model.

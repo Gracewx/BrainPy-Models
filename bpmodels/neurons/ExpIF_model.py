@@ -45,7 +45,8 @@ def get_ExpIF(V_rest=-65., V_reset=-68., V_th=-30., V_T=-59.9, delta_T=3.48,
         C (float): Membrane capacitance.
         tau (float): Membrane time constant. Compute by R * C.
         t_refractory (int): Refractory period length.
-        noise (float): noise.   
+        noise (float): noise.
+        mode (str): Data structure of ST members.
         
     Returns:
         bp.Neutype: return description of ExpIF model.

@@ -48,6 +48,7 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
         k4 (float): De-activating rate constant of GABAb receptor.
         T (float): Transmitter concentration when synapse is triggered by a pre-synaptic spike.
         T_duration (float): Transmitter concentration duration time after being triggered.
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.SynType: return description of GABAb synapse model.
@@ -187,6 +188,7 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
         kd (float): Dissociation constant of the binding of G protein on K+ channels.
         T (float): Transmitter concentration when synapse is triggered by a pre-synaptic spike.
         T_duration (float): Transmitter concentration duration time after being triggered.
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.SynType: return decription of GABAb synapse model.

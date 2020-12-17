@@ -51,6 +51,7 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
         t_refractory (float): Refractory period length. [ms]
         noise(float): The noise fluctuation.
         V_th (float): The membrane potential threshold.
+        mode (str): Data structure of ST members.
 
     Returns:
         bp.Neutype: return description of Izhikevich model.
