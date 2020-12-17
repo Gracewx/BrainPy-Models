@@ -24,23 +24,26 @@ We provide the following models:
 +=================================+=================================+===================+============================+
 | Leaky integrate-and-fire model  | Alpha Synapse                   |   STDP            |Continuous attractor network|
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Hodgkin-Huxley model            | AMPA / NMDA                     |                   |    E/I balance network     |
+| Hodgkin-Huxley model            | AMPA / NMDA                     |   BCM rule        |    E/I balance network     |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Izhikevich model                | GABA_A / GABA_B                 |                   |                            | 
+| Izhikevich model                | GABA_A / GABA_B                 |   Oja's rule      |                            | 
 +---------------------------------+---------------------------------+-------------------+----------------------------+
 | Morris–Lecar model              | Exponential Decay Synapse       |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
 | Generalized integrate-and-fire  | Difference of Two Exponentials  |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-| Exponential integrate-and-fire  |                                 |                   |                            |
+| Exponential integrate-and-fire  | Short-term plasticity           |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| Quadratic integrate-and-fire    |                                 |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| adaptive Exponential IF         |                                 |                   |                            |
++---------------------------------+---------------------------------+-------------------+----------------------------+
+| adaptive Quadratic IF           |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
 | Hindmarsh–Rose model            |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
 | Wilson-Cowan model              |                                 |                   |                            |
 +---------------------------------+---------------------------------+-------------------+----------------------------+
-|                                 |                                 |                   |                            |
-+---------------------------------+---------------------------------+-------------------+----------------------------+
-
 
 
 
@@ -73,7 +76,7 @@ The following packages need to be installed to use ``BrainPy-Models``:
 Quick Start
 ============
 
-The use of ``bpmodels`` is very convenient, let's take an example of exploring different firing types in the izhikevich model.
+The use of ``bpmodels`` is very convenient, let's take an example of the implementation of the E-I balanced network.
 
 We start by importing the ``brainpy`` and ``bpmodels`` packages and set profile.
 
@@ -81,6 +84,8 @@ We start by importing the ``brainpy`` and ``bpmodels`` packages and set profile.
 
     import brainpy as bp
     import bpmodels
+    import brainpy.numpy as np
+    import matplotlib.pyplot as plt
 
     # set profile
     bp.profile.set(backend='numba',
@@ -88,53 +93,64 @@ We start by importing the ``brainpy`` and ``bpmodels`` packages and set profile.
                 merge_steps=True,
                 numerical_method='exponential')
 
+    # set parameters
+    V_rest = -52.
+    V_reset = -60.
+    V_th = -50.
+    num_exc = 500
+    num_inh = 500
+    prob = 0.15
+    
+    JE = 1 / np.sqrt(prob * num_exc)
+    JI = 1 / np.sqrt(prob * num_inh)
 
-The pre-defined izhikevich model provides many different firing types, so we can use ``type='tonic spiking'`` to get a pre-defined model with tonic spiking parameters.
+
+The E-I balanced network is based on leaky Integrate-and-Fire (LIF) neurons 
+connecting with single exponential decay synapses. As showed in the table above, 
+``bpmodels`` provides pre-defined LIF neuron model and exponential synapse model, 
+so we can use ``bpmodels.neurons.get_LIF`` and ``bpmodels.synapses.get_exponential`` 
+to get the pre-defined models.
 
 ::
 
-    izh = bpmodels.neurons.get_Izhikevich(type='tonic spiking')
+    neu = bpmodels.neurons.get_LIF(V_reset = V_reset, V_rest = V_rest, V_th=V_th, noise=0.)
     
-    (step_I, duration) = bp.inputs.constant_current(
-                            [(0, 50), (10, 100), (0, 50)])
+    syn = bpmodels.synapses.get_exponential(tau_decay = 2.)
 
-    neuron = bp.NeuGroup(neu_type, 1, monitors= ['V', 'u'])
+    # build network
+    group = bp.NeuGroup(neu, geometry=num_exc + num_inh, monitors=['spike'])
 
-    neuron.run(duration = duration, inputs = ["ST.input", step_I])
+    group.ST['V'] = np.random.random(num_exc + num_inh) * (V_th - V_rest) + V_rest
     
+    exc_conn = bp.SynConn(syn,
+                          pre_group=group[:num_exc],
+                          post_group=group,
+                          conn=bp.connect.FixedProb(prob=prob))
+    exc_conn.ST['w'] = JE
+
+    inh_conn = bp.SynConn(syn,
+                          pre_group=group[num_exc:],
+                          post_group=group,
+                          conn=bp.connect.FixedProb(prob=prob))
+    exc_conn.ST['w'] = -JI
+
+    net = bp.Network(group, exc_conn, inh_conn)
+    net.run(duration=1000., inputs=(group, 'ST.input', 3.))
+
 
     # visualization
+    fig, gs = bp.visualize.get_figure(4, 1, 2, 12)
 
-    ts = neuron.mon.ts
-    fig, gs = bp.visualize.get_figure(3, 1, 3, 6)
+    fig.add_subplot(gs[:3, 0])
+    bp.visualize.plot_raster(group.mon, net.ts, xlim=(50, 950))
 
-    fig.add_subplot(gs[0, 0])
-    plt.plot(ts, step_I, 'r')
-    plt.ylabel('Input Current')
-    plt.xlim(-0.1, duration + 0.1)
-    plt.xlabel('Time (ms)')
-    plt.title('Input Current')
-
-    fig.add_subplot(gs[1, 0])
-    plt.plot(ts, neuron.mon.V[:, 0], label='V')
-    plt.ylabel('Membrane potential')
-    plt.xlabel('Time (ms)')
-    plt.xlim(-0.1, duration + 0.1)
-    plt.ylim(-95., 40.)
-    plt.title('Membrane potential')
-    plt.legend()
-
-    fig.add_subplot(gs[2, 0])
-    plt.plot(ts, neuron.mon.u[:, 0], label='u')
-    plt.xlim(-0.1, duration + 0.1)
-    plt.ylabel('Recovery variable')
-    plt.xlabel('Time (ms)')
-    plt.title('Recovery variable')
-    plt.legend()
-
+    fig.add_subplot(gs[3, 0])
+    rates = bp.measure.firing_rate(group.mon.spike, 5.)
+    plt.plot(net.ts, rates)
+    plt.xlim(50, 950)
     plt.show()
     
     
 Then you would expect to see the following output:
 
-.. image:: docs/images/izh_tonic_spiking.png
+.. image:: docs/images/EI_balanced.png

@@ -2,8 +2,9 @@
 import matplotlib.pyplot as plt
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
-def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., type=None):
+def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., type=None, mode='scalar'):
 
     '''
     The Izhikevich neuron model.
@@ -98,7 +99,7 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
         =========================== ======= ======= ======= =======
     '''
 
-    state = bp.types.NeuState(
+    ST = bp.types.NeuState(
            {'V': -65., 'u': 1., 'input': 0., 'spike': 0., 't_last_spike': -1e7}
     )
 
@@ -198,8 +199,16 @@ def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th
     def reset(ST):
         ST['input'] = 0.
 
-    return bp.NeuType(name='Izhikevich_neuron',
-                      requires={'ST': state},
-                      steps=(update, reset),
-                      mode="scalar")
 
+
+    if mode == 'scalar':
+        return bp.NeuType(name='Izhikevich_neuron',
+                          requires={'ST': ST},
+                          steps=(update, reset),
+                          mode=mode)
+    elif mode == 'vector':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))

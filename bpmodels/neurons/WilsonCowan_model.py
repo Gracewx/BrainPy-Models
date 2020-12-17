@@ -1,9 +1,10 @@
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
 def get_WilsonCowan(c1 = 12., c2 = 4., c3 = 13., c4 = 11.,
                     k_e = 1., k_i = 1.,tau_e = 1., tau_i = 1., r_e = 1., r_i = 1.,
-                    slope_e = 1.2, slope_i = 1., theta_e = 2.8, theta_i = 4.):
+                    slope_e = 1.2, slope_i = 1., theta_e = 2.8, theta_i = 4., mode='scalar'):
     """
     Wilson-Cowan firing rate neuron model.
 
@@ -90,7 +91,15 @@ def get_WilsonCowan(c1 = 12., c2 = 4., c3 = 13., c4 = 11.,
         ST['input_e'] = 0
         ST['input_i'] = 0
 
-    return bp.NeuType(name='WilsonCowan_neuron',
-                      requires=dict(ST=ST),
-                      steps=(update, reset),
-                      mode='scalar')
+    
+    if mode == 'scalar':
+        return bp.NeuType(name='WilsonCowan_neuron',
+                          requires=dict(ST=ST),
+                          steps=(update, reset),
+                          mode=mode)
+    elif mode == 'vector':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))

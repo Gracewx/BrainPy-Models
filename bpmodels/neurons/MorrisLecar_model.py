@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import brainpy as bp
 import brainpy.numpy as np
+import sys
 
 
 def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
-                    g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04):
+                    g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04, mode='vector'):
     """
     The Morris-Lecar neuron model.
 
@@ -79,7 +80,15 @@ def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
     def reset(ST):
         ST['input'] = 0.
 
-    return bp.NeuType(name='MorrisLecar_neuron',
-                      requires={"ST": ST},
-                      steps=[update, reset],
-                      mode="vector")
+                             
+    if mode == 'scalar':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'vector':
+        return bp.NeuType(name='MorrisLecar_neuron',
+                          requires={"ST": ST},
+                          steps=[update, reset],
+                          mode=mode)
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))

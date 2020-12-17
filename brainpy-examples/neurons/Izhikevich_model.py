@@ -5,8 +5,6 @@ import brainpy as bp
 import brainpy.numpy as np
 import bpmodels
 
-
-
 bp.profile.set(backend='numba', merge_steps=True)
 
 Izhikevich = bpmodels.neurons.get_Izhikevich(type='None')
