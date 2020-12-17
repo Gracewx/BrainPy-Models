@@ -19,3 +19,4 @@ bpmodels.neurons
     get_GeneralizedIF
     get_HindmarshRose
     get_WilsonCowan
+    get_ResonateandFire

@@ -11,3 +11,4 @@ from .WilsonCowan_model import *
 from .QuaIF_model import *
 from .AdExIF_model import *
 from .AdQuaIF_model import *
+from .ResonateandFire_model import *
