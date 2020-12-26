@@ -6,3 +6,5 @@ Networks
    :caption: Networks
    
    networks/EI_balanced_network
+   networks/CANN
+   networks/Gamma_oscillations
