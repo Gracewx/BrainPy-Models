@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
-
 import brainpy as bp
-import numpy as np
+import brainpy.numpy as np
 import sys
 
 def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30., 
               V_T=-59.9, delta_T=3.48, a=1., b=1,
               R=1, C=10., tau=10., tau_w = 30.,
-              t_refractory=1.7, noise=0., mode='scalar'):
+              t_refractory=0., noise=0., mode='scalar'):
     """Adaptive Exponential Integrate-and-Fire neuron model.
     
     .. math::
     
-        \\tau_m\\frac{d V}{d t}= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\Delta_T}} + R w + RI(t)
+        \\tau_m\\frac{d V}{d t}= - (V-V_{rest}) + \\Delta_T e^{\\frac{V-V_T}{\\Delta_T}} - R w + RI(t)
     
         \\tau_w \\frac{d w}{d t}=a(V-V_{rest}) - w + b \\tau_w \\sum \\delta (t-t^f)
 
@@ -72,7 +70,7 @@ def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30.,
 
     @bp.integrate
     def int_V(V, _t_, w, I_ext):  # integrate u(t)
-        return (- (V - V_rest) + delta_T * np.exp((V - V_T) / delta_T) + R * w + R * I_ext) / tau, noise / tau
+        return (- (V - V_rest) + delta_T * np.exp((V - V_T) / delta_T) - R * w + R * I_ext) / tau, noise / tau
 
     @bp.integrate
     def int_w(w, _t_, V):
@@ -82,8 +80,8 @@ def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30.,
         ST['spike'] = 0
         ST['refractory'] = True if _t_ - ST['t_last_spike'] <= t_refractory else False
         if not ST['refractory']:
-            V = int_V(ST['V'], _t_, ST['w'], ST['input'])
-            w = int_w(ST['w'], _t_, V)
+            w = int_w(ST['w'], _t_, ST['V'])
+            V = int_V(ST['V'], _t_, w, ST['input'])
             if V >= V_th:
                 V = V_reset
                 w += b
