@@ -4,7 +4,7 @@ import sys
 
 def get_QuaIF(V_rest=-65., V_reset=-68., V_th=-30., 
             a_0 = .07, V_c = -50, R=1., C=10.,
-            tau=10., t_refractory=5., noise=0., mode='scalar'):
+            tau=10., t_refractory=0., noise=0., mode='scalar'):
     """Quadratic Integrate-and-Fire neuron model.
         
     .. math::
