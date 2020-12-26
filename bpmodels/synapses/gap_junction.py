@@ -10,7 +10,7 @@ def get_gap_junction(mode='scalar'):
 
     .. math::
 
-    I_{syn} &= w (V_{pre} - V_{post})
+        I_{syn} = w (V_{pre} - V_{post})
 
     ST refers to synapse state, members of ST are listed below:
 
@@ -83,7 +83,7 @@ def get_gap_junction_lif(weight, k_spikelet=0.1, post_has_refractory=False, mode
 
     .. math::
 
-    I_{syn} &= w (V_{pre} - V_{post})
+        I_{syn} = w (V_{pre} - V_{post})
 
     ST refers to synapse state, members of ST are listed below:
 
@@ -91,6 +91,7 @@ def get_gap_junction_lif(weight, k_spikelet=0.1, post_has_refractory=False, mode
     **Member name** **Initial Value** **Explanation**
     --------------- ----------------- ---------------------------------------------------------
     w                0.                Synapse weights.
+    
     spikelet         0.                conductance for post-synaptic neuron
     =============== ================= =========================================================
 
