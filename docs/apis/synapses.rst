@@ -19,3 +19,6 @@ bpmodels.synapses
     get_STP
     get_exponential
     get_two_exponentials
+    get_gap_junction
+    get_gap_junction_lif
+    get_voltage_jump
