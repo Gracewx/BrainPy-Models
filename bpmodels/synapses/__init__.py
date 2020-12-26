@@ -7,3 +7,5 @@ from .GABAa import *
 from .GABAb import *
 from .exponential import *
 from .two_exponentials import *
+from .gap_junction import *
+from .voltage_jump import *

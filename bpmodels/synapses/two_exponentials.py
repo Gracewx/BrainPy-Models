@@ -10,7 +10,7 @@ def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
 
         I_{syn}(t) &= g_{syn} (t) (V(t)-E_{syn})
 
-        g_{syn} (t) &= \\bar{g}_{syn} \\frac{\\tau_d \\tau_r} {\\tau_d - \\tau_r} 
+        g_{syn} (t) &= \\sum \\bar{g}_{syn} \\frac{\\tau_d \\tau_r} {\\tau_d - \\tau_r} 
         (exp(- \\frac{t-t_f}{\\tau_d}) - exp(- \\frac{t-t_f}{\\tau_r}))
 
     ST refers to synapse state, members of ST are listed below:

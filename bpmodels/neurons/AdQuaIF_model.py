@@ -1,17 +1,16 @@
 import brainpy as bp
-import numpy as np
 import sys
 
 def get_AdQuaIF(a = 1, b = .1, a_0 = .07,  
                     V_c = -50, V_rest=-65., V_reset=-68., V_th=-30.,
                     R=1., C=10.,
                     tau=10., tau_w = 10., 
-                    t_refractory=5., noise=0., mode='scalar'):
+                    t_refractory=0., noise=0., mode='scalar'):
     """Adaptive Quadratic Integrate-and-Fire neuron model.
         
     .. math::
 
-        \\tau_m \\frac{d V}{d t}=a_0(V-V_{rest})(V-V_c) - w + RI(t)
+        \\tau_m \\frac{d V}{d t}=a_0(V-V_{rest})(V-V_c) - R w + RI(t)
         
         \\tau_w \\frac{d w}{d t}=a(V-V_{rest}) - w + b \\tau_w \\sum \\delta (t-t^f)
     
@@ -78,7 +77,7 @@ def get_AdQuaIF(a = 1, b = .1, a_0 = .07,
 
     @bp.integrate
     def int_V(V, _t_, w, I_ext):  
-        return (a_0* (V - V_rest)*(V-V_c) - w + R * I_ext) / tau, noise / tau
+        return (a_0* (V - V_rest)*(V-V_c) - R * w + R * I_ext) / tau, noise / tau
 
     @bp.integrate
     def int_w(w, _t_, V):
@@ -90,8 +89,8 @@ def get_AdQuaIF(a = 1, b = .1, a_0 = .07,
             ST['refractory'] = 1.
         else:
             ST['refractory'] = 0.
-            V = int_V(ST['V'], _t_, ST['w'], ST['input'])
-            w = int_w(ST['w'], _t_, V)
+            w = int_w(ST['w'], _t_, ST['V'])
+            V = int_V(ST['V'], _t_, w, ST['input'])
             if V >= V_th:
                 V = V_reset
                 w += b
