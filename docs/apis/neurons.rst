@@ -12,6 +12,7 @@ bpmodels.neurons
     get_HH
     get_Izhikevich
     get_ExpIF
+    get_AdExIF
     get_QuaIF
     get_AdQuaIF
     get_MorrisLecar
