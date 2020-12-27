@@ -14,7 +14,7 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     
         &\\frac{d I_j}{d t} = - k_j I_j
     
-        &\\frac{d V}{d t} = ( - (V - V_{rest}) + R\\sum_{j}I_j + RI)
+        &\\frac{d V}{d t} = ( - (V - V_{rest}) + R\\sum_{j}I_j + RI) / \\tau
     
         &\\frac{d V_{th}}{d t} = a(V - V_{rest}) - b(V_{th} - V_{th\\infty})
     
