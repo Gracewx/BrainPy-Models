@@ -7,13 +7,13 @@ import sys
 def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
                     g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04, mode='vector'):
     """
-    The Morris-Lecar neuron model.
+    The Morris-Lecar neuron model. (Also known as $I_{Ca}$+$I_K$-model.)
 
     .. math::
 
-        C\\frac{dV}{dt} = -  g_{Ca} M_{\\infty} (V - V_{Ca})- g_{K} W(V - V_{K}) - g_{Leak} (V - V_{Leak}) + I_{ext}
+        &C\\frac{dV}{dt} = -  g_{Ca} M_{\\infty} (V - V_{Ca})- g_{K} W(V - V_{K}) - g_{Leak} (V - V_{Leak}) + I_{ext}
 
-        \\frac{dW}{dt} = \\frac{W_{\\infty}(V) - W}{ \\tau_W(V)} 
+        &\\frac{dW}{dt} = \\frac{W_{\\infty}(V) - W}{ \\tau_W(V)} 
 
     ST refers to neuron state, members of ST are listed below:
     
