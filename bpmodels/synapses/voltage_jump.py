@@ -31,8 +31,9 @@ def get_voltage_jump(post_has_refractory=False, mode='vector'):
     """
     if mode=='vector':
 
+        ST=bp.types.SynState(['g'])
+
         requires = dict(
-            ST=bp.types.SynState(['g']),
             pre=bp.types.NeuState(['spike']),
             pre2post=bp.types.ListConn(),
         )
@@ -64,6 +65,6 @@ def get_voltage_jump(post_has_refractory=False, mode='vector'):
         raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
     return bp.SynType(name='voltage_jump_synapse',
-                      requires=requires,
+                      ST=ST, requires=requires,
                       steps=(update, output),
                       mode = mode)

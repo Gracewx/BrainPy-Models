@@ -88,7 +88,7 @@ We start by importing the ``brainpy`` and ``bpmodels`` packages and set profile.
     import matplotlib.pyplot as plt
 
     # set profile
-    bp.profile.set(backend='numba',
+    bp.profile.set(jit=True,
                 device='cpu',
                 merge_steps=True,
                 numerical_method='exponential')

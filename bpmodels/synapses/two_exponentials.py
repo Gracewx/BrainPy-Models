@@ -41,20 +41,21 @@ def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
                 Cambridge: Cambridge UP, 2011. 172-95. Print.
     '''
 
+    ST=bp.types.SynState({'g': 0., 't_last_pre_spike': -1e7}, help='The conductance defined by exponential function.')
+
     requires = {
-        'ST': bp.types.SynState({'g': 0., 't_last_pre_spike': -1e7}, help='The conductance defined by exponential function.'),
         'pre': bp.types.NeuState(['spike'], help='pre-synaptic neuron state must have "V"'),
         'post': bp.types.NeuState(['input', 'V'], help='post-synaptic neuron state must include "input" and "V"'),
         'pre2syn': bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index'),
         'post2syn': bp.types.ListConn(help='Post-synaptic neuron index -> synapse index'),
     }
     
-    def update(ST, _t_, pre, pre2syn):
+    def update(ST, _t, pre, pre2syn):
         for pre_idx in np.where(pre['spike'] > 0.)[0]:
             syn_idx = pre2syn[pre_idx]
-            ST['t_last_pre_spike'][syn_idx] = _t_
+            ST['t_last_pre_spike'][syn_idx] = _t
         c = (tau_d * tau_r) / (tau_d - tau_r)
-        g = g_max * c * (np.exp(-(_t_-ST['t_last_pre_spike']) / tau_d)-np.exp(-(_t_-ST['t_last_pre_spike']) / tau_r))
+        g = g_max * c * (np.exp(-(_t-ST['t_last_pre_spike']) / tau_d)-np.exp(-(_t-ST['t_last_pre_spike']) / tau_r))
         ST['g'] = g
 
     @bp.delayed
@@ -65,6 +66,6 @@ def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
         post['input'] -= I_syn
 
     return bp.SynType(name='two_exponentials_synapse',
-                      requires=requires,
+                      ST=ST, requires=requires,
                       steps=(update, output),
                       mode = 'vector')

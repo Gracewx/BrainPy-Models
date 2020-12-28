@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 import bpmodels
 
-bp.profile.set(backend='numba', dt=0.02, merge_steps=True)
+bp.profile.set(jit=True, dt=0.02, merge_steps=True)
 ML = bpmodels.neurons.get_MorrisLecar(noise=0.)
 
 '''The current is constant'''

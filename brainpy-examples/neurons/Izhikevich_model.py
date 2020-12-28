@@ -5,7 +5,7 @@ import brainpy as bp
 import brainpy.numpy as np
 import bpmodels
 
-bp.profile.set(backend='numba', merge_steps=True)
+bp.profile.set(jit=True, merge_steps=True)
 
 Izhikevich = bpmodels.neurons.get_Izhikevich(type='None')
 neu = bp.NeuGroup(Izhikevich, 10, monitors=['V', 'u'])

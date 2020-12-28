@@ -44,18 +44,19 @@ def get_exponential(g_max=0.2, E=-60., tau_decay=8., mode='vector'):
     '''
 
     @bp.integrate
-    def ints(s, _t_):
+    def ints(s, _t):
         return - s / tau_decay
 
+    ST=bp.types.SynState(['s', 'g'], help='synapse state.')
+
     requires = {
-        'ST': bp.types.SynState(['s', 'g'], help='AMPA synapse state.'),
         'pre': bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         'post': bp.types.NeuState(['V', 'input'], help='Post-synaptic neuron state must have "V" and "input" item.')
     }
 
     if mode == 'scalar':
-        def update(ST, _t_, pre):
-            s = ints(ST['s'], _t_)
+        def update(ST, _t, pre):
+            s = ints(ST['s'], _t)
             s += pre['spike']
             ST['s'] = s
             ST['g'] = g_max * s
@@ -69,8 +70,8 @@ def get_exponential(g_max=0.2, E=-60., tau_decay=8., mode='vector'):
         requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
         requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
 
-        def update(ST, _t_, pre, pre2syn):
-            s = ints(ST['s'], _t_)
+        def update(ST, _t, pre, pre2syn):
+            s = ints(ST['s'], _t)
             spike_idx = np.where(pre['spike'] > 0.)[0]
             for i in spike_idx:
                 syn_idx = pre2syn[i]
@@ -88,8 +89,8 @@ def get_exponential(g_max=0.2, E=-60., tau_decay=8., mode='vector'):
     elif mode == 'matrix':
         requires['conn_mat']=bp.types.MatConn()
 
-        def update(ST, _t_, pre, conn_mat):
-            s = ints(ST['s'], _t_)
+        def update(ST, _t, pre, conn_mat):
+            s = ints(ST['s'], _t)
             s += pre['spike'].reshape((-1, 1)) * conn_mat
             ST['s'] = s
             ST['g'] = g_max * s
@@ -104,6 +105,6 @@ def get_exponential(g_max=0.2, E=-60., tau_decay=8., mode='vector'):
 
 
     return bp.SynType(name='exponential_synapse',
-                      requires=requires,
+                      ST=ST, requires=requires,
                       steps=(update, output),
                       mode = mode)

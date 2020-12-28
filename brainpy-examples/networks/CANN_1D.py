@@ -165,6 +165,6 @@ def smooth_tracking():
 
 if __name__ == '__main__':
     pass
-    # population_coding()
-    template_matching()
+    population_coding()
+    # template_matching()
     # smooth_tracking()

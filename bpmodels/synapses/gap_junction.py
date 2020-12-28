@@ -36,11 +36,12 @@ def get_gap_junction(mode='scalar'):
 
     """
 
+    ST=bp.types.SynState(['w'])
+
     requires = dict(
-        ST=bp.types.SynState(['w']),
         pre=bp.types.NeuState(['V']),
         post=bp.types.NeuState(['V', 'input'])
-        )
+    )
 
     if mode=='scalar':
         def update(ST, pre, post):
@@ -72,7 +73,7 @@ def get_gap_junction(mode='scalar'):
         raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
     return bp.SynType(name='gap_junction_synapse', 
-                        requires=requires, 
+                        ST=ST, requires=requires, 
                         steps=update, 
                         mode=mode)
 
@@ -111,8 +112,9 @@ def get_gap_junction_lif(weight, k_spikelet=0.1, post_has_refractory=False, mode
 
     """
 
+    ST=bp.types.SynState('w', 'spikelet')
+
     requires = dict(
-        ST=bp.types.SynState('w', 'spikelet'),
         pre=bp.types.NeuState(['V', 'spike']),
         post=bp.types.NeuState(['V', 'input'])
     )
@@ -172,6 +174,6 @@ def get_gap_junction_lif(weight, k_spikelet=0.1, post_has_refractory=False, mode
         raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
     return bp.SynType(name='gap_junctin_synapse_for_LIF',
-                      requires=requires,
+                      ST=ST, requires=requires,
                       steps=steps,
                       mode=mode)

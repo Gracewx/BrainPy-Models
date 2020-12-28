@@ -7,7 +7,7 @@ import sys
 def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.,
                     g_Leak=2., C=20., V1=-1.2, V2=18., V3=2., V4=30., phi=0.04, mode='vector'):
     """
-    The Morris-Lecar neuron model. (Also known as $I_{Ca}$+$I_K$-model.)
+    The Morris-Lecar neuron model. (Also known as :math:`I_{Ca}+I_K`-model.)
 
     .. math::
 
@@ -77,9 +77,9 @@ def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
         dVdt = (- I_Ca - I_K - I_Leak + Isyn) / C
         return dVdt, noise / C
 
-    def update(ST, _t_):
-        W = int_W(ST['W'], _t_, ST['V'])
-        V = int_V(ST['V'], _t_, ST['W'], ST['input'])
+    def update(ST, _t):
+        W = int_W(ST['W'], _t, ST['V'])
+        V = int_V(ST['V'], _t, ST['W'], ST['input'])
         ST['V'] = V
         ST['W'] = W
         ST['input'] = 0.
@@ -92,7 +92,7 @@ def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
         raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
     elif mode == 'vector':
         return bp.NeuType(name='MorrisLecar_neuron',
-                          requires={"ST": ST},
+                          ST=ST,
                           steps=[update, reset],
                           mode=mode)
     elif mode == 'matrix':

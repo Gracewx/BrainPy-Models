@@ -69,24 +69,25 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
     """
 
     @bp.integrate
-    def int_x(x, _t_):
+    def int_x(x, _t):
         return -x / tau_rise
 
     @bp.integrate
-    def int_s(s, _t_, x):
+    def int_s(s, _t, x):
         return -s / tau_decay + a * x * (1 - s)
 
+    ST=bp.types.SynState({'s': 0., 'x': 0., 'g': 0.})
+
     requires = dict(
-        ST=bp.types.SynState({'s': 0., 'x': 0., 'g': 0.}),
         pre=bp.types.NeuState(['spike']),
         post=bp.types.NeuState(['V', 'input'])
     )
 
     if mode == 'scalar':
-        def update(ST, _t_, pre):
-            x = int_x(ST['x'], _t_)
+        def update(ST, _t, pre):
+            x = int_x(ST['x'], _t)
             x += pre['spike']
-            s = int_s(ST['s'], _t_, x)
+            s = int_s(ST['s'], _t, x)
             ST['x'] = x
             ST['s'] = s
             ST['g'] = g_max * s
@@ -101,13 +102,13 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
         requires['pre2syn']=bp.types.ListConn(help='Pre-synaptic neuron index -> synapse index')
         requires['post2syn']=bp.types.ListConn(help='Post-synaptic neuron index -> synapse index')
 
-        def update(ST, _t_, pre, pre2syn):
+        def update(ST, _t, pre, pre2syn):
             for pre_id in range(len(pre2syn)):
                 if pre['spike'][pre_id] > 0.:
                     syn_ids = pre2syn[pre_id]
                     ST['x'][syn_ids] += 1.
-            x = int_x(ST['x'], _t_)
-            s = int_s(ST['s'], _t_, x)
+            x = int_x(ST['x'], _t)
+            s = int_s(ST['s'], _t, x)
             ST['x'] = x
             ST['s'] = s
             ST['g'] = g_max * s
@@ -124,10 +125,10 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
     elif mode == 'matrix':
         requires['conn_mat']=bp.types.MatConn()
 
-        def update(ST, _t_, pre, conn_mat):
-            x = int_x(ST['x'], _t_)
+        def update(ST, _t, pre, conn_mat):
+            x = int_x(ST['x'], _t)
             x += pre['spike'].reshape((-1, 1)) * conn_mat
-            s = int_s(ST['s'], _t_, x)
+            s = int_s(ST['s'], _t, x)
             ST['x'] = x
             ST['s'] = s
             ST['g'] = g_max * s
@@ -144,7 +145,7 @@ def get_NMDA(g_max=0.15, E=0, alpha=0.062, beta=3.57,
 
 
     return bp.SynType(name='NMDA_synapse',
-                      requires=requires,
+                      ST=ST, requires=requires,
                       steps=(update, output),
                       mode = mode)
 

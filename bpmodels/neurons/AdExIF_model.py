@@ -69,24 +69,24 @@ def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30.,
     )
 
     @bp.integrate
-    def int_V(V, _t_, w, I_ext):  # integrate u(t)
+    def int_V(V, _t, w, I_ext):  # integrate u(t)
         return (- (V - V_rest) + delta_T * np.exp((V - V_T) / delta_T) - R * w + R * I_ext) / tau, noise / tau
 
     @bp.integrate
-    def int_w(w, _t_, V):
+    def int_w(w, _t, V):
         return (a * (V - V_rest)-w) / tau_w, noise / tau_w
 
-    def update(ST, _t_):
+    def update(ST, _t):
         ST['spike'] = 0
-        ST['refractory'] = True if _t_ - ST['t_last_spike'] <= t_refractory else False
+        ST['refractory'] = True if _t - ST['t_last_spike'] <= t_refractory else False
         if not ST['refractory']:
-            w = int_w(ST['w'], _t_, ST['V'])
-            V = int_V(ST['V'], _t_, w, ST['input'])
+            w = int_w(ST['w'], _t, ST['V'])
+            V = int_V(ST['V'], _t, w, ST['input'])
             if V >= V_th:
                 V = V_reset
                 w += b
                 ST['spike'] = 1
-                ST['t_last_spike'] = _t_
+                ST['t_last_spike'] = _t
             ST['V'] = V
             ST['w'] = w
             
@@ -96,7 +96,7 @@ def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30.,
     
     if mode == 'scalar':
         return bp.NeuType(name='AdExIF_neuron',
-                          requires=dict(ST=ST),
+                          ST=ST,
                           steps=(update, reset),
                           mode=mode)
     elif mode == 'vector':

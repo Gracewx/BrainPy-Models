@@ -3,4 +3,4 @@ numba
 matplotlib
 sympy
 autopep8
-brain.py
+brain.py>=0.3.0

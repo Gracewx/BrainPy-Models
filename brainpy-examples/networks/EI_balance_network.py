@@ -11,8 +11,7 @@ import matplotlib.pyplot as plt
 
 
 bp.profile.set(jit=True, device='cpu',
-               numerical_method='exponential',
-               show_code=True)
+               numerical_method='exponential')
 
 num_exc = 500
 num_inh = 500

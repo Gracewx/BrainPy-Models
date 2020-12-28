@@ -68,16 +68,16 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200., mode = 'vector'):
     """
 
     @bp.integrate
-    def int_u(u, _t_):
+    def int_u(u, _t):
         return - u / tau_f
 
     @bp.integrate
-    def int_x(x, _t_):
+    def int_x(x, _t):
         return (1 - x) / tau_d
 
+    ST=bp.types.SynState({'u': 0., 'x': 1., 'w': 1., 'g': 0.})
 
     requires = dict(
-        ST=bp.types.SynState({'u': 0., 'x': 1., 'w': 1., 'g': 0.}),
         pre=bp.types.NeuState(['spike']),
         post=bp.types.NeuState(['V', 'input'])
     )
@@ -142,6 +142,6 @@ def get_STP(U=0.15, tau_f=1500., tau_d=200., mode = 'vector'):
             post['input'] += g
 
     return bp.SynType(name='STP_synapse',
-                      requires=requires,
+                      ST=ST, requires=requires,
                       steps=(update, output),
                       mode = mode)

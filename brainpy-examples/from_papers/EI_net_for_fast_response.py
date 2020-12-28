@@ -13,7 +13,7 @@ Implementation of the paper：
 import brainpy as bp
 import brainpy.numpy as np
 
-bp.profile.set(backend='numba', numerical_method='exponential')
+bp.profile.set(jit=True, numerical_method='exponential')
 
 num = 10000
 num_inh = int(num * 0.2)
@@ -50,8 +50,8 @@ def get_neu(tau):
     def int_f(V, t, Isyn):
         return (-V + Isyn) / tau
 
-    def update(ST, _t_):
-        V = int_f(ST['V'], _t_, ST['input'])
+    def update(ST, _t):
+        V = int_f(ST['V'], _t, ST['input'])
         if V >= V_threshold:
             ST['spike'] = 1.
             V = V_reset
@@ -61,7 +61,7 @@ def get_neu(tau):
         ST['input'] = 0.
 
     return bp.NeuType(name='LIF',
-                      requires=dict(ST=neu_ST),
+                      ST=neu_ST,
                       steps=update,
                       mode='scalar')
 
@@ -72,16 +72,14 @@ def get_neu(tau):
 
 
 def get_syn(tau):
-    syn_requires = {
-        'ST': bp.types.SynState(['s', 'g', 'w'])
-    }
+    ST= bp.types.SynState(['s', 'g', 'w'])
 
     @bp.integrate
     def ints(s, t):
         return - s / tau
 
-    def update(ST, _t_, pre, pre2syn):
-        s = ints(ST['s'], _t_)
+    def update(ST, _t, pre, pre2syn):
+        s = ints(ST['s'], _t)
 
         for i in range(pre['spike'].shape[0]):
             if pre['spike'][i] > 0.:
@@ -96,7 +94,7 @@ def get_syn(tau):
             post['input'][post_id] += np.sum(ST['g'][pos[0]: pos[1]])
 
     return bp.SynType(name='alpha_synapse',
-                      requires=syn_requires,
+                      ST=ST,
                       steps=(update, output))
 
 

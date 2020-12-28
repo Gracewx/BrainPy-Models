@@ -47,11 +47,11 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
                neurons to networks and models of cognition. Cambridge 
                University Press, 2014.
     """
+    ST=bp.types.SynState(
+            {'w': 1., 'dwdt': 0.}, 
+            help='BCM synapse state.')
 
     requires = dict(
-        ST=bp.types.SynState(
-            {'w': 1., 'dwdt': 0.}, 
-            help='BCM synapse state.'),
         pre=bp.types.NeuState(
             ['r'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(
@@ -74,7 +74,7 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
         requires['post2syn']=bp.types.ListConn()
         requires['post2pre']=bp.types.ListConn()
 
-        def learn(ST, _t_, pre, post, post2syn, post2pre, r_th, sum_post_r, post_r):
+        def learn(ST, _t, pre, post, post2syn, post2pre, r_th, sum_post_r, post_r):
             for post_id , post_r_i in enumerate(post['r']):
                 if post_r_i < r_0:
                     post_r[post_id] = post_r_i
@@ -87,11 +87,11 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
 
                     # threshold
                     sum_post_r[post_id] += post_r_i
-                    r_threshold = sum_post_r[post_id] / (_t_ / bp.profile._dt + 1)
+                    r_threshold = sum_post_r[post_id] / (_t / bp.profile._dt + 1)
                     r_th[post_id] = r_threshold
                     
                     # BCM rule
-                    w, dw = int_w(w, _t_, pre_r, post_r_i, r_th[post_id])
+                    w, dw = int_w(w, _t, pre_r, post_r_i, r_th[post_id])
                     w = np.clip(w, w_min, w_max)
                     ST['w'][syn_ids] = w
                     ST['dwdt'][syn_ids] = dw
@@ -107,21 +107,21 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
     elif mode == 'matrix':
         requires['conn_mat']=bp.types.MatConn()
 
-        def learn(ST, _t_, pre, post, conn_mat, r_th, sum_post_r, post_r):
+        def learn(ST, _t, pre, post, conn_mat, r_th, sum_post_r, post_r):
             post_r_i = post['r']
             w = ST['w'] * conn_mat
             pre_r = pre['r']
 
             # threshold
             sum_post_r += post_r_i
-            r_th = sum_post_r / (_t_ / bp.profile._dt + 1)          
+            r_th = sum_post_r / (_t / bp.profile._dt + 1)          
 
             # BCM rule
             dim = np.shape(w)
             reshape_th = np.vstack((r_th,)*dim[0])
             reshape_post = np.vstack((post_r_i,)*dim[0])
             reshape_pre = np.vstack((pre_r,)*dim[1]).T
-            w, dw = int_w(w, _t_, reshape_pre, reshape_post, reshape_th)
+            w, dw = int_w(w, _t, reshape_pre, reshape_post, reshape_th)
             w = np.clip(w, w_min, w_max)
             ST['w'] = w
             ST['dwdt'] = dw
@@ -139,6 +139,7 @@ def get_BCM(learning_rate=0.01, w_max=2., w_min = 0., r_0 = 0., mode='matrix'):
         raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
     return bp.SynType(name='BCM_synapse',
+                      ST=ST,
                       requires=requires,
                       steps=[learn, output],
                       mode=mode)

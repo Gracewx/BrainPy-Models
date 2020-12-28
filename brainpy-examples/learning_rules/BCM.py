@@ -17,14 +17,14 @@ def rate_neuron():
     def reset(ST):
         ST['input'] = 0.
 
-    return bp.NeuType(name='rate', steps=[update, reset], requires={'ST': ST}, mode='vector')
+    return bp.NeuType(name='rate', steps=[update, reset], ST=ST, mode='vector')
 
 
 
 
 w_max = 2.
 
-bp.profile.set(backend='numpy', dt=.1)
+bp.profile.set(dt=.1)
 
 n_post = 1
 

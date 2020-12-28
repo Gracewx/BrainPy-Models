@@ -63,22 +63,23 @@ def int_v(v, t, u):
     return (-v + m * u) / tau_v
 
 
-def neu_update(ST, _t_, Jxx):
-    ST['u'], ST['r'] = int_u(ST['u'], _t_, ST['v'], Jxx, ST['input'])
-    ST['v'] = int_v(ST['v'], _t_,ST['u'])
+def neu_update(ST, _t, Jxx):
+    ST['u'], ST['r'] = int_u(ST['u'], _t, ST['v'], Jxx, ST['input'])
+    ST['v'] = int_v(ST['v'], _t,ST['u'])
     ST['input'] = 0.
 
 
+
 requires = {
-    'ST': bp.types.NeuState(['x', 'v', 'u', 'r', 'input']),
     'Jxx': bp.types.Array(dim=2, help='Weight connection matrix.')
 }
 
 
 cann = bp.NeuType(name='CANN',
                   steps=neu_update,
+                  ST=bp.types.NeuState(['x', 'v', 'u', 'r', 'input']), 
                   requires=requires,
-                  vector_based=True)
+                  mode='vector')
 
 
 # connection #
