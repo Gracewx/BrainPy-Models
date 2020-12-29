@@ -1,5 +1,5 @@
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_AdExIF(V_rest=-65., V_reset=-68., V_th=-30., 

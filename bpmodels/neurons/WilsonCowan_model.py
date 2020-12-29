@@ -1,5 +1,5 @@
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_WilsonCowan(c1 = 12., c2 = 4., c3 = 13., c4 = 11.,

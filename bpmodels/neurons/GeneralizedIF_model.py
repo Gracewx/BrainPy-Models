@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
+import numpy as np
 import sys
 
 def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset = -60.,

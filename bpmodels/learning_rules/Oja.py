@@ -1,5 +1,5 @@
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_Oja(gamma = 0.005, w_max = 1., w_min = 0., mode = 'vector'):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):

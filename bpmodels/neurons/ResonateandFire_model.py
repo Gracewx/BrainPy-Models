@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_ResonateandFire(b = -1., omega = 10., V_th = 1., V_reset = 1., x_reset = 0., mode='scalar'):

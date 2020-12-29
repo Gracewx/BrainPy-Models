@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012, 

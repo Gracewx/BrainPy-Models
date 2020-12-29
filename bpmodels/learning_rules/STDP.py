@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-from brainpy import numpy as np
+import numpy as np
 import sys
 
 def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10., 

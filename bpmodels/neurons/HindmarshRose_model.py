@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest = -1.6, mode='scalar'):

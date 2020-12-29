@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import matplotlib.pyplot as plt
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_Izhikevich(a=0.02, b=0.20, c=-65., d=8., t_refractory=0., noise=0., V_th=30., type=None, mode='scalar'):
