@@ -41,8 +41,11 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
                neurons to networks and models of cognition. Cambridge 
                University Press, 2014.
     """
+    
+    ST_vector = bp.types.SynState({'s': 0., 'g': 0.}, help = "GABAa synapse state")
+    ST_scalar = bp.types.SynState(['s'], help = 'GABAa synapse state.')
+    
     requires_vector = dict(
-        ST=bp.types.SynState({'s': 0., 'g': 0.}, help = "GABAa synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help="Pre-synaptic neuron index -> synapse index"),
@@ -50,7 +53,6 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
     )
 
     requires_scalar = {
-        'ST': bp.types.SynState(['s'], help = 'GABAa synapse state.'),
         'pre': bp.types.NeuState(['spike'], help = 
                                  'Pre-synaptic neuron state must have "isFire"'),
         'post': bp.types.NeuState(['V', 'input'], help = 
@@ -62,8 +64,8 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
         return - s / tau_decay
     
     if mode=='scalar':
-        def update(ST, _t_, pre):
-            s = int_s(ST['s'], _t_)
+        def update(ST, _t, pre):
+            s = int_s(ST['s'], _t)
             s += pre['spike']
             ST['s'] = s
     elif mode=='vector':
@@ -78,7 +80,7 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
 
     if mode=='scalar':
         @bp.delayed
-        def output(ST, _t_, post):
+        def output(ST, _t, post):
             I_syn = - g_max * ST['s'] * (post['V'] - E)
             post['input'] += I_syn
     elif mode=='vector':
@@ -91,11 +93,13 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
 
     if mode == 'scalar':
         return bp.SynType(name='GABAa_synapse',
+                          ST=ST_scalar,
                           requires=requires_scalar,
                           steps=(update, output),
                           mode=mode)
     elif mode == 'vector':
         return bp.SynType(name='GABAa_synapse',
+                          ST=ST_vector,
                           requires=requires_vector,
                           steps=(update, output),
                           mode=mode)
@@ -105,7 +109,7 @@ def get_GABAa1(g_max=0.4, E=-80., tau_decay=6., mode='vector'):
         raise ValueError("BrainPy does not support mode '%s'." % (mode))
 
 
-def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
+def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1., mode='vector'):
     """
     GABAa conductance-based synapse model (markov form).
 
@@ -147,8 +151,11 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
                on the integrative properties of neocortical pyramidal neurons
                in vivo." Journal of neurophysiology 81.4 (1999): 1531-1547.
     """
+    
+    
+    ST=bp.types.SynState({'s': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAa synapse state")
+    
     requires = dict(
-        ST=bp.types.SynState({'s': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAa synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"), 
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help = "Pre-synaptic neuron index -> synapse index"),
@@ -159,12 +166,12 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
     def int_s(s, t, TT):
         return alpha * TT * (1 - s) - beta * s
 
-    def update(ST, pre, pre2syn, _t_):
+    def update(ST, pre, pre2syn, _t):
         for pre_id in np.where(pre['spike'] > 0.)[0]:
             syn_ids = pre2syn[pre_id]
-            ST['t_last_pre_spike'][syn_ids] = _t_
-        TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
-        s = int_s(ST['s'], _t_, TT)
+            ST['t_last_pre_spike'][syn_ids] = _t
+        TT = ((_t - ST['t_last_pre_spike']) < T_duration) * T
+        s = int_s(ST['s'], _t, TT)
         ST['s'] = s
         ST['g'] = g_max * s
 
@@ -175,7 +182,15 @@ def get_GABAa2(g_max=0.04, E=-80., alpha=0.53, beta=0.18, T=1., T_duration=1.):
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] -= post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAa_synapse',
-                      requires=requires,
-                      steps=(update, output),
-                      mode='vector')
+    if mode == 'scalar':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'vector':
+        return bp.SynType(name='GABAa_synapse',
+                          ST=ST,
+                          requires=requires,
+                          steps=[update, output],
+                          mode='vector')
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))

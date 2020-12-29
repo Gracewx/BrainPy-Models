@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
+import numpy as np
 import matplotlib.pyplot as plt
 
 import bpmodels
 
 bp.profile.set(jit=True, dt=0.02, merge_steps=True)
-ML = bpmodels.neurons.get_MorrisLecar(noise=0.)
+ML = bpmodels.neurons.get_MorrisLecar(noise=1.)
 
 '''The current is constant'''
 neu = bp.NeuGroup(ML, geometry=(100,), monitors=['V', 'W'])

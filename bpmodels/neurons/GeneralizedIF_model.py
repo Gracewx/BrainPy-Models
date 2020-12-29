@@ -90,34 +90,34 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     )
     
     @bp.integrate
-    def int_I1(I1, _t_):
+    def int_I1(I1, _t):
         return - k1 * I1
         
     @bp.integrate
-    def int_I2(I2, _t_):
+    def int_I2(I2, _t):
         return - k2 * I2
         
     @bp.integrate
-    def int_V_th(V_th, _t_, V):
+    def int_V_th(V_th, _t, V):
         return a * (V- V_rest) - b * (V_th - V_th_inf)
     
     @bp.integrate
-    def int_V(V, _t_, I_ext, I1, I2):
+    def int_V(V, _t, I_ext, I1, I2):
         return ( - (V - V_rest) + R * I_ext + R * I1 + R * I2) / tau
         
-    def update(ST, _t_):
+    def update(ST, _t):
         ST['spike'] = 0
-        I1 = int_I1(ST['I1'], _t_)
-        I2 = int_I2(ST['I2'], _t_)
-        V_th = int_V_th(ST['V_th'], _t_, ST['V'])
-        V = int_V(ST['V'], _t_, ST['input'], ST['I1'], ST['I2'])
+        I1 = int_I1(ST['I1'], _t)
+        I2 = int_I2(ST['I2'], _t)
+        V_th = int_V_th(ST['V_th'], _t, ST['V'])
+        V = int_V(ST['V'], _t, ST['input'], ST['I1'], ST['I2'])
         if V > ST['V_th']:
             V = V_reset
             I1 = R1 * I1 + A1
             I2 = R2 * I2 + A2
             V_th = max(V_th, V_th_reset)
             ST['spike'] = 1
-            ST['t_last_spike'] = _t_
+            ST['t_last_spike'] = _t
         ST['I1'] = I1
         ST['I2'] = I2
         ST['V_th'] = V_th
@@ -129,7 +129,7 @@ def get_GeneralizedIF(V_rest = -70., V_reset = -70., V_th_inf = -50., V_th_reset
     
     if mode == 'scalar':
         return bp.NeuType(name='GeneralizedIF_neuron',
-                          requires=dict(ST=ST),
+                          ST=ST,
                           steps=(update, reset),
                           mode=mode)
     elif mode == 'vector':

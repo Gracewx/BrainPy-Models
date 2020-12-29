@@ -39,8 +39,11 @@ def get_Oja(gamma = 0.005, w_max = 1., w_min = 0., mode = 'vector'):
                neurons to networks and models of cognition. Cambridge 
                University Press, 2014.
     """
+    
+    
+    ST = bp.types.SynState({'w': 0.05, 'output_save': 0.})
+    
     requires = dict(
-        ST = bp.types.SynState({'w': 0.05, 'output_save': 0.}),
         pre = bp.types.NeuState(['r']),
         post = bp.types.NeuState(['r']), 
         post2syn=bp.types.ListConn(),
@@ -48,11 +51,11 @@ def get_Oja(gamma = 0.005, w_max = 1., w_min = 0., mode = 'vector'):
     )
     
     @bp.integrate
-    def int_w(w, _t_, r_pre, r_post):
+    def int_w(w, _t, r_pre, r_post):
         dw = gamma * (r_post * r_pre - np.square(r_post) * w)
         return dw
 
-    def update(ST, _t_, pre, post, post2syn, post2pre):
+    def update(ST, _t, pre, post, post2syn, post2pre):
         for post_id, post_r in enumerate(post['r']):
             syn_ids = post2syn[post_id]
             pre_ids = post2pre[post_id]
@@ -60,7 +63,7 @@ def get_Oja(gamma = 0.005, w_max = 1., w_min = 0., mode = 'vector'):
             w = ST['w'][syn_ids]
             output = np.dot(w, pre_r)
             output += post_r
-            w = int_w(w, _t_, pre_r, output)
+            w = int_w(w, _t, pre_r, output)
             ST['w'][syn_ids] = w
             ST['output_save'][syn_ids] = output
     
@@ -74,6 +77,7 @@ def get_Oja(gamma = 0.005, w_max = 1., w_min = 0., mode = 'vector'):
         raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
     elif mode == 'vector':
         return bp.SynType(name='Oja_synapse',
+                          ST=ST,
                           requires=requires,
                           steps=(update, output),
                           mode=mode)

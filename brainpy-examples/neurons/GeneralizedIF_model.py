@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import brainpy as bp
+import numpy as np
 import bpmodels
 from bpmodels.neurons import get_GeneralizedIF
 
@@ -7,7 +8,7 @@ print("version：", bp.__version__)
 ## set global params
 dt = 0.02  # update variables per <dt> ms
 duration = 200.  # simulate duration
-bp.profile.set(backend="numba", dt=dt, merge_steps=True)
+bp.profile.set(jit=True, dt=dt, merge_steps=True)
 
 # define neuron type
 GIF_neuron = get_GeneralizedIF(noise=1.)

@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 import brainpy as bp
 import bpmodels
-import brainpy.numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 
 print("version：", bp.__version__)
 ## set global params
 dt = 0.125  # update variables per <dt> ms
 duration = 350.  # simulate duration
-bp.profile.set(backend="numba", dt=dt, merge_steps=True, show_code=False)
+bp.profile.set(jit=True, dt=dt, merge_steps=True, show_code=False)
 
 # define neuron type
-Exp_LIF_neuron = bpmodels.neurons.get_ExpIF()
+Exp_LIF_neuron = bpmodels.neurons.get_ExpIF(noise = 1.)
 
 # build neuron group
 neu = bp.NeuGroup(Exp_LIF_neuron, geometry=(10,), monitors=['V'])
 neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 neu.pars['V_rest'] = np.random.randint(-65, -63, size=(10,))
 neu.pars['tau'] = np.random.randint(5, 10, size=(10,))
-neu.pars['noise'] = 1.
 
 # create input
 current, pos_dur = bp.inputs.constant_current([(0.30, duration)])

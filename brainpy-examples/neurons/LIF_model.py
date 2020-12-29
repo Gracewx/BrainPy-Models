@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 
 import bpmodels
@@ -9,10 +9,10 @@ print("version：", bp.__version__)
 ## set global params
 dt = 0.02  # update variables per <dt> ms
 duration = 100.  # simulate duration
-bp.profile.set(backend="numba", dt=dt, merge_steps=True)
+bp.profile.set(jit=True, dt=dt, merge_steps=True)
 
 # define neuron type
-LIF_neuron = bpmodels.neurons.get_LIF(noise=1.)
+LIF_neuron = bpmodels.neurons.get_LIF()
 
 # build neuron group
 neu = bp.NeuGroup(LIF_neuron, geometry=(10,), monitors=['V', 'refractory', "spike", "t_last_spike"])

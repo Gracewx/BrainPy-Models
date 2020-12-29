@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import brainpy as bp
 import bpmodels
-import brainpy.numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 
 print("version：", bp.__version__)
 ## set global params
 dt = 0.002  # update variables per <dt> ms
 duration = 20.  # simulate duration
-bp.profile.set(backend="numba", dt=dt, merge_steps=True, show_code=False)
+bp.profile.set(jit=True, dt=dt, merge_steps=True, show_code=False)
 
 # define neuron type
 RF_neuron = bpmodels.neurons.get_ResonateandFire()
@@ -18,8 +18,8 @@ neu = bp.NeuGroup(RF_neuron, geometry=(10,), monitors=['x', 'V', 'spike'])
 neu.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 
 # create input
-current = bp.inputs.spike_current([0.1, 2.0],
-                                  bp.profile._dt, 2., duration=duration)
+current = bp.inputs.spike_current([0.1],
+                                  bp.profile._dt, -2., duration=duration)
 
 # simulate
 neu.run(duration=duration, inputs=["ST.input", current], report=True)
@@ -35,6 +35,7 @@ plt.ylabel('V')
 plt.legend()
 
 fig.add_subplot(gs[0, 1])
+plt.plot(ts, neu.mon.V[:, 0], label = "V-t plot")
 plt.plot(ts, neu.mon.V[:, 0], label = "V-t plot")
 plt.xlabel('Time (ms)')
 plt.ylabel('V')

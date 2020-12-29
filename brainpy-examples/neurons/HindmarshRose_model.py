@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import bpmodels
 import matplotlib.pyplot as plt
 
 # set global params
 dt = 0.02  # update variables per <dt> ms
-bp.profile.set(backend="numba", dt=dt, merge_steps=True)
+bp.profile.set(jit=True, dt=dt, merge_steps=True)
 mode = 'irregular_bursting'
 param= {'quiescence':         [1.0, 2.0],  #a
         'spiking':            [3.5, 5.0],  #c

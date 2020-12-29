@@ -2,14 +2,14 @@
 
 import matplotlib.pyplot as plt
 import brainpy as bp
-from brainpy import numpy as np
+import numpy as np
 import bpmodels
 from bpmodels.neurons import get_LIF
 from bpmodels.learning_rules import get_STDP1, get_STDP2
 
 duration = 550.
 dt = 0.02
-bp.profile.set(backend = "numba", dt = dt, merge_steps = True, show_code = False)
+bp.profile.set(jit=True, dt = dt, merge_steps = True, show_code = False)
 STDP_syn = get_STDP1()
 
 # set params
@@ -30,7 +30,6 @@ stdp = bp.SynConn(model = STDP_syn, num = delta_t_num,
 stdp.ST["A_s"] = 0.
 stdp.ST["A_t"] = 0.
 stdp.ST['w'] = 10.
-stdp.runner.set_schedule(['input', 'update', 'output', 'monitor'])
 stdp.pre = bp.types.NeuState(['spike'])(delta_t_num)
 stdp.post = bp.types.NeuState(['V', 'input', 'spike'])(delta_t_num)
 

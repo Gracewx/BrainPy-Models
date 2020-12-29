@@ -1,5 +1,5 @@
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 import bpmodels
 
@@ -7,18 +7,18 @@ import bpmodels
 def get_fr_neu():
     ST = bp.types.NeuState({'r': 0, 'nothing': 0.})
     
-    def update(ST, _t_):
+    def update(ST, _t):
         ST['nothing'] = 0.
         
     return bp.NeuType(name='fr_zombie_neuron',
-                 requires=dict(ST=ST),
-                 steps=update,
-                 mode='scalar')
+                      ST=ST,
+                      steps=update,
+                      mode='scalar')
 
 # set params
 pre_neu_num = 2
 post_neu_num = 1
-bp.profile.set(backend="numba", dt=0.02, merge_steps=True, show_code=False)
+bp.profile.set(jit=True, dt=0.02, merge_steps=True, show_code=False)
 
 # build network
 fr_neu = get_fr_neu()

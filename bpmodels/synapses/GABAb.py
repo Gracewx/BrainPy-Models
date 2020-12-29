@@ -58,15 +58,16 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
                neurons to networks and models of cognition. Cambridge 
                University Press, 2014.
     """
-
+    
+    ST_scalar = bp.types.SynState({'R': 0., 'G': 0., 'g': 0., 't_last_spike': -1e7, }, help = "GABAb synapse state")
+    ST_vector = bp.types.SynState({'R': 0., 'G': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAb synapse state")
+    
     requires_scalar = {
-        'ST': bp.types.SynState({'R': 0., 'G': 0., 'g': 0., 't_last_spike': -1e7, }, help = "GABAb synapse state"),
         'pre': bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         'post': bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
     }
 
     requires_vector = dict(
-        ST=bp.types.SynState({'R': 0., 'G': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAb synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help = "Pre-synaptic neuron index -> synapse index"),
@@ -82,30 +83,30 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
         return k1 * R - k2 * G
 
     if mode == 'scalar':
-        def update(ST, _t_, pre):
+        def update(ST, _t, pre):
             if pre['spike'] > 0.:
-                ST['t_last_spike'] = _t_
-            TT = ((_t_ - ST['t_last_spike']) < T_duration) * T
-            R = int_R(ST['R'], _t_, TT)
-            G = int_G(ST['G'], _t_, R)
+                ST['t_last_spike'] = _t
+            TT = ((_t - ST['t_last_spike']) < T_duration) * T
+            R = int_R(ST['R'], _t, TT)
+            G = int_G(ST['G'], _t, R)
             ST['R'] = R
             ST['G'] = G
             ST['g'] = g_max * G ** 4 / (G ** 4 + kd)
     elif mode == 'vector':
-        def update(ST, _t_, pre, pre2syn):
+        def update(ST, _t, pre, pre2syn):
             for pre_id in np.where(pre['spike'] > 0.)[0]:
                 syn_ids = pre2syn[pre_id]
-                ST['t_last_pre_spike'][syn_ids] = _t_
-            TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
-            R = int_R(ST['R'], _t_, TT)
-            G = int_G(ST['G'], _t_, R)
+                ST['t_last_pre_spike'][syn_ids] = _t
+            TT = ((_t - ST['t_last_pre_spike']) < T_duration) * T
+            R = int_R(ST['R'], _t, TT)
+            G = int_G(ST['G'], _t, R)
             ST['R'] = R
             ST['G'] = G
             ST['g'] = g_max * G ** 4 / (G ** 4 + kd)
     
     if mode == 'scalar':
         @bp.delayed
-        def output(ST, _t_, post):
+        def output(ST, _t, post):
             I_syn = ST['g'] * (post['V'] - E)
             post['input'] -= I_syn
     elif mode == 'vector':
@@ -118,11 +119,13 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
 
     if mode == 'scalar':
         return bp.SynType(name='GABAb1_synapse',
+                          ST=ST_scalar,
                           requires=requires_scalar,
                           steps=(update, output),
                           mode=mode)
     elif mode == 'vector':
         return bp.SynType(name='GABAb1_synapse',
+                          ST=ST_vector,
                           requires=requires_vector,
                           steps=(update, output),
                           mode=mode)
@@ -133,7 +136,7 @@ def get_GABAb1(g_max=0.02, E=-95., k1=0.18, k2=0.034, k3=0.09, k4=0.0012,
 
 
 def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
-               k5=8.3e-5, k6=7.9e-3, kd=100., T=0.5, T_duration=0.5):
+               k5=8.3e-5, k6=7.9e-3, kd=100., T=0.5, T_duration=0.5, mode='vector'):
     """
     GABAb conductance-based synapse model (markov form).
     
@@ -200,8 +203,9 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
                Proc. Natl. Acad. Sci. USA v92 (1995): 9515-9519.
 
     """
+    ST=bp.types.SynState({'D': 0., 'R': 0., 'G': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAb synapse state")
+    
     requires = dict(
-        ST=bp.types.SynState({'D': 0., 'R': 0., 'G': 0., 'g': 0., 't_last_pre_spike': -1e7}, help = "GABAb synapse state"),
         pre=bp.types.NeuState(['spike'], help = "Pre-synaptic neuron state must have 'spike' item"),
         post=bp.types.NeuState(['V', 'input'], help = "Post-synaptic neuron state must have 'V' and 'input' item"),
         pre2syn=bp.types.ListConn(help = "Pre-synaptic neuron index -> synapse index"),
@@ -220,15 +224,15 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
     def int_G(G, t, R):
         return k5 * R - k6 * G
 
-    def update(ST, _t_, pre, pre2syn):
+    def update(ST, _t, pre, pre2syn):
         # calculate synaptic state
         for pre_id in np.where(pre['spike'] > 0.)[0]:
             syn_ids = pre2syn[pre_id]
-            ST['t_last_pre_spike'][syn_ids] = _t_
-        TT = ((_t_ - ST['t_last_pre_spike']) < T_duration) * T
-        D = int_D(ST['D'], _t_, ST['R'])
-        R = int_R(ST['R'], _t_, TT, D)
-        G = int_G(ST['G'], _t_, R)
+            ST['t_last_pre_spike'][syn_ids] = _t
+        TT = ((_t - ST['t_last_pre_spike']) < T_duration) * T
+        D = int_D(ST['D'], _t, ST['R'])
+        R = int_R(ST['R'], _t, TT, D)
+        G = int_G(ST['G'], _t, R)
         ST['D'] = D
         ST['R'] = R
         ST['G'] = G
@@ -241,7 +245,15 @@ def get_GABAb2(g_max=0.02, E=-95., k1=0.66, k2=0.02, k3=0.0053, k4=0.017,
             post_cond[post_id] = np.sum(ST['g'][syn_ids])
         post['input'] += post_cond * (post['V'] - E)
 
-    return bp.SynType(name='GABAb2_synapse',
-                      requires=requires,
-                      steps=(update, output),
-                      mode='vector')
+    if mode == 'scalar':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    elif mode == 'vector':
+        return bp.SynType(name='GABAb2_synapse',
+                          ST=ST,
+                          requires=requires,
+                          steps=(update, output),
+                          mode=mode)
+    elif mode == 'matrix':
+        raise ValueError("mode of function '%s' can not be '%s'." % (sys._getframe().f_code.co_name, mode))
+    else:
+        raise ValueError("BrainPy does not support mode '%s'." % (mode))

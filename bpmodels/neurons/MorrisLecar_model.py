@@ -62,14 +62,14 @@ def get_MorrisLecar(noise=0., V_Ca=130., g_Ca=4.4, V_K=-84., g_K=8., V_Leak=-60.
     )
 
     @bp.integrate
-    def int_W(W, t, V):
+    def int_W(W, _t, V):
         tau_W = 1 / (phi * np.cosh((V - V3) / (2 * V4)))
         W_inf = (1 / 2) * (1 + np.tanh((V - V3) / V4))
         dWdt = (W_inf - W) / tau_W
         return dWdt
 
     @bp.integrate
-    def int_V(V, t, W, Isyn):
+    def int_V(V, _t, W, Isyn):
         M_inf = (1 / 2) * (1 + np.tanh((V - V1) / V2))
         I_Ca = g_Ca * M_inf * (V - V_Ca)
         I_K = g_K * W * (V - V_K)

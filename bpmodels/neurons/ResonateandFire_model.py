@@ -79,27 +79,27 @@ def get_ResonateandFire(b = -1., omega = 10., V_th = 1., V_reset = 1., x_reset =
     )
 
     @bp.integrate
-    def int_x(x, _t_, V):  #input--internal
+    def int_x(x, _t, V):  #input--internal
         return b * x - omega * V
 
     @bp.integrate        
-    def int_V(V, _t_, x):  #V
+    def int_V(V, _t, x):  #V
         return omega * x + b * V
 
 
-    def update(ST, _t_):
+    def update(ST, _t):
         # update variables
         ST['spike'] = 0
         x = ST['x']
         x += ST['input']
         V = ST['V']
-        x = int_x(x, _t_, V)
-        V = int_V(V, _t_, x)
+        x = int_x(x, _t, V)
+        V = int_V(V, _t, x)
         if V > V_th:
             V = V_reset
             x = x_reset
             ST['spike'] = 1
-            ST['t_last_spike'] = _t_
+            ST['t_last_spike'] = _t
         ST['x'] = x
         ST['V'] = V
     
@@ -109,7 +109,7 @@ def get_ResonateandFire(b = -1., omega = 10., V_th = 1., V_reset = 1., x_reset =
     
     if mode == 'scalar':
         return bp.NeuType(name='RF_neuron',
-                          requires=dict(ST=ST),
+                          ST=ST,
                           steps=(update, reset),
                           mode=mode)   
     elif mode == 'vector':

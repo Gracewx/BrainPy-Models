@@ -70,9 +70,10 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
         .. [1] Stimberg, Marcel, et al. "Equation-oriented specification of neural models for
                simulations." Frontiers in neuroinformatics 8 (2014): 6.
     """
+    
+    ST=bp.types.SynState({'A_s': 0., 'A_t': 0., 'g': 0., 'w': 0.}, help='STDP synapse state.')
+    
     requires_scalar = dict(
-        ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w'], 
-                             help='STDP synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state \
                                                must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input', 'spike'], 
@@ -81,8 +82,6 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     )
 
     requires_vector = dict(
-        ST=bp.types.SynState({'A_s': 0., 'A_t': 0., 'g': 0., 'w': 0.}, 
-                             help='STDP synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state \
                                                must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input', 'spike'], 
@@ -93,15 +92,15 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     )
 
     @bp.integrate
-    def int_A_s(A_s, _t_):
+    def int_A_s(A_s, _t):
         return -A_s / tau_s
 
     @bp.integrate
-    def int_A_t(A_t, _t_):
+    def int_A_t(A_t, _t):
         return -A_t / tau_t
 
     @bp.integrate
-    def int_g(g, _t_):
+    def int_g(g, _t):
         return -g / tau_decay
 
     if mode=='scalar':
@@ -109,10 +108,10 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
             return w if w > 0 else 0
     
     if mode=='scalar':
-        def update(ST, _t_, pre, post):
-            A_s = int_A_s(ST['A_s'], _t_)
-            A_t = int_A_t(ST['A_t'], _t_)
-            g = int_g(ST['g'], _t_)
+        def update(ST, _t, pre, post):
+            A_s = int_A_s(ST['A_s'], _t)
+            A_t = int_A_t(ST['A_t'], _t)
+            g = int_g(ST['g'], _t)
             w = ST['w']
             if pre['spike']:
                 g += ST['w']
@@ -126,10 +125,10 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
             ST['g'] = g
             ST['w'] = w
     elif mode=='vector':
-        def update(ST, _t_, pre, post, pre2syn, post2syn):
-            A_s = int_A_s(ST['A_s'], _t_)
-            A_t = int_A_t(ST['A_t'], _t_)
-            g = int_g(ST['g'], _t_)
+        def update(ST, _t, pre, post, pre2syn, post2syn):
+            A_s = int_A_s(ST['A_s'], _t)
+            A_t = int_A_t(ST['A_t'], _t)
+            g = int_g(ST['g'], _t)
             w = ST['w']
             for i in np.where(pre['spike'] > 0.)[0]:
                 syn_ids = pre2syn[i]
@@ -160,11 +159,13 @@ def get_STDP1(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
 
     if mode == 'scalar':
         return bp.SynType(name='STDP_synapse',
+                          ST=ST,
                           requires=requires_scalar,
                           steps=(update, output),
                           mode=mode)
     elif mode == 'vector':
         return bp.SynType(name='STDP_synapse',
+                          ST=ST,
                           requires=requires_vector,
                           steps=(update, output),
                           mode=mode)
@@ -241,14 +242,14 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
                simulations." Frontiers in neuroinformatics 8 (2014): 6.
     """
 
+    ST = bp.types.SynState({'A_s': 0., 'A_t': 0., 'g': 0., 'w': 0., 'last_spike':-1e7}, help='STDP synapse state.')
+
     requires_scalar = dict(
-        ST=bp.types.SynState(['A_s', 'A_t', 'g', 'w', 'last_spike'], help='AMPA synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input', 'spike'], help='Pre-synaptic neuron state must have "V" and "input" item.'),
     )
 
     requires_vector = dict(
-        ST=bp.types.SynState({'A_s': 0., 'A_t': 0., 'g': 0., 'w': 0., 'last_spike':-1e7}, help='STDP synapse state.'),
         pre=bp.types.NeuState(['spike'], help='Pre-synaptic neuron state must have "spike" item.'),
         post=bp.types.NeuState(['V', 'input', 'spike'], help='Post-synaptic neuron state must have "V", "input" and "spike" item.'),
         pre2syn=bp.types.ListConn(
@@ -258,7 +259,7 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
     )
 
     @bp.integrate
-    def int_g(g, _t_):
+    def int_g(g, _t):
         return -g / tau_decay
     
     if mode=='scalar':
@@ -266,39 +267,39 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
             return w if w > 0 else 0
 
     if mode=='scalar':
-        def update(ST, _t_, pre, post):
-            g = int_g(ST['g'], _t_)
+        def update(ST, _t, pre, post):
+            g = int_g(ST['g'], _t)
             w = ST['w']
             if pre['spike']:
                 g += w
-                ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t_) / tau_s) + delta_A_s
-                ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t_) / tau_t)
+                ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t) / tau_s) + delta_A_s
+                ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t) / tau_t)
                 w = np.clip(my_relu(ST['w'] - ST['A_t']), w_min, w_max)
-                ST['last_spike'] = _t_
+                ST['last_spike'] = _t
             if post['spike']:
-                ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t_) / tau_s)
-                ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t_) / tau_t) + delta_A_t
+                ST['A_s'] = ST['A_s'] * np.exp((ST['last_spike'] - _t) / tau_s)
+                ST['A_t'] = ST['A_t'] * np.exp((ST['last_spike'] - _t) / tau_t) + delta_A_t
                 w = np.clip(my_relu(ST['w'] + ST['A_s']), w_min, w_max)
-                ST['last_spike']  =_t_
+                ST['last_spike']  =_t
             ST['w'] = w
             ST['g'] = g
     elif mode=='vector':
-        def update(ST, _t_, pre, post, pre2syn, post2syn):
-            g = int_g(ST['g'], _t_)
+        def update(ST, _t, pre, post, pre2syn, post2syn):
+            g = int_g(ST['g'], _t)
             w = ST['w']
             for i in np.where(pre['spike'] > 0.)[0]:
                 syn_id = pre2syn[i]
                 g[syn_id] += ST['w'][syn_id]
-                ST['A_s'][syn_id] = ST['A_s'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t_) / tau_s) + delta_A_s
-                ST['A_t'][syn_id] = ST['A_t'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t_) / tau_t)
+                ST['A_s'][syn_id] = ST['A_s'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t) / tau_s) + delta_A_s
+                ST['A_t'][syn_id] = ST['A_t'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t) / tau_t)
                 w[syn_id] = np.clip(ST['w'][syn_id] - ST['A_t'][syn_id], w_min, w_max)
-                ST['last_spike'][syn_id] = _t_
+                ST['last_spike'][syn_id] = _t
             for i in np.where(post['spike'] > 0.)[0]:
                 syn_id = post2syn[i]
-                ST['A_s'][syn_id] = ST['A_s'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t_) / tau_s)
-                ST['A_t'][syn_id] = ST['A_t'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t_) / tau_t) + delta_A_t
+                ST['A_s'][syn_id] = ST['A_s'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t) / tau_s)
+                ST['A_t'][syn_id] = ST['A_t'][syn_id] * np.exp((ST['last_spike'][syn_id] - _t) / tau_t) + delta_A_t
                 w[syn_id] = np.clip(ST['w'][syn_id] + ST['A_s'][syn_id], w_min, w_max)
-                ST['last_spike'][syn_id]  =_t_
+                ST['last_spike'][syn_id]  =_t
             ST['w'] = w
             ST['g'] = g
 
@@ -317,11 +318,13 @@ def get_STDP2(g_max=0.10, E=0., tau_decay=10., tau_s = 10., tau_t = 10.,
 
     if mode == 'scalar':
         return bp.SynType(name='STDP_synapse',
+                          ST=ST,
                           requires=requires_scalar,
                           steps=(update, output),
                           mode='scalar')
     elif mode == 'vector':
         return bp.SynType(name='STDP_synapse',
+                          ST=ST,
                           requires=requires_vector,
                           steps=(update, output),
                           mode=mode)

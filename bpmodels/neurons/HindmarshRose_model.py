@@ -62,21 +62,21 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
     )
 
     @bp.integrate
-    def int_V(V, _t_, y, z, I_ext):
+    def int_V(V, _t, y, z, I_ext):
         return y - a * V * V * V + b * V * V - z + I_ext
 
     @bp.integrate
-    def int_y(y, _t_, V):
+    def int_y(y, _t, V):
         return c - d * V * V - y
 
     @bp.integrate
-    def int_z(z, _t_, V):
+    def int_z(z, _t, V):
         return r * (s * (V - V_rest) - z)
     
-    def update(ST, _t_):
-        V = int_V(ST['V'], _t_, ST['y'], ST['z'], ST['input'])
-        y = int_y(ST['y'], _t_, ST['V'])
-        z = int_z(ST['z'], _t_, ST['V'])
+    def update(ST, _t):
+        V = int_V(ST['V'], _t, ST['y'], ST['z'], ST['input'])
+        y = int_y(ST['y'], _t, ST['V'])
+        z = int_z(ST['z'], _t, ST['V'])
         ST['V'] = V
         ST['y'] = y
         ST['z'] = z
@@ -87,7 +87,7 @@ def get_HindmarshRose(a = 1., b = 3., c = 1., d = 5., r = 0.01, s = 4., V_rest =
     
     if mode == 'scalar':
         return bp.NeuType(name="HindmarshRose_neuron",
-                          requires=dict(ST=ST),
+                          ST=ST,
                           steps=(update, reset),
                           mode=mode)
     elif mode == 'vector':

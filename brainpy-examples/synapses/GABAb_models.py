@@ -2,15 +2,15 @@
 
 import matplotlib.pyplot as plt
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import bpmodels
 from bpmodels.neurons import get_LIF
 
 duration = 500.
 dt = 0.02
-bp.profile.set(backend="numba", dt=dt, merge_steps=True, show_code=False)
+bp.profile.set(jit=True, dt=dt, merge_steps=True, show_code=False)
 LIF_neuron = get_LIF()
-GABAa_syn = bpmodels.synapses.get_GABAb1()
+GABAa_syn = bpmodels.synapses.get_GABAb1(mode='vector')
 
 # build and simulate gabaa net
 pre = bp.NeuGroup(LIF_neuron, geometry=(10,), monitors=['V', 'input', 'spike'])
@@ -22,22 +22,21 @@ post.runner.set_schedule(['input', 'update', 'monitor', 'reset'])
 post.pars['V_rest'] = -65.
 post.ST['V'] = -65.
 
-gabaa = bp.SynConn(model=GABAa_syn, pre_group=pre, post_group=post,
+gabab = bp.SynConn(model=GABAa_syn, pre_group=pre, post_group=post,
                    conn=bp.connect.All2All(), monitors=['g'], delay=10.)
-gabaa.runner.set_schedule(['input', 'update', 'output', 'monitor'])
 
-net = bp.Network(pre, gabaa, post)
+net = bp.Network(pre, gabab, post)
 
 current = bp.inputs.spike_current([5, 10, 15, 20],
                                   bp.profile._dt, 1., duration=duration)
-net.run(duration=duration, inputs=[gabaa, 'pre.spike', current, "="], report=True)
+net.run(duration=duration, inputs=[gabab, 'pre.spike', current, "="], report=True)
 
 # paint gabaa
 ts = net.ts
 fig, gs = bp.visualize.get_figure(2, 1, 5, 6)
 
 fig.add_subplot(gs[0, 0])
-plt.plot(ts, gabaa.mon.g[:, 0], label='g')
+plt.plot(ts, gabab.mon.g[:, 0], label='g')
 plt.legend()
 
 fig.add_subplot(gs[1, 0])
