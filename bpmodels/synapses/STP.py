@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_STP(U=0.15, tau_f=1500., tau_d=200., mode = 'vector'):

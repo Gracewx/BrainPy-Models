@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import bpmodels
 
 

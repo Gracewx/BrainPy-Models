@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import bpmodels
 
 bp.profile.set(jit=True, merge_steps=True)

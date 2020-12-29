@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 
 def get_two_exponentials(g_max=1., E=-60., tau_d=3., tau_r=1.):
     '''

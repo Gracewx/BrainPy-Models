@@ -1,5 +1,5 @@
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 import sys
 
 def get_voltage_jump(post_has_refractory=False, mode='vector'):

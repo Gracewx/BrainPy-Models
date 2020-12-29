@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 
 
 def get_exponential(g_max=0.2, E=-60., tau_decay=8., mode='vector'):

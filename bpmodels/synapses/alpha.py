@@ -1,5 +1,5 @@
 import brainpy as bp
-import brainpy.numpy as np
+import numpy as np
 
 
 def get_alpha(g_max=.2, E=0., tau_decay = 2.):
