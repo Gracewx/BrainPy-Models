@@ -1,5 +1,5 @@
 import brainpy as bp
-from brainpy import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 from bpmodels.learning_rules import get_BCM
 
@@ -32,8 +32,8 @@ neuron = rate_neuron()
 post = bp.NeuGroup(neuron, n_post, monitors=['r'])
 pre = bp.NeuGroup(neuron, 20, monitors=['r'])
 
-mode = 'matrix'
-#mode = 'vector'
+#mode = 'matrix'
+mode = 'vector'
 print(mode)
 
 bcm1 = get_BCM(learning_rate=0.005, w_max=w_max, mode=mode)

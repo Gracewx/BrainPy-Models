@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import brainpy as bp
-from brainpy import numpy as np
+import numpy as np
 import sys
 
 def get_AMPA1(g_max=0.10, E=0., tau_decay=2.0, mode = 'vector'):
