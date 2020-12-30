@@ -70,7 +70,7 @@ analyzer = bp.PhasePortraitAnalyzer(
     target_vars={'x': [-3, 3], 'y': [-10., 5.]},
     fixed_vars={'Isyn': 1., 'z': 0.})
 analyzer.plot_nullcline()
-analyzer.plot_vector_filed()
+analyzer.plot_vector_field()
 analyzer.plot_fixed_point()
 analyzer.plot_trajectory([(0., 0., 100.)],
                          inputs=('ST.input', 1.),

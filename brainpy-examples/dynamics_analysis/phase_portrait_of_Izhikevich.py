@@ -98,7 +98,7 @@ analyzer = bp.PhasePortraitAnalyzer(
     fixed_vars={'Isyn': 30.})
 plt.axvline(Vth, label='threshold')
 analyzer.plot_nullcline()
-analyzer.plot_vector_filed()
+analyzer.plot_vector_field()
 analyzer.plot_fixed_point()
 analyzer.plot_trajectory([(-10, 0., 100.), (-10, 0., (50, 100.))],
                          inputs=('ST.input', 30.),

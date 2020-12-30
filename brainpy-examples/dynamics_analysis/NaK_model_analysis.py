@@ -127,7 +127,7 @@ analyzer = bp.PhasePortraitAnalyzer(
     target_vars=OrderedDict(V=[-90, 20], n=[0., 1.]),
     fixed_vars={'input': 50., 'inp': 50.})
 analyzer.plot_nullcline()
-analyzer.plot_vector_filed()
+analyzer.plot_vector_field()
 analyzer.plot_fixed_point()
 analyzer.plot_trajectory([(-10, 0.2, 100.), (-80, 0.4, 100.)],
                          show=True)
