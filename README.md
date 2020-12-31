@@ -70,9 +70,9 @@ V_rest = -52.
 V_reset = -60.
 V_th = -50.
 
-neu = bpmodels.neurons.get_LIF(V_reset = V_reset, V_rest = V_rest, V_th=V_th, noise=0.)
+neu = bpmodels.neurons.get_LIF(V_rest=V_rest, V_reset = V_reset, V_th=V_th, noise=0., mode='scalar')
 
-syn = bpmodels.synapses.get_exponential(tau_decay = 2.)
+syn = bpmodels.synapses.get_exponential(tau_decay = 2., mode='scalar')
 ```
 
 
@@ -80,7 +80,7 @@ syn = bpmodels.synapses.get_exponential(tau_decay = 2.)
 # build network
 num_exc = 500
 num_inh = 500
-prob = 0.15
+prob = 0.1
 
 JE = 1 / np.sqrt(prob * num_exc)
 JI = 1 / np.sqrt(prob * num_inh)
@@ -93,27 +93,27 @@ exc_conn = bp.SynConn(syn,
                       pre_group=group[:num_exc],
                       post_group=group,
                       conn=bp.connect.FixedProb(prob=prob))
-exc_conn.pars['g_max'] = JE
+exc_conn.ST['w'] = JE
 
 inh_conn = bp.SynConn(syn,
                       pre_group=group[num_exc:],
                       post_group=group,
                       conn=bp.connect.FixedProb(prob=prob))
-exc_conn.pars['g_max'] = -JI
+exc_conn.ST['w'] = -JI
 
 net = bp.Network(group, exc_conn, inh_conn)
-net.run(duration=1000., inputs=(group, 'ST.input', 3.))
+net.run(duration=500., inputs=(group, 'ST.input', 3.))
 
 # visualization
-fig, gs = bp.visualize.get_figure(4, 1, 2, 12)
+fig, gs = bp.visualize.get_figure(4, 1, 2, 10)
 
 fig.add_subplot(gs[:3, 0])
-bp.visualize.raster_plot(net.ts, group.mon.spike, xlim=(50, 950))
+bp.visualize.raster_plot(net.ts, group.mon.spike, xlim=(50, 450))
 
 fig.add_subplot(gs[3, 0])
 rates = bp.measure.firing_rate(group.mon.spike, 5.)
 plt.plot(net.ts, rates)
-plt.xlim(50, 950)
+plt.xlim(50, 450)
 plt.show()
 ```
 
