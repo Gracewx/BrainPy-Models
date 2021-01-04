@@ -24,10 +24,11 @@ setup(
     version=version,
     description='BrainPy-Models: An example package accompany with BrainPy.',
     long_description=README,
+    long_description_content_type="text/markdown",
     author='Pku-Nip-Lab',
     author_email='adaduo@outlook.com',
     packages=find_packages(),
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     install_requires=[
         'Brain.Py',
     ],

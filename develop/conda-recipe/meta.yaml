@@ -1,6 +1,6 @@
 package:
     name: bpmodels
-    version: "0.2.0"
+    version: "0.2.1"
 
 source:
     path: ../../
@@ -11,14 +11,14 @@ build:
 
 requirements:
     host:
-        - python
+        - python==3.8
         - setuptools>=24
         - numpy>= 1.13
         - sympy>=1.2
         - numba>=0.40
-        - brainpy
+        - brainpy>=0.3.0
     run:
-        - python
+        - python==3.8
         - numpy>=1.13
         - sympy>=1.2
         - numba>=0.40
